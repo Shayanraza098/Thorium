@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thorium</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-start: #e0eafc;
+            --background-end: #cfdef3;
+            --surface: #ffffff;
+            --primary-gradient: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+            --primary-gradient-hover: linear-gradient(45deg, #5a0eb9 0%, #1d6bde 100%);
+            --secondary: #f0f2f5;
+            --secondary-hover: #e4e6e9;
+            --text-primary: #1c1e21;
+            --text-secondary: #606770;
+            --danger: #fa383e;
+            --danger-hover: #e02d32;
+            --success: #00c471;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'Source Code Pro', monospace;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: 0 16px 48px rgba(0, 27, 85, 0.15);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        .header {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--secondary);
+        }
+        .header h1 {
+            font-size: 2em;
+            margin: 0;
+            font-weight: 700;
+        }
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-top: 4px;
+        }
+        .content {
+            padding: 24px 32px;
+            flex-grow: 1;
+        }
+        .setup-screen {
+            text-align: center;
+        }
+        .setup-screen h2 {
+            font-weight: 600;
+            font-size: 1.5em;
+            color: var(--text-primary);
+        }
+        .setup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .code-display {
+            background: var(--secondary);
+            color: #2575fc;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-size: 2em;
+            font-weight: 600;
+            letter-spacing: 4px;
+            word-break: break-all;
+            border: 1px solid #e0e0e0;
+            font-family: var(--font-mono);
+            user-select: all;
+        }
+        .input-group {
+            margin: 24px 0;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .input-group input,
+        .message-input input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #dce1e6;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #fdfdfd;
+            color: var(--text-primary);
+        }
+        .input-group input:focus,
+        .message-input input:focus {
+            outline: none;
+            border-color: #a9c5ff;
+            box-shadow: 0 0 0 4px rgba(37, 117, 252, 0.1);
+        }
+        .message-input input {
+            flex: 1;
+        }
+        button {
+            background-image: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            font-family: var(--font-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.3);
+        }
+        button:hover {
+            background-image: var(--primary-gradient-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(37, 117, 252, 0.4);
+        }
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(37, 117, 252, 0.3);
+        }
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        button.secondary {
+            background-image: none;
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        button.secondary:hover {
+            background-color: var(--secondary-hover);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        button.secondary:active {
+             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .chat-screen {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background-color: #dce1e6; border-radius: 6px; }
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+            animation: slideIn 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .message {
+            padding: 12px 18px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 12px 4px 12px;
+        }
+        .sender-name {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .timestamp {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .message-wrapper.sent { align-self: flex-end; align-items: flex-end; }
+        .message-wrapper.received { align-self: flex-start; align-items: flex-start; }
+        .message-wrapper.sent .sender-name { display: none; }
+        .message-wrapper.sent .message-meta { justify-content: flex-end; }
+        .message.sent {
+            background-image: var(--primary-gradient);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        .message.received {
+            background: var(--secondary);
+            color: var(--text-primary);
+            border-bottom-left-radius: 6px;
+        }
+        .message-input { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+        .typing-indicator {
+            min-height: 24px;
+            padding: 4px 12px;
+            font-style: italic;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .typing-indicator.visible {
+            opacity: 1;
+        }
+        .status { text-align: center; padding: 10px; margin: 10px 0; border-radius: 12px; font-weight: 500; }
+        .status.waiting { background: #fff3cd; color: #856404; }
+        .status.success {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #e6f9f1; color: #00874a; padding: 12px;
+        }
+        .status.error { background: #fde8e9; color: #d91c22; }
+        #statusMessage .status { margin-top: 20px; }
+        .hidden { display: none; }
+        .copy-btn {
+            background-image: none;
+            background-color: var(--success);
+            padding: 10px 20px;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 196, 113, 0.2);
+        }
+        .copy-btn:hover { background-color: #00b366; box-shadow: 0 6px 16px rgba(0, 196, 113, 0.3); }
+        .online-indicator {
+            display: inline-block; width: 10px; height: 10px;
+            background: var(--success); border-radius: 50%;
+        }
+        /* Lock icon for secure status */
+        .secure-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300874a"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .disconnect-btn {
+            width: 100%;
+            background-image: none;
+            background-color: var(--danger);
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(250, 56, 62, 0.2);
+        }
+        .disconnect-btn:hover { background: var(--danger-hover); box-shadow: 0 6px 16px rgba(250, 56, 62, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                 <h1>Thorium</h1>
+                 <p>Secure P2P</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="setup-screen" id="setupScreen">
+                <h2 style="margin-bottom: 10px;">Start a Session</h2>
+                <div class="input-group">
+                    <label for="username">Your Name:</label>
+                    <input type="text" id="username" placeholder="Enter your name to begin">
+                </div>
+                <div class="setup-buttons">
+                    <button onclick="createChat()">Create</button>
+                    <button onclick="showJoinForm()" class="secondary">Join </button>
+                </div>
+
+                <div id="createSection" class="hidden">
+                    <div class="code-display" id="codeDisplay"></div>
+                    <button class="copy-btn" onclick="copyCode(event)">Copy Code</button>
+                    <div class="status waiting" id="createStatus">Waiting to connect...</div>
+                </div>
+
+                <div id="joinSection" class="hidden">
+                    <div class="input-group">
+                        <label for="joinCode">Enter Code:</label>
+                        <input type="text" id="joinCode" placeholder="Enter code here">
+                    </div>
+                    <button onclick="joinChat()">Connect</button>
+                </div>
+
+                <div id="statusMessage"></div>
+            </div>
+
+            <div class="chat-screen" id="chatScreen">
+                <div class="status success" id="connectedStatus"></div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="typing-indicator" id="typingIndicator"></div>
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)" oninput="handleTyping()">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+                <button onclick="disconnect()" class="disconnect-btn">Disconnect</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+    <script>
+        // --- Disable common ways to view source ---
+        document.addEventListener('keydown', function(event) {
+            // Disable Ctrl+U
+            if ((event.ctrlKey || event.metaKey) && event.key === 'u') {
+                event.preventDefault();
+            }
+        });
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+
+        let peer = null;
+        let conn = null;
+        let myPeerId = null;
+        let username = '';
+        let peerName = 'Peer';
+        let codeExpirationTimer = null;
+        let typingTimer = null;
+
+        // --- NEW: Cryptography variables ---
+        let myKeyPair = null;
+        let sharedSecret = null;
+
+        // --- CRYPTOGRAPHY: Helper Functions ---
+        // Generate an ECDH key pair for secure key exchange
+        async function generateKeyPair() {
+            return await window.crypto.subtle.generateKey(
+                { name: "ECDH", namedCurve: "P-256" },
+                true,
+                ["deriveKey"]
+            );
+        }
+        // Derive a shared secret key from your private key and the peer's public key
+        async function deriveSharedSecret(privateKey, publicKey) {
+            return await window.crypto.subtle.deriveKey(
+                { name: "ECDH", public: publicKey },
+                privateKey,
+                { name: "AES-GCM", length: 256 },
+                true,
+                ["encrypt", "decrypt"]
+            );
+        }
+        // Encrypt a message using the shared secret
+        async function encryptMessage(message) {
+            if (!sharedSecret) throw new Error("Shared secret is not derived yet.");
+            const iv = window.crypto.getRandomValues(new Uint8Array(12)); // GCM requires a 12-byte IV
+            const encodedMessage = new TextEncoder().encode(message);
+            const ciphertext = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                sharedSecret,
+                encodedMessage
+            );
+            return {
+                ciphertext: Array.from(new Uint8Array(ciphertext)), // Convert to array for JSON serialization
+                iv: Array.from(iv)
+            };
+        }
+        // Decrypt a message using the shared secret
+        async function decryptMessage({ ciphertext, iv }) {
+            if (!sharedSecret) throw new Error("Shared secret is not derived yet.");
+            try {
+                const decrypted = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: new Uint8Array(iv) },
+                    sharedSecret,
+                    new Uint8Array(ciphertext)
+                );
+                return new TextDecoder().decode(decrypted);
+            } catch (e) {
+                console.error("Decryption failed:", e);
+                showStatus('Message decryption failed. The secure session might be compromised.', 'error');
+                return null;
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUsername = localStorage.getItem('thorium-username');
+            if (savedUsername) {
+                document.getElementById('username').value = savedUsername;
+            }
+        });
+
+        function validateUsername() {
+            username = document.getElementById('username').value.trim();
+            if (!username) {
+                showStatus('Please enter your name first.', 'error');
+                return false;
+            }
+            localStorage.setItem('thorium-username', username);
+            return true;
+        }
+
+        async function createChat() {
+            if (!validateUsername()) return;
+            document.getElementById('createSection').classList.remove('hidden');
+            document.getElementById('joinSection').classList.add('hidden');
+            document.querySelector('.setup-buttons').style.display = 'none';
+            myKeyPair = await generateKeyPair(); // Generate keys for the creator
+            
+            const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            myPeerId = 'thorium-chat-' + roomCode;
+            peer = new Peer(myPeerId, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }});
+
+            peer.on('open', (id) => {
+                document.getElementById('codeDisplay').textContent = roomCode;
+                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
+                let timeLeft = 60;
+                const statusElement = document.getElementById('createStatus');
+                codeExpirationTimer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        statusElement.textContent = `Waiting for peer to connect... (Code expires in ${timeLeft}s)`;
+                        timeLeft--;
+                    } else {
+                        clearInterval(codeExpirationTimer);
+                        if (peer && !conn) { 
+                            peer.destroy();
+                            statusElement.textContent = 'Code expired.';
+                            showStatus('Code expired. Please create a new one.', 'error');
+                            setTimeout(resetSetup, 2000);
+                        }
+                    }
+                }, 1000);
+            });
+
+            peer.on('connection', (connection) => {
+                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
+                conn = connection;
+                setupConnection(false); // isInitiator = false
+            });
+
+            peer.on('error', (err) => {
+                console.error('PeerJS error:', err);
+                showStatus(`Connection error: ${err.type}. Please try again.`, 'error');
+                disconnect(true);
+            });
+        }
+
+        function showJoinForm() {
+            if (!validateUsername()) return;
+            document.getElementById('joinSection').classList.remove('hidden');
+            document.getElementById('createSection').classList.add('hidden');
+            document.querySelector('.setup-buttons').style.display = 'none';
+        }
+
+        async function joinChat() {
+            if (!validateUsername()) return;
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            if (!code) {
+                showStatus('Please enter a code.', 'error'); return;
+            }
+
+            myKeyPair = await generateKeyPair(); // Generate keys for the joiner
+            const targetPeerId = 'thorium-chat-' + code;
+            peer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }});
+
+            peer.on('open', (id) => {
+                myPeerId = id;
+                conn = peer.connect(targetPeerId);
+                setupConnection(true); // isInitiator = true
+            });
+
+            peer.on('error', (err) => {
+                console.error('PeerJS error:', err);
+                if (err.type === 'peer-unavailable') {
+                    showStatus('Invalid code. Please try again.', 'error');
+                } else {
+                    showStatus('Could not connect. Check code and try again.', 'error');
+                }
+                disconnect(true);
+            });
+        }
+
+        function setupConnection(isInitiator) {
+            conn.on('open', async () => {
+                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
+                
+                if (isInitiator) {
+                    // Export and send public key to start the secure handshake
+                    const publicKey = await window.crypto.subtle.exportKey("jwk", myKeyPair.publicKey);
+                    conn.send({ type: 'handshake-start', name: username, publicKey });
+                }
+            });
+
+            conn.on('data', async (encryptedData) => {
+                const data = await decryptMessage(encryptedData);
+                if (!data) return; // Decryption failed
+
+                const parsedData = JSON.parse(data);
+
+                if (parsedData.type === 'message') {
+                    displayMessage(parsedData.message, parsedData.name, 'received', parsedData.timestamp);
+                } else if (parsedData.type === 'typing') {
+                    const typingIndicator = document.getElementById('typingIndicator');
+                    if (parsedData.status === 'start') {
+                        typingIndicator.textContent = `${peerName} is typing...`;
+                        typingIndicator.classList.add('visible');
+                    } else {
+                        typingIndicator.classList.remove('visible');
+                    }
+                }
+            });
+
+            // This is the unencrypted handshake channel
+            conn.on('data', async (data) => {
+                // If sharedSecret is already set, it's an encrypted message, handle with the other listener.
+                if (sharedSecret) return;
+
+                // Handle the multi-step handshake
+                if (data.type === 'handshake-start') {
+                    peerName = data.name;
+                    const peerPublicKey = await window.crypto.subtle.importKey("jwk", data.publicKey, { name: "ECDH", namedCurve: "P-256" }, true, []);
+                    sharedSecret = await deriveSharedSecret(myKeyPair.privateKey, peerPublicKey);
+                    
+                    // Respond with our own public key
+                    const publicKey = await window.crypto.subtle.exportKey("jwk", myKeyPair.publicKey);
+                    conn.send({ type: 'handshake-reply', name: username, publicKey });
+
+                    // Secure connection is now established
+                    showChatScreen();
+
+                } else if (data.type === 'handshake-reply') {
+                    peerName = data.name;
+                    const peerPublicKey = await window.crypto.subtle.importKey("jwk", data.publicKey, { name: "ECDH", namedCurve: "P-256" }, true, []);
+                    sharedSecret = await deriveSharedSecret(myKeyPair.privateKey, peerPublicKey);
+
+                    // Secure connection is now established
+                    showChatScreen();
+                }
+            });
+
+            conn.on('close', () => {
+                showStatus('Peer has disconnected.', 'error');
+                setTimeout(disconnect, 2000);
+            });
+
+            conn.on('error', (err) => {
+                console.error('Connection error:', err);
+                showStatus('Connection lost.', 'error');
+                setTimeout(disconnect, 2000);
+            });
+        }
+
+        function showChatScreen() {
+             document.getElementById('setupScreen').style.display = 'none';
+             document.getElementById('chatScreen').style.display = 'flex';
+             document.getElementById('connectedStatus').innerHTML = `<span class="secure-icon"></span> End to end Encrypted with <strong>${peerName}</strong>.`;
+        }
+        
+        // --- MODIFIED: `send` function now encrypts all data ---
+        async function send(data) {
+             if (conn && conn.open && sharedSecret) {
+                const encryptedData = await encryptMessage(JSON.stringify(data));
+                conn.send(encryptedData);
+             }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const msg = input.value.trim();
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            if (msg) {
+                if (typingTimer) clearTimeout(typingTimer);
+                await send({ type: 'typing', status: 'stop' });
+                typingTimer = null;
+
+                await send({ type: 'message', name: username, message: msg, timestamp: timestamp });
+                displayMessage(msg, username, 'sent', timestamp);
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function displayMessage(text, name, type, timestamp) {
+            const chatBox = document.getElementById('chatMessages');
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${type}`;
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'message-meta';
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'sender-name';
+            nameDiv.textContent = (type === 'sent') ? 'You' : name;
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'timestamp';
+            timeDiv.textContent = timestamp;
+            metaDiv.appendChild(nameDiv);
+            metaDiv.appendChild(timeDiv);
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${type}`;
+            msgDiv.textContent = text;
+            wrapper.appendChild(metaDiv);
+            wrapper.appendChild(msgDiv);
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function handleTyping() {
+            if (!typingTimer) {
+                await send({ type: 'typing', status: 'start' });
+            }
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(async () => {
+                await send({ type: 'typing', status: 'stop' });
+                typingTimer = null;
+            }, 2500);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                if (statusDiv.innerHTML.includes(message)) {
+                    statusDiv.innerHTML = '';
+                }
+            }, 4000);
+        }
+
+        function copyCode(event) {
+            const code = document.getElementById('codeDisplay').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.disabled = true;
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            });
+        }
+        
+        function resetSetup() {
+            document.getElementById('createSection').classList.add('hidden');
+            document.getElementById('joinSection').classList.add('hidden');
+            document.querySelector('.setup-buttons').style.display = 'flex';
+            document.getElementById('codeDisplay').textContent = '';
+            document.getElementById('joinCode').value = '';
+        }
+
+        function disconnect(silent = false) {
+            if (codeExpirationTimer) clearInterval(codeExpirationTimer);
+            if (typingTimer) clearTimeout(typingTimer);
+            
+            if (conn) conn.close();
+            if (peer) peer.destroy();
+            
+            peer = null;
+            conn = null;
+            myPeerId = null;
+            myKeyPair = null;
+            sharedSecret = null;
+
+            document.getElementById('chatScreen').style.display = 'none';
+            document.getElementById('setupScreen').style.display = 'block';
+            document.getElementById('messageInput').value = '';
+            
+            resetSetup();
+            if (!silent) {
+                showStatus('Disconnected successfully.', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
+
