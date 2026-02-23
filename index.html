@@ -1,34 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thorium</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    
     <style>
+
         :root {
-            --background-start: #e0eafc;
-            --background-end: #cfdef3;
+            /* Palette: Core Light */
+            --background-start: #f8fafc;
+            --background-end: #e2e8f0;
             --surface: #ffffff;
-            --primary-gradient: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
-            --primary-gradient-hover: linear-gradient(45deg, #5a0eb9 0%, #1d6bde 100%);
-            --secondary: #f0f2f5;
-            --secondary-hover: #e4e6e9;
-            --text-primary: #1c1e21;
-            --text-secondary: #606770;
-            --danger: #fa383e;
-            --danger-hover: #e02d32;
-            --success: #00c471;
-            --font-main: 'Inter', sans-serif;
+            --surface-glass: rgba(255, 255, 255, 0.7);
+            
+            /* Gradient Architecture */
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --primary-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            --glow-color: rgba(99, 102, 241, 0.3);
+            
+            /* Typography Scale */
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-on-gradient: #ffffff;
+            
+            /* UI State Definitions */
+            --secondary: #f1f5f9;
+            --secondary-hover: #e2e8f0;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --waiting-bg: #fef3c7;
+            --waiting-text: #92400e;
+            
+            /* Font Systems */
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
             --font-mono: 'Source Code Pro', monospace;
+            
+            /* Border & Shadow Ratios */
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            
+            /* Animation Timing */
+            --speed-fast: 0.15s;
+            --speed-normal: 0.3s;
+            --speed-slow: 0.6s;
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
         }
-        * {
+
+         */
+        body.dark-mode {
+            --background-start: #020617;
+            --background-end: #0f172a;
+            --surface: #1e293b;
+            --surface-glass: rgba(30, 41, 59, 0.7);
+            --secondary: #334155;
+            --secondary-hover: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --glow-color: rgba(168, 85, 247, 0.2);
+            --input-bg: #0f172a;
+        }
+
+       * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: 
+                background-color var(--speed-normal) var(--ease-in-out),
+                color var(--speed-normal) var(--ease-in-out),
+                border-color var(--speed-normal) var(--ease-in-out),
+                box-shadow var(--speed-normal) var(--ease-in-out);
         }
+
         body {
             font-family: var(--font-main);
             background: linear-gradient(135deg, var(--background-start), var(--background-end));
@@ -37,681 +87,1247 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: var(--surface);
-            border-radius: 24px;
-            box-shadow: 0 16px 48px rgba(0, 27, 85, 0.15);
-            max-width: 600px;
-            width: 100%;
+            padding: 24px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            letter-spacing: -0.01em;
+        }
+
+        .container {
+            background-color: var(--surface-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            max-width: 640px;
+            width: 100%;
+            height: 90vh;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: containerEnter var(--speed-slow) var(--ease-out-expo) forwards;
+            position: relative;
         }
+
+        @keyframes containerEnter {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* * ==========================================
+         * HEADER COMPONENTS
+         * ==========================================
+         */
         .header {
-            background: transparent;
-            color: var(--text-primary);
-            padding: 32px 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--secondary);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
         }
+
+        body.dark-mode .header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            background-color: var(--secondary);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            background-color: var(--secondary-hover);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+        }
+
+        /* FIXED: Header h1 styling for perfect gradient rendering */
         .header h1 {
-            font-size: 2em;
-            margin: 0;
-            font-weight: 700;
+            font-size: 2.2em;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background-image: var(--primary-gradient);
+            background-size: 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent; /* Fallback for browsers that don't support text-fill-color */
+            margin-bottom: 6px;
+            width: fit-content;
+            display: block;
         }
+
         .header p {
             color: var(--text-secondary);
-            font-size: 1.1em;
-            margin-top: 4px;
-        }
-        .content {
-            padding: 24px 32px;
-            flex-grow: 1;
-        }
-        .setup-screen {
-            text-align: center;
-        }
-        .setup-screen h2 {
-            font-weight: 600;
-            font-size: 1.5em;
-            color: var(--text-primary);
-        }
-        .setup-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin: 24px 0;
-        }
-        .code-display {
-            background: var(--secondary);
-            color: #2575fc;
-            padding: 20px;
-            border-radius: 16px;
-            margin: 20px 0;
-            font-size: 2em;
-            font-weight: 600;
-            letter-spacing: 4px;
-            word-break: break-all;
-            border: 1px solid #e0e0e0;
-            font-family: var(--font-mono);
-            user-select: all;
-        }
-        .input-group {
-            margin: 24px 0;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
+            font-size: 0.95em;
             font-weight: 500;
+        }
+
+        /* * ==========================================
+         * CONTENT WRAPPER & NAVIGATION
+         * ==========================================
+         */
+        .content {
+            padding: 32px;
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: none;
+        }
+
+        .content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .setup-screen, .chat-screen, .disconnect-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fade-in {
+            animation: screenFade var(--speed-normal) var(--ease-in-out) both;
+        }
+
+        @keyframes screenFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* * ==========================================
+         * UI ELEMENTS: INPUTS & BUTTONS
+         * ==========================================
+         */
+        .screen-title {
+            font-weight: 700;
+            font-size: 1.6em;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             color: var(--text-secondary);
         }
-        .input-group input,
-        .message-input input {
+
+        .input-wrapper input, .input-wrapper select {
             width: 100%;
             padding: 16px;
-            border: 1px solid #dce1e6;
-            border-radius: 12px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
             font-size: 1em;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background: #fdfdfd;
+            background-color: var(--secondary);
             color: var(--text-primary);
-        }
-        .input-group input:focus,
-        .message-input input:focus {
+            font-family: inherit;
             outline: none;
-            border-color: #a9c5ff;
-            box-shadow: 0 0 0 4px rgba(37, 117, 252, 0.1);
         }
-        .message-input input {
-            flex: 1;
+
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #6366f1;
+            background-color: var(--surface);
+            box-shadow: 0 0 0 4px var(--glow-color);
         }
-        button {
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        button.action-trigger {
             background-image: var(--primary-gradient);
-            color: white;
+            color: var(--text-on-gradient);
             border: none;
             padding: 16px 32px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 1em;
-            font-weight: 600;
-            font-family: var(--font-main);
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.3);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
-        button:hover {
-            background-image: var(--primary-gradient-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(37, 117, 252, 0.4);
+
+        button.action-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -5px var(--glow-color);
+            filter: brightness(1.05);
         }
-        button:active {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(37, 117, 252, 0.3);
+
+        button.action-trigger:active {
+            transform: translateY(0);
         }
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        button.secondary {
+
+        button.action-trigger.outline {
             background-image: none;
             background-color: var(--secondary);
             color: var(--text-primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
         }
-        button.secondary:hover {
+
+        button.action-trigger.outline:hover {
             background-color: var(--secondary-hover);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
         }
-        button.secondary:active {
-             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
+
+        /* * ==========================================
+         * CHAT INTERFACE: MESSAGES
+         * ==========================================
+         */
         .chat-screen {
             display: none;
             height: 100%;
-            flex-direction: column;
         }
-        .chat-messages {
+
+        .message-viewport {
             flex-grow: 1;
-            height: 400px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background-color: #dce1e6; border-radius: 6px; }
-        .message-wrapper {
+
+        .bubble-wrap {
             display: flex;
             flex-direction: column;
-            max-width: 75%;
-            animation: slideIn 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 80%;
+            animation: bubblePop 0.4s var(--ease-out-expo) both;
         }
-        .message {
-            padding: 12px 18px;
+
+        @keyframes bubblePop {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .bubble {
+            padding: 14px 18px;
             border-radius: 20px;
+            font-size: 0.98em;
+            line-height: 1.55;
             word-wrap: break-word;
-            line-height: 1.5;
+            box-shadow: var(--shadow-sm);
         }
-        .message-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 0 12px 4px 12px;
+
+        .bubble img {
+            max-width: 100%;
+            border-radius: 14px;
+            margin: 6px 0;
+            display: block;
         }
-        .sender-name {
-            font-size: 0.8em;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .timestamp {
-            font-size: 0.7em;
-            color: var(--text-secondary);
-            margin-left: 8px;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .message-wrapper.sent { align-self: flex-end; align-items: flex-end; }
-        .message-wrapper.received { align-self: flex-start; align-items: flex-start; }
-        .message-wrapper.sent .sender-name { display: none; }
-        .message-wrapper.sent .message-meta { justify-content: flex-end; }
-        .message.sent {
-            background-image: var(--primary-gradient);
-            color: white;
-            border-bottom-right-radius: 6px;
-        }
-        .message.received {
-            background: var(--secondary);
-            color: var(--text-primary);
-            border-bottom-left-radius: 6px;
-        }
-        .message-input { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-        .typing-indicator {
-            min-height: 24px;
-            padding: 4px 12px;
-            font-style: italic;
-            font-size: 0.9em;
-            color: var(--text-secondary);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .typing-indicator.visible {
-            opacity: 1;
-        }
-        .status { text-align: center; padding: 10px; margin: 10px 0; border-radius: 12px; font-weight: 500; }
-        .status.waiting { background: #fff3cd; color: #856404; }
-        .status.success {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: #e6f9f1; color: #00874a; padding: 12px;
-        }
-        .status.error { background: #fde8e9; color: #d91c22; }
-        #statusMessage .status { margin-top: 20px; }
-        .hidden { display: none; }
-        .copy-btn {
-            background-image: none;
-            background-color: var(--success);
-            padding: 10px 20px;
-            font-size: 0.9em;
-            margin-top: -10px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 196, 113, 0.2);
-        }
-        .copy-btn:hover { background-color: #00b366; box-shadow: 0 6px 16px rgba(0, 196, 113, 0.3); }
-        .online-indicator {
-            display: inline-block; width: 10px; height: 10px;
-            background: var(--success); border-radius: 50%;
-        }
-        /* Lock icon for secure status */
-        .secure-icon {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            margin-right: 6px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300874a"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>');
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-        .disconnect-btn {
+
+        .bubble audio {
             width: 100%;
-            background-image: none;
-            background-color: var(--danger);
+            height: 36px;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(250, 56, 62, 0.2);
         }
-        .disconnect-btn:hover { background: var(--danger-hover); box-shadow: 0 6px 16px rgba(250, 56, 62, 0.3); }
+
+        .meta {
+            font-size: 0.72em;
+            font-weight: 600;
+            margin-top: 6px;
+            color: var(--text-secondary);
+            padding: 0 4px;
+        }
+
+        /* Sent/Received Visual Differentiation */
+        .bubble-wrap.outgoing {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .bubble-wrap.incoming {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .outgoing .bubble {
+            background: var(--primary-gradient);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .incoming .bubble {
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        /* * ==========================================
+         * INPUT BAR & MULTIMEDIA MENU
+         * ==========================================
+         */
+        .composer {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background-color: var(--secondary);
+            padding: 8px;
+            border-radius: var(--radius-lg);
+            position: relative;
+        }
+
+        .composer input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 12px;
+            font-size: 1em;
+            color: var(--text-primary);
+        }
+
+        .action-tray-trigger {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            background: var(--surface);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .send-pill {
+            background: var(--primary-gradient);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Attachment Menu Styling */
+        .attachment-menu {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            width: 180px;
+            display: none;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .attachment-menu.open {
+            display: flex;
+            flex-direction: column;
+            animation: menuSlide var(--speed-normal) var(--ease-out-expo);
+        }
+
+        @keyframes menuSlide {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tray-item {
+            padding: 14px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .tray-item:hover {
+            background-color: var(--secondary);
+        }
+
+        .tray-item.rec {
+            color: var(--danger);
+            animation: recPulse 1s infinite;
+        }
+
+        @keyframes recPulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* * ==========================================
+         * UTILITY: STATUS & MODALS
+         * ==========================================
+         */
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85em;
+            font-weight: 700;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .status-badge.waiting {
+            background-color: var(--waiting-bg);
+            color: var(--waiting-text);
+            animation: pulseFade 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulseFade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .code-well {
+            background-color: var(--secondary);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 2em;
+            letter-spacing: 0.2em;
+            color: #6366f1;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Fullscreen Camera Modal */
+        #camOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        #videoPipe {
+            width: 100%;
+            max-width: 480px;
+            border-radius: 24px;
+            background-color: #000;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .cam-actions {
+            margin-top: 32px;
+            display: flex;
+            gap: 24px;
+        }
+
+        .shutter {
+            width: 72px;
+            height: 72px;
+            background-color: #fff;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .shutter svg { width: 32px; height: 32px; fill: #000; }
+
+        /* Lightbox Overlay */
+        #imageViewer {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.95);
+            z-index: 6000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+
+        #imageViewer img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div>
-                 <h1>Thorium</h1>
-                 <p>Secure P2P</p>
-            </div>
-        </div>
 
-        <div class="content">
-            <div class="setup-screen" id="setupScreen">
-                <h2 style="margin-bottom: 10px;">Start a Session</h2>
-                <div class="input-group">
-                    <label for="username">Your Name:</label>
-                    <input type="text" id="username" placeholder="Enter your name to begin">
-                </div>
-                <div class="setup-buttons">
-                    <button onclick="createChat()">Create</button>
-                    <button onclick="showJoinForm()" class="secondary">Join </button>
+<body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+    
+    <div class="container" id="app">
+        
+        <!-- Drag Feedback Overlay -->
+        <div class="drag-overlay hidden" id="dropHint">Drop your file here</div>
+        
+        <!-- App Header -->
+        <header class="header">
+            <button class="theme-toggle" id="modeSwitch" title="Switch Theme">
+                <svg id="modeIcon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
+            </button>
+            <h1>Thorium</h1>
+            <p>End-to-End P2P Link</p>
+        </header>
+
+        <main class="content">
+            
+            <!-- Setup Initial Screen -->
+            <section class="setup-screen fade-in" id="setupView">
+                <h2 class="screen-title">Start a Session</h2>
+                
+                <div class="input-wrapper">
+                    <label for="identity">Your Name</label>
+                    <input type="text" id="identity" placeholder="e.g., Virat">
                 </div>
 
-                <div id="createSection" class="hidden">
-                    <div class="code-display" id="codeDisplay"></div>
-                    <button class="copy-btn" onclick="copyCode(event)">Copy Code</button>
-                    <div class="status waiting" id="createStatus">Waiting to connect...</div>
-                </div>
-
-                <div id="joinSection" class="hidden">
-                    <div class="input-group">
-                        <label for="joinCode">Enter Code:</label>
-                        <input type="text" id="joinCode" placeholder="Enter code here">
+                <!-- HOST SELECTION AREA -->
+                <div id="hostOptions">
+                    <div class="input-wrapper">
+                        <label for="sessionLife">Session Life (Code Expiry)</label>
+                        <select id="sessionLife" onchange="checkManualLife()">
+                            <option value="60">1 Minute (Quick Link)</option>
+                            <option value="300" selected>5 Minutes (Standard)</option>
+                            <option value="custom">Manual Minute Entry</option>
+                        </select>
                     </div>
-                    <button onclick="joinChat()">Connect</button>
+
+                    <div class="input-wrapper hidden" id="manualLifeBox">
+                        <label for="manualMinutes">Manual Minutes</label>
+                        <input type="number" id="manualMinutes" placeholder="e.g. 10" min="1">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="action-trigger" onclick="initiateHosting()">Establish Host</button>
+                        <button class="action-trigger outline" onclick="revealJoinPanel()">Join Host</button>
+                    </div>
                 </div>
 
-                <div id="statusMessage"></div>
-            </div>
-
-            <div class="chat-screen" id="chatScreen">
-                <div class="status success" id="connectedStatus"></div>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="typing-indicator" id="typingIndicator"></div>
-                <div class="message-input">
-                    <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)" oninput="handleTyping()">
-                    <button onclick="sendMessage()">Send</button>
+                <!-- Hosting Progress Sub-section -->
+                <div id="hostingArea" class="hidden">
+                    <div class="code-well" id="nodeCode">------</div>
+                    <button class="action-trigger outline" onclick="copyIdentityID()">Copy Code </button>
+                    <div class="connection-status status-badge waiting" id="nodeStatus">Awaiting to connect</div>
                 </div>
-                <button onclick="disconnect()" class="disconnect-btn">Disconnect</button>
-            </div>
+
+                <!-- Joining Details Sub-section -->
+                <div id="joiningArea" class="hidden">
+                    <div class="input-wrapper" style="margin-top: 24px;">
+                        <label for="targetID">Target Node ID</label>
+                        <input type="text" id="targetID" placeholder="Enter peer code">
+                    </div>
+                    <div class="button-group">
+                        <button class="action-trigger" onclick="connectToNode()">Connect</button>
+                        <button class="action-trigger outline" onclick="resetSetupView()">Back</button>
+                    </div>
+                </div>
+                
+                <div id="uxFeedback"></div>
+            </section>
+
+            <!-- Active Chat Screen -->
+            <section class="chat-screen fade-in" id="chatView">
+                <div class="connection-status" id="linkSuccess" style="background-color: var(--secondary); color: var(--success); margin-bottom: 20px;"></div>
+                
+                <div class="message-viewport" id="scrollContainer"></div>
+                
+                <div class="typing-indicator" id="peerTyping"></div>
+                
+                <div class="composer">
+                    <!-- Multimedia Action Trigger -->
+                    <div class="action-container">
+                        <button class="action-tray-trigger" onclick="toggleTray()" id="trayIcon" title="Attachments">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        </button>
+                        
+                        <div class="attachment-menu" id="trayMenu">
+                            <div class="tray-item" onclick="startCameraLink()">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                Snap Frame
+                            </div>
+                            <label class="tray-item">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                                File Library
+                                <input type="file" id="imagePicker" class="hidden" accept="image/*" onchange="processImageUpload(event)">
+                            </label>
+                            <div class="tray-item" id="micTrigger" onclick="manageVoiceComms()">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v11m0 0a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"/></svg>
+                                Voice Note
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKeySubmit(event)" oninput="broadcastTyping()">
+                    
+                    <button class="send-pill" onclick="transmitText()">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+                
+                <button class="action-trigger outline" style="margin-top: 16px; font-size: 0.8em; padding: 10px;" onclick="closeSession()">End Connection</button>
+            </section>
+
+            <!-- Disconnect Screen -->
+            <section class="disconnect-screen fade-in hidden" id="deathView">
+                <h2 class="screen-title">Node Purged</h2>
+                <p id="cleanupStatus" style="text-align: center; color: var(--text-secondary); margin-bottom: 24px;">Memory scrub in progress...</p>
+                <div class="button-group">
+                    <button class="action-trigger" onclick="redoAction()">Redo Session</button>
+                    <button class="action-trigger outline" onclick="location.reload()">Reset All</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Technical Overlays -->
+    <div id="camOverlay">
+        <video id="videoPipe" autoplay playsinline></video>
+        <div class="cam-actions">
+            <button class="action-trigger outline" style="width: auto;" onclick="haltCamera()">Abort</button>
+            <button class="shutter" onclick="freezeFrame()">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            </button>
         </div>
     </div>
 
+    <div id="imageViewer" onclick="this.style.display='none'">
+        <img id="viewerImg" src="" alt="Multimedia decrypted view">
+    </div>
+
+    <!-- Signaling substrate -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+    
     <script>
-        // --- Disable common ways to view source ---
-        document.addEventListener('keydown', function(event) {
-            // Disable Ctrl+U
-            if ((event.ctrlKey || event.metaKey) && event.key === 'u') {
-                event.preventDefault();
-            }
+        /**
+         * ==========================================
+         * JAVASCRIPT LOGIC SUBSYSTEM
+         * ==========================================
+         */
+
+        // ------------------------------------------
+        // GLOBAL STATE REGISTRY
+        // ------------------------------------------
+        let nodePeer = null;         // Peer Instance
+        let nodeConn = null;         // Established Link
+        let localAlias = '';         // Local Identity
+        let remoteAlias = 'Peer';    // Remote Identity
+        let nodeKeys = null;         // ECDH Pair
+        let cipherKey = null;        // Derived AES Key
+        let typeTick = null;         // Typing Debounce
+        let lifeTick = null;         // Code Expiration Tick
+        let killLoop = null;         // Global Termination Interval
+        
+        // Voice Data
+        let audioRecorder = null;
+        let pcmChunks = [];
+        let isCapturingAudio = false;
+        let streamHandle = null;
+
+        // ------------------------------------------
+        // THEME INTERFACE HANDLERS
+        // ------------------------------------------
+        const modeSwitch = document.getElementById('modeSwitch');
+        const modeIcon = document.getElementById('modeIcon');
+        
+        const SUN = "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z";
+        const MOON = "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z";
+
+        /**
+         * Refreshes the SVG path and storage preference.
+         */
+        function applyMode() {
+            const dark = document.body.classList.contains('dark-mode');
+            modeIcon.innerHTML = `<path d="${dark ? SUN : MOON}"/>`;
+        }
+
+        modeSwitch.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('thor-pref', document.body.classList.contains('dark-mode'));
+            applyMode();
         });
-        // Disable right-click context menu
-        document.addEventListener('contextmenu', event => event.preventDefault());
 
+        // Preference recovery
+        if(localStorage.getItem('thor-pref') === 'true') { 
+            document.body.classList.add('dark-mode'); 
+            applyMode(); 
+        }
 
-        let peer = null;
-        let conn = null;
-        let myPeerId = null;
-        let username = '';
-        let peerName = 'Peer';
-        let codeExpirationTimer = null;
-        let typingTimer = null;
-
-        // --- NEW: Cryptography variables ---
-        let myKeyPair = null;
-        let sharedSecret = null;
-
-        // --- CRYPTOGRAPHY: Helper Functions ---
-        // Generate an ECDH key pair for secure key exchange
-        async function generateKeyPair() {
+        // ------------------------------------------
+        // CRYPTO CORE (WebCrypto API Wrapper)
+        // ------------------------------------------
+        
+        /**
+         * Generates an Elliptic Curve key pair on the P-256 curve.
+         * @returns {Promise<CryptoKeyPair>} The cryptographic pair.
+         */
+        async function fetchNewKeys() { 
             return await window.crypto.subtle.generateKey(
-                { name: "ECDH", namedCurve: "P-256" },
-                true,
+                { name: "ECDH", namedCurve: "P-256" }, 
+                true, 
                 ["deriveKey"]
-            );
+            ); 
         }
-        // Derive a shared secret key from your private key and the peer's public key
-        async function deriveSharedSecret(privateKey, publicKey) {
+
+        /**
+         * Computes the shared symmetric key via DH algorithm.
+         * @param {CryptoKey} priv Local private.
+         * @param {CryptoKey} pub Remote public.
+         */
+        async function synthesizeSharedKey(priv, pub) { 
             return await window.crypto.subtle.deriveKey(
-                { name: "ECDH", public: publicKey },
-                privateKey,
-                { name: "AES-GCM", length: 256 },
-                true,
+                { name: "ECDH", public: pub }, 
+                priv, 
+                { name: "AES-GCM", length: 256 }, 
+                true, 
                 ["encrypt", "decrypt"]
-            );
+            ); 
         }
-        // Encrypt a message using the shared secret
-        async function encryptMessage(message) {
-            if (!sharedSecret) throw new Error("Shared secret is not derived yet.");
-            const iv = window.crypto.getRandomValues(new Uint8Array(12)); // GCM requires a 12-byte IV
-            const encodedMessage = new TextEncoder().encode(message);
-            const ciphertext = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: iv },
-                sharedSecret,
-                encodedMessage
+
+        /**
+         * Wraps plaintext into an encrypted and authenticated GCM packet.
+         * @param {string} raw Raw text data.
+         * @returns {Promise<Object>} The encrypted structure.
+         */
+        async function sealPacket(raw) {
+            if (!cipherKey) return null;
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const bytes = new TextEncoder().encode(raw);
+            const sealed = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv }, 
+                cipherKey, 
+                bytes
             );
-            return {
-                ciphertext: Array.from(new Uint8Array(ciphertext)), // Convert to array for JSON serialization
-                iv: Array.from(iv)
+            return { 
+                ciphertext: Array.from(new Uint8Array(sealed)), 
+                iv: Array.from(iv) 
             };
         }
-        // Decrypt a message using the shared secret
-        async function decryptMessage({ ciphertext, iv }) {
-            if (!sharedSecret) throw new Error("Shared secret is not derived yet.");
+
+        /**
+         * Deciphers and verifies the GCM packet.
+         * @param {Object} blob The encrypted structure.
+         * @returns {Promise<string|null>} Plaintext or failure.
+         */
+        async function unsealPacket(blob) {
+            if (!cipherKey) return null;
             try {
-                const decrypted = await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: new Uint8Array(iv) },
-                    sharedSecret,
-                    new Uint8Array(ciphertext)
+                const dec = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: new Uint8Array(blob.iv) }, 
+                    cipherKey, 
+                    new Uint8Array(blob.ciphertext)
                 );
-                return new TextDecoder().decode(decrypted);
-            } catch (e) {
-                console.error("Decryption failed:", e);
-                showStatus('Message decryption failed. The secure session might be compromised.', 'error');
-                return null;
+                return new TextDecoder().decode(dec);
+            } catch (error) { 
+                console.warn("Security Breach: Unauthorized or Corrupted Packet.", error);
+                return null; 
             }
         }
 
+        // ------------------------------------------
+        // MULTIMEDIA ENGINE
+        // ------------------------------------------
+        
+        function toggleTray() { 
+            document.getElementById('trayMenu').classList.toggle('open'); 
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedUsername = localStorage.getItem('thorium-username');
-            if (savedUsername) {
-                document.getElementById('username').value = savedUsername;
+        // Global blur for menu
+        window.addEventListener('mousedown', (e) => { 
+            if (!e.target.closest('.action-container')) {
+                document.getElementById('trayMenu').classList.remove('open'); 
             }
         });
 
-        function validateUsername() {
-            username = document.getElementById('username').value.trim();
-            if (!username) {
-                showStatus('Please enter your name first.', 'error');
-                return false;
+        /**
+         * Requests video stream and opens the capture viewport.
+         */
+        async function startCameraLink() {
+            toggleTray();
+            try {
+                streamHandle = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" },
+                    audio: false 
+                });
+                const pipe = document.getElementById('videoPipe');
+                pipe.srcObject = streamHandle;
+                document.getElementById('camOverlay').style.display = 'flex';
+            } catch (err) { 
+                alert("Technical Halt: Camera Hardware Restricted.");
             }
-            localStorage.setItem('thorium-username', username);
+        }
+
+        function haltCamera() {
+            if (streamHandle) {
+                streamHandle.getTracks().forEach(t => t.stop());
+            }
+            document.getElementById('camOverlay').style.display = 'none';
+        }
+
+        /**
+         * Renders the current frame to canvas and serializes for transport.
+         */
+        function freezeFrame() {
+            const pipe = document.getElementById('videoPipe');
+            const sheet = document.createElement('canvas');
+            sheet.width = pipe.videoWidth;
+            sheet.height = pipe.videoHeight;
+            const brush = sheet.getContext('2d');
+            brush.drawImage(pipe, 0, 0, sheet.width, sheet.height);
+            const b64 = sheet.toDataURL('image/jpeg', 0.82);
+            dispatchMediaPacket(b64, 'img');
+            haltCamera();
+        }
+
+        /**
+         * Orchestrates the audio capture and encryption lifecycle.
+         */
+        async function manageVoiceComms() {
+            const mic = document.getElementById('micTrigger');
+            if (!isCapturingAudio) {
+                try {
+                    const sound = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioRecorder = new MediaRecorder(sound);
+                    pcmChunks = [];
+                    
+                    audioRecorder.ondataavailable = event => { pcmChunks.push(event.data); };
+                    audioRecorder.onstop = async () => {
+                        const blob = new Blob(pcmChunks, { type: 'audio/webm' });
+                        const conv = new FileReader();
+                        conv.onload = async (e) => { dispatchMediaPacket(e.target.result, 'voice'); };
+                        conv.readAsDataURL(blob);
+                        sound.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    audioRecorder.start();
+                    isCapturingAudio = true;
+                    mic.classList.add('rec');
+                    mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> End Recording';
+                } catch (err) { 
+                    alert("Technical Halt: Audio Hardware Restricted.");
+                }
+            } else {
+                audioRecorder.stop();
+                isCapturingAudio = false;
+                mic.classList.remove('rec');
+                mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v11m0 0a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"/></svg> Voice Note';
+                toggleTray();
+            }
+        }
+
+        // ------------------------------------------
+        // SESSION ESTABLISHMENT LOGIC
+        // ------------------------------------------
+        
+        function checkManualLife() {
+            const val = document.getElementById('sessionLife').value;
+            const box = document.getElementById('manualLifeBox');
+            if (val === 'custom') box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        }
+
+        function validateIdentity() {
+            const val = document.getElementById('identity').value.trim();
+            if (!val) { 
+                showFeedback('Enter your name first', 'error'); 
+                return false; 
+            }
+            localAlias = val; 
             return true;
         }
 
-        async function createChat() {
-            if (!validateUsername()) return;
-            document.getElementById('createSection').classList.remove('hidden');
-            document.getElementById('joinSection').classList.add('hidden');
-            document.querySelector('.setup-buttons').style.display = 'none';
-            myKeyPair = await generateKeyPair(); // Generate keys for the creator
-            
-            const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            myPeerId = 'thorium-chat-' + roomCode;
-            peer = new Peer(myPeerId, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }});
+        function showFeedback(txt, type) {
+            const log = document.getElementById('uxFeedback');
+            log.innerHTML = `<div style="padding:12px; border-radius:12px; font-size:0.9em; margin-top:16px; background:${type==='error'?'#fee2e2':'#dcfce7'}; color:${type==='error'?'#991b1b':'#166534'};">${txt}</div>`;
+            setTimeout(() => { log.innerHTML = ''; }, 4500);
+        }
 
-            peer.on('open', (id) => {
-                document.getElementById('codeDisplay').textContent = roomCode;
-                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
-                let timeLeft = 60;
-                const statusElement = document.getElementById('createStatus');
-                codeExpirationTimer = setInterval(() => {
-                    if (timeLeft > 0) {
-                        statusElement.textContent = `Waiting for peer to connect... (Code expires in ${timeLeft}s)`;
-                        timeLeft--;
+        function copyIdentityID() {
+            const id = document.getElementById('nodeCode').textContent;
+            navigator.clipboard.writeText(id).then(() => {
+                showFeedback('Node Fingerprint copied to clipboard.', 'success');
+            });
+        }
+
+        /**
+         * Spawns a new Signaling Node and displays host credentials.
+         */
+        async function initiateHosting() {
+            if (!validateIdentity()) return;
+            
+            // Handle Session Expiry Calculation
+            const lifeSel = document.getElementById('sessionLife').value;
+            let secondsLeft = 300;
+            if (lifeSel === 'custom') {
+                const mins = parseInt(document.getElementById('manualMinutes').value);
+                if (isNaN(mins) || mins <= 0) return showFeedback("Enter valid manual minutes.", "error");
+                secondsLeft = mins * 60;
+            } else {
+                secondsLeft = parseInt(lifeSel);
+            }
+
+            document.getElementById('hostingArea').classList.remove('hidden');
+            document.getElementById('joiningArea').classList.add('hidden');
+            document.getElementById('hostOptions').classList.add('hidden');
+            
+            nodeKeys = await fetchNewKeys();
+            const fingerprint = Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            nodePeer = new Peer('thor-v4-' + fingerprint, { 
+                config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+            });
+
+            nodePeer.on('open', () => {
+                document.getElementById('nodeCode').textContent = fingerprint;
+                
+                // Code Expiration Countdown
+                lifeTick = setInterval(() => {
+                    if (secondsLeft <= 0) {
+                        clearInterval(lifeTick);
+                        closeSession("Session code expired. Node purged.");
                     } else {
-                        clearInterval(codeExpirationTimer);
-                        if (peer && !conn) { 
-                            peer.destroy();
-                            statusElement.textContent = 'Code expired.';
-                            showStatus('Code expired. Please create a new one.', 'error');
-                            setTimeout(resetSetup, 2000);
-                        }
+                        const m = Math.floor(secondsLeft / 60);
+                        const s = (secondsLeft % 60).toString().padStart(2, '0');
+                        document.getElementById('nodeStatus').textContent = `Waiting for peer... (${m}:${s})`;
+                        secondsLeft--;
                     }
                 }, 1000);
             });
-
-            peer.on('connection', (connection) => {
-                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
-                conn = connection;
-                setupConnection(false); // isInitiator = false
-            });
-
-            peer.on('error', (err) => {
-                console.error('PeerJS error:', err);
-                showStatus(`Connection error: ${err.type}. Please try again.`, 'error');
-                disconnect(true);
-            });
-        }
-
-        function showJoinForm() {
-            if (!validateUsername()) return;
-            document.getElementById('joinSection').classList.remove('hidden');
-            document.getElementById('createSection').classList.add('hidden');
-            document.querySelector('.setup-buttons').style.display = 'none';
-        }
-
-        async function joinChat() {
-            if (!validateUsername()) return;
-            const code = document.getElementById('joinCode').value.trim().toUpperCase();
-            if (!code) {
-                showStatus('Please enter a code.', 'error'); return;
-            }
-
-            myKeyPair = await generateKeyPair(); // Generate keys for the joiner
-            const targetPeerId = 'thorium-chat-' + code;
-            peer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }});
-
-            peer.on('open', (id) => {
-                myPeerId = id;
-                conn = peer.connect(targetPeerId);
-                setupConnection(true); // isInitiator = true
-            });
-
-            peer.on('error', (err) => {
-                console.error('PeerJS error:', err);
-                if (err.type === 'peer-unavailable') {
-                    showStatus('Invalid code. Please try again.', 'error');
-                } else {
-                    showStatus('Could not connect. Check code and try again.', 'error');
-                }
-                disconnect(true);
-            });
-        }
-
-        function setupConnection(isInitiator) {
-            conn.on('open', async () => {
-                if (codeExpirationTimer) clearInterval(codeExpirationTimer);
-                
-                if (isInitiator) {
-                    // Export and send public key to start the secure handshake
-                    const publicKey = await window.crypto.subtle.exportKey("jwk", myKeyPair.publicKey);
-                    conn.send({ type: 'handshake-start', name: username, publicKey });
-                }
-            });
-
-            conn.on('data', async (encryptedData) => {
-                const data = await decryptMessage(encryptedData);
-                if (!data) return; // Decryption failed
-
-                const parsedData = JSON.parse(data);
-
-                if (parsedData.type === 'message') {
-                    displayMessage(parsedData.message, parsedData.name, 'received', parsedData.timestamp);
-                } else if (parsedData.type === 'typing') {
-                    const typingIndicator = document.getElementById('typingIndicator');
-                    if (parsedData.status === 'start') {
-                        typingIndicator.textContent = `${peerName} is typing...`;
-                        typingIndicator.classList.add('visible');
-                    } else {
-                        typingIndicator.classList.remove('visible');
-                    }
-                }
-            });
-
-            // This is the unencrypted handshake channel
-            conn.on('data', async (data) => {
-                // If sharedSecret is already set, it's an encrypted message, handle with the other listener.
-                if (sharedSecret) return;
-
-                // Handle the multi-step handshake
-                if (data.type === 'handshake-start') {
-                    peerName = data.name;
-                    const peerPublicKey = await window.crypto.subtle.importKey("jwk", data.publicKey, { name: "ECDH", namedCurve: "P-256" }, true, []);
-                    sharedSecret = await deriveSharedSecret(myKeyPair.privateKey, peerPublicKey);
-                    
-                    // Respond with our own public key
-                    const publicKey = await window.crypto.subtle.exportKey("jwk", myKeyPair.publicKey);
-                    conn.send({ type: 'handshake-reply', name: username, publicKey });
-
-                    // Secure connection is now established
-                    showChatScreen();
-
-                } else if (data.type === 'handshake-reply') {
-                    peerName = data.name;
-                    const peerPublicKey = await window.crypto.subtle.importKey("jwk", data.publicKey, { name: "ECDH", namedCurve: "P-256" }, true, []);
-                    sharedSecret = await deriveSharedSecret(myKeyPair.privateKey, peerPublicKey);
-
-                    // Secure connection is now established
-                    showChatScreen();
-                }
-            });
-
-            conn.on('close', () => {
-                showStatus('Peer has disconnected.', 'error');
-                setTimeout(disconnect, 2000);
-            });
-
-            conn.on('error', (err) => {
-                console.error('Connection error:', err);
-                showStatus('Connection lost.', 'error');
-                setTimeout(disconnect, 2000);
-            });
-        }
-
-        function showChatScreen() {
-             document.getElementById('setupScreen').style.display = 'none';
-             document.getElementById('chatScreen').style.display = 'flex';
-             document.getElementById('connectedStatus').innerHTML = `<span class="secure-icon"></span> End to end Encrypted with <strong>${peerName}</strong>.`;
-        }
-        
-        // --- MODIFIED: `send` function now encrypts all data ---
-        async function send(data) {
-             if (conn && conn.open && sharedSecret) {
-                const encryptedData = await encryptMessage(JSON.stringify(data));
-                conn.send(encryptedData);
-             }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const msg = input.value.trim();
-            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            if (msg) {
-                if (typingTimer) clearTimeout(typingTimer);
-                await send({ type: 'typing', status: 'stop' });
-                typingTimer = null;
+            nodePeer.on('connection', conn => { 
+                clearInterval(lifeTick);
+                nodeConn = conn; 
+                executeHandshake(false); 
+            });
+        }
 
-                await send({ type: 'message', name: username, message: msg, timestamp: timestamp });
-                displayMessage(msg, username, 'sent', timestamp);
-                input.value = '';
-                input.focus();
+        async function connectToNode() {
+            if (!validateIdentity()) return;
+            const code = document.getElementById('targetID').value.trim().toUpperCase();
+            if (!code) return showFeedback('Valid Session ID required.', 'error');
+            
+            nodeKeys = await fetchNewKeys();
+            nodePeer = new Peer({ 
+                config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+            });
+            
+            nodePeer.on('open', () => { 
+                nodeConn = nodePeer.connect('thor-v4-' + code); 
+                executeHandshake(true); 
+            });
+            
+            nodePeer.on('error', () => { 
+                showFeedback('Link Abandoned: Host not found or code expired.', 'error'); 
+                resetSetupView(); 
+            });
+        }
+
+        function revealJoinPanel() { 
+            if (!validateIdentity()) return; 
+            document.getElementById('joiningArea').classList.remove('hidden'); 
+            document.getElementById('hostingArea').classList.add('hidden');
+            document.getElementById('hostOptions').classList.add('hidden');
+        }
+
+        function resetSetupView() {
+            if (nodePeer) nodePeer.destroy(); 
+            clearInterval(lifeTick);
+            document.getElementById('joiningArea').classList.add('hidden'); 
+            document.getElementById('hostingArea').classList.add('hidden');
+            document.getElementById('hostOptions').classList.remove('hidden');
+        }
+
+        /**
+         * Key Negotiation Logic.
+         */
+        function executeHandshake(isInitiator) {
+            nodeConn.on('open', async () => {
+                if (isInitiator) {
+                    const jwk = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
+                    nodeConn.send({ 
+                        type: 'hs-init', 
+                        alias: localAlias, 
+                        key: jwk 
+                    });
+                }
+            });
+            
+            nodeConn.on('data', async (incoming) => {
+                if (incoming.type === 'hs-init' || incoming.type === 'hs-reply') {
+                    remoteAlias = incoming.alias;
+                    const foreignKey = await window.crypto.subtle.importKey(
+                        "jwk", 
+                        incoming.key, 
+                        { name: "ECDH", namedCurve: "P-256" }, 
+                        true, 
+                        []
+                    );
+                    
+                    cipherKey = await synthesizeSharedKey(nodeKeys.privateKey, foreignKey);
+                    
+                    if (incoming.type === 'hs-init') {
+                        const localJWK = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
+                        nodeConn.send({ 
+                            type: 'hs-reply', 
+                            alias: localAlias, 
+                            key: localJWK 
+                        });
+                    }
+                    launchChatroom();
+                } else if (incoming.ciphertext) {
+                    const plain = await unsealPacket(incoming);
+                    if (plain) handleDataRouting(JSON.parse(plain));
+                }
+            });
+            
+            nodeConn.on('close', () => closeSession());
+        }
+
+        function launchChatroom() {
+            document.getElementById('setupView').style.display = 'none';
+            document.getElementById('chatView').style.display = 'flex';
+            document.getElementById('linkSuccess').innerHTML = `
+                End to End encrypted chat with <strong>${remoteAlias}</strong>
+            `;
+        }
+
+        /**
+         * Interprets and displays incoming verified payloads.
+         */
+        function handleDataRouting(p) {
+            if (p.type === 'txt') renderBubble(p.content, remoteAlias, 'incoming', p.ts);
+            else if (p.type === 'img') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image');
+            else if (p.type === 'voice') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio');
+            else if (p.type === 'typing') {
+                const tip = document.getElementById('peerTyping');
+                tip.textContent = `${remoteAlias} is typing`;
+                tip.className = p.active ? 'typing-indicator visible' : 'typing-indicator';
             }
         }
 
-        function displayMessage(text, name, type, timestamp) {
-            const chatBox = document.getElementById('chatMessages');
-            const wrapper = document.createElement('div');
-            wrapper.className = `message-wrapper ${type}`;
-            const metaDiv = document.createElement('div');
-            metaDiv.className = 'message-meta';
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'sender-name';
-            nameDiv.textContent = (type === 'sent') ? 'You' : name;
-            const timeDiv = document.createElement('div');
-            timeDiv.className = 'timestamp';
-            timeDiv.textContent = timestamp;
-            metaDiv.appendChild(nameDiv);
-            metaDiv.appendChild(timeDiv);
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${type}`;
-            msgDiv.textContent = text;
-            wrapper.appendChild(metaDiv);
-            wrapper.appendChild(msgDiv);
-            chatBox.appendChild(wrapper);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        // ------------------------------------------
+        // DATA TRANSMISSION
+        // ------------------------------------------
+
+        async function transmitText() {
+            const bar = document.getElementById('userInput');
+            const str = bar.value.trim();
+            if (!str) return;
+            
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const p = { type: 'txt', content: str, ts: now };
+            const sealed = await sealPacket(JSON.stringify(p));
+            
+            if (nodeConn?.open) nodeConn.send(sealed);
+            renderBubble(str, 'You', 'outgoing', now);
+            
+            bar.value = ''; 
+            broadcastTyping(true);
         }
 
-        async function handleTyping() {
-            if (!typingTimer) {
-                await send({ type: 'typing', status: 'start' });
+        function processImageUpload(e) { 
+            const f = e.target.files[0]; 
+            if (f) {
+                const scan = new FileReader();
+                scan.onload = event => dispatchMediaPacket(event.target.result, 'img');
+                scan.readAsDataURL(f);
             }
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(async () => {
-                await send({ type: 'typing', status: 'stop' });
-                typingTimer = null;
+        }
+
+        async function dispatchMediaPacket(data, mediaType) {
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const p = { type: mediaType, content: data, ts: now };
+            const sealed = await sealPacket(JSON.stringify(p));
+            
+            if (nodeConn?.open) nodeConn.send(sealed);
+            renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio');
+        }
+
+        // ------------------------------------------
+        // RENDER ENGINE
+        // ------------------------------------------
+
+        function renderBubble(txt, owner, side, ts) {
+            const list = document.getElementById('scrollContainer');
+            const wrap = document.createElement('div'); 
+            wrap.className = `bubble-wrap ${side}`;
+            wrap.innerHTML = `
+                <div class="bubble">${txt}</div>
+                <div class="meta">${owner} • ${ts}</div>
+            `;
+            list.appendChild(wrap); 
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function renderMedia(src, owner, side, ts, kind) {
+            const list = document.getElementById('scrollContainer');
+            const wrap = document.createElement('div'); 
+            wrap.className = `bubble-wrap ${side}`;
+            
+            let content = '';
+            if (kind === 'image') {
+                content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Node Media">`;
+            } else {
+                content = `<audio controls src="${src}"></audio>`;
+            }
+            
+            wrap.innerHTML = `
+                <div class="bubble">${content}</div>
+                <div class="meta">${owner} • ${ts}</div>
+            `;
+            list.appendChild(wrap); 
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function popLightbox(src) { 
+            document.getElementById('viewerImg').src = src; 
+            document.getElementById('imageViewer').style.display = 'flex'; 
+        }
+
+        // ------------------------------------------
+        // INTERACTIVITY & TERMINATION
+        // ------------------------------------------
+
+        async function broadcastTyping(stop = false) {
+            if (stop) { 
+                const s = await sealPacket(JSON.stringify({ type: 'typing', active: false })); 
+                if (nodeConn?.open) nodeConn.send(s); 
+                clearTimeout(typeTick); 
+                typeTick = null; 
+                return; 
+            }
+            if (!typeTick) { 
+                const s = await sealPacket(JSON.stringify({ type: 'typing', active: true })); 
+                if (nodeConn?.open) nodeConn.send(s); 
+            }
+            clearTimeout(typeTick);
+            typeTick = setTimeout(async () => { 
+                const s = await sealPacket(JSON.stringify({ type: 'typing', active: false })); 
+                if (nodeConn?.open) nodeConn.send(s); 
+                typeTick = null; 
             }, 2500);
         }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
-            setTimeout(() => {
-                if (statusDiv.innerHTML.includes(message)) {
-                    statusDiv.innerHTML = '';
-                }
-            }, 4000);
-        }
-
-        function copyCode(event) {
-            const code = document.getElementById('codeDisplay').textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                btn.disabled = true;
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }, 2000);
-            });
+        function handleKeySubmit(e) { if (e.key === 'Enter') transmitText(); }
+        
+        function handleDragOver(e) { 
+            e.preventDefault(); 
+            document.getElementById('dropHint').classList.remove('hidden'); 
         }
         
-        function resetSetup() {
-            document.getElementById('createSection').classList.add('hidden');
-            document.getElementById('joinSection').classList.add('hidden');
-            document.querySelector('.setup-buttons').style.display = 'flex';
-            document.getElementById('codeDisplay').textContent = '';
-            document.getElementById('joinCode').value = '';
+        function handleDragLeave() { 
+            document.getElementById('dropHint').classList.add('hidden'); 
         }
-
-        function disconnect(silent = false) {
-            if (codeExpirationTimer) clearInterval(codeExpirationTimer);
-            if (typingTimer) clearTimeout(typingTimer);
-            
-            if (conn) conn.close();
-            if (peer) peer.destroy();
-            
-            peer = null;
-            conn = null;
-            myPeerId = null;
-            myKeyPair = null;
-            sharedSecret = null;
-
-            document.getElementById('chatScreen').style.display = 'none';
-            document.getElementById('setupScreen').style.display = 'block';
-            document.getElementById('messageInput').value = '';
-            
-            resetSetup();
-            if (!silent) {
-                showStatus('Disconnected successfully.', 'success');
+        
+        function handleDrop(e) { 
+            e.preventDefault(); 
+            handleDragLeave(); 
+            const files = e.dataTransfer.files; 
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const r = new FileReader();
+                r.onload = ev => dispatchMediaPacket(ev.target.result, 'img');
+                r.readAsDataURL(files[0]);
             }
         }
+
+        /**
+         * Executes a secure session teardown.
+         */
+        function closeSession(msg) {
+            if (nodeConn) nodeConn.close(); 
+            if (nodePeer) nodePeer.destroy();
+            clearInterval(lifeTick);
+            
+            document.getElementById('chatView').style.display = 'none';
+            document.getElementById('setupView').style.display = 'none';
+            document.getElementById('deathView').classList.remove('hidden');
+            
+            if (msg) document.getElementById('cleanupStatus').textContent = msg;
+
+            let scrub = 10; 
+            const statusLabel = document.getElementById('cleanupStatus');
+            
+            killLoop = setInterval(() => { 
+                scrub--; 
+                if (scrub <= 0) { 
+                    clearInterval(killLoop); 
+                    location.reload(); 
+                } else {
+                    const baseText = msg || "Memory scrub in progress...";
+                    statusLabel.textContent = `${baseText} (${scrub}s)`; 
+                }
+            }, 1000);
+        }
+
+        /**
+         * REDO LOGIC: Resets the state without reloading the whole page.
+         * Clears all termination timers and returns to identity setup.
+         */
+        function redoAction() {
+            // Kill existing reset timer
+            if (killLoop) clearInterval(killLoop);
+            
+            // UI Reset
+            document.getElementById('deathView').classList.add('hidden');
+            document.getElementById('setupView').style.display = 'flex';
+            document.getElementById('scrollContainer').innerHTML = '';
+            
+            // Logical reset
+            resetSetupView();
+            
+            // Status Refresh
+            document.getElementById('cleanupStatus').textContent = "Memory scrub in progress...";
+        }
+
     </script>
 </body>
+<!--
+    SECURITY DISCLOSURE:
+    Thorium utilizes the client-side SubtleCrypto API. All encryption occurs 
+    within the isolated browser sandbox. No private keys are ever transmitted 
+    across the signaling layer. This specific build includes session life 
+    management to ensure signaling nodes are not left active indefinitely.
+-->
 </html>
-
