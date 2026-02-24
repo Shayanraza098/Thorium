@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thorium</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
     
     <style>
-
         :root {
             /* Palette: Core Light */
             --background-start: #f8fafc;
             --background-end: #e2e8f0;
             --surface: #ffffff;
-            --surface-glass: rgba(255, 255, 255, 0.7);
+            --surface-glass: rgba(255, 255, 255, 0.85);
             
             /* Gradient Architecture */
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -32,6 +35,7 @@
             --success: #10b981;
             --waiting-bg: #fef3c7;
             --waiting-text: #92400e;
+            --border-color: rgba(0, 0, 0, 0.05);
             
             /* Font Systems */
             --font-main: 'Inter', system-ui, -apple-system, sans-serif;
@@ -54,29 +58,28 @@
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-         */
+        /* DARK MODE - NOW TRUE BLACK */
         body.dark-mode {
-            --background-start: #020617;
-            --background-end: #0f172a;
-            --surface: #1e293b;
-            --surface-glass: rgba(30, 41, 59, 0.7);
-            --secondary: #334155;
-            --secondary-hover: #475569;
+            --background-start: #000000;
+            --background-end: #000000;
+            --surface: #111111;
+            --surface-glass: rgba(15, 15, 15, 0.85);
+            --secondary: #222222;
+            --secondary-hover: #333333;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --glow-color: rgba(168, 85, 247, 0.2);
-            --input-bg: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
-       * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             transition: 
                 background-color var(--speed-normal) var(--ease-in-out),
                 color var(--speed-normal) var(--ease-in-out),
-                border-color var(--speed-normal) var(--ease-in-out),
-                box-shadow var(--speed-normal) var(--ease-in-out);
+                border-color var(--speed-normal) var(--ease-in-out);
         }
 
         body {
@@ -103,38 +106,26 @@
             height: 90vh;
             display: flex;
             flex-direction: column;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             animation: containerEnter var(--speed-slow) var(--ease-out-expo) forwards;
             position: relative;
+            overflow: hidden;
         }
 
         @keyframes containerEnter {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* * ==========================================
-         * HEADER COMPONENTS
-         * ==========================================
-         */
+        /* HEADER COMPONENTS */
         .header {
             padding: 32px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--border-color);
             position: relative;
-        }
-
-        body.dark-mode .header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .theme-toggle {
@@ -156,7 +147,6 @@
         .theme-toggle:hover {
             transform: translateY(-2px);
             background-color: var(--secondary-hover);
-            box-shadow: var(--shadow-sm);
         }
 
         .theme-toggle svg {
@@ -165,7 +155,6 @@
             fill: var(--text-primary);
         }
 
-        /* FIXED: Header h1 styling for perfect gradient rendering */
         .header h1 {
             font-size: 2.2em;
             font-weight: 800;
@@ -175,10 +164,8 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: transparent; /* Fallback for browsers that don't support text-fill-color */
+            color: transparent;
             margin-bottom: 6px;
-            width: fit-content;
-            display: block;
         }
 
         .header p {
@@ -187,10 +174,7 @@
             font-weight: 500;
         }
 
-        /* * ==========================================
-         * CONTENT WRAPPER & NAVIGATION
-         * ==========================================
-         */
+        /* CONTENT WRAPPER */
         .content {
             padding: 32px;
             flex-grow: 1;
@@ -200,10 +184,7 @@
             flex-direction: column;
             scrollbar-width: none;
         }
-
-        .content::-webkit-scrollbar {
-            display: none;
-        }
+        .content::-webkit-scrollbar { display: none; }
 
         .setup-screen, .chat-screen, .disconnect-screen {
             width: 100%;
@@ -212,19 +193,13 @@
             flex-direction: column;
         }
 
-        .fade-in {
-            animation: screenFade var(--speed-normal) var(--ease-in-out) both;
-        }
-
+        .fade-in { animation: screenFade var(--speed-normal) var(--ease-in-out) both; }
         @keyframes screenFade {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* * ==========================================
-         * UI ELEMENTS: INPUTS & BUTTONS
-         * ==========================================
-         */
+        /* UI ELEMENTS */
         .screen-title {
             font-weight: 700;
             font-size: 1.6em;
@@ -234,10 +209,7 @@
             letter-spacing: -0.02em;
         }
 
-        .input-wrapper {
-            margin-bottom: 20px;
-        }
-
+        .input-wrapper { margin-bottom: 20px; }
         .input-wrapper label {
             display: block;
             margin-bottom: 10px;
@@ -266,11 +238,7 @@
             box-shadow: 0 0 0 4px var(--glow-color);
         }
 
-        .button-group {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
+        .button-group { display: flex; gap: 16px; margin-top: 8px; }
 
         button.action-trigger {
             background-image: var(--primary-gradient);
@@ -291,12 +259,9 @@
         button.action-trigger:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 20px -5px var(--glow-color);
-            filter: brightness(1.05);
         }
 
-        button.action-trigger:active {
-            transform: translateY(0);
-        }
+        button.action-trigger:active { transform: translateY(0); }
 
         button.action-trigger.outline {
             background-image: none;
@@ -304,19 +269,10 @@
             color: var(--text-primary);
             box-shadow: none;
         }
+        button.action-trigger.outline:hover { background-color: var(--secondary-hover); }
 
-        button.action-trigger.outline:hover {
-            background-color: var(--secondary-hover);
-        }
-
-        /* * ==========================================
-         * CHAT INTERFACE: MESSAGES
-         * ==========================================
-         */
-        .chat-screen {
-            display: none;
-            height: 100%;
-        }
+        /* CHAT INTERFACE */
+        .chat-screen { display: none; height: 100%; position: relative; }
 
         .message-viewport {
             flex-grow: 1;
@@ -333,11 +289,18 @@
             flex-direction: column;
             max-width: 80%;
             animation: bubblePop 0.4s var(--ease-out-expo) both;
+            position: relative;
         }
 
         @keyframes bubblePop {
             from { opacity: 0; transform: scale(0.9) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .bubble-content-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .bubble {
@@ -347,19 +310,18 @@
             line-height: 1.55;
             word-wrap: break-word;
             box-shadow: var(--shadow-sm);
+            position: relative;
         }
 
-        .bubble img {
-            max-width: 100%;
-            border-radius: 14px;
-            margin: 6px 0;
-            display: block;
-        }
-
-        .bubble audio {
-            width: 100%;
-            height: 36px;
-            margin-top: 10px;
+        .bubble img { max-width: 100%; border-radius: 14px; margin: 6px 0; display: block; }
+        
+        /* FIXED AUDIO SIZING: Prevent collapsing to 0 width */
+        .bubble audio { 
+            width: 250px; 
+            max-width: 100%; 
+            height: 44px; 
+            margin-top: 8px; 
+            outline: none;
         }
 
         .meta {
@@ -368,35 +330,107 @@
             margin-top: 6px;
             color: var(--text-secondary);
             padding: 0 4px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
         }
 
-        /* Sent/Received Visual Differentiation */
-        .bubble-wrap.outgoing {
-            align-self: flex-end;
-            align-items: flex-end;
+        .edited-tag {
+            font-size: 0.85em;
+            opacity: 0.7;
+            font-style: italic;
         }
 
-        .bubble-wrap.incoming {
-            align-self: flex-start;
-            align-items: flex-start;
+        /* Message Reactions */
+        .msg-reactions {
+            position: absolute;
+            bottom: -10px;
+            right: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2px 6px;
+            font-size: 0.85em;
+            box-shadow: var(--shadow-sm);
+            display: none;
         }
+        .msg-reactions.active { display: block; }
+
+        /* Message Action Menu */
+        .msg-action-btn {
+            cursor: pointer;
+            opacity: 0;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bubble-wrap:hover .msg-action-btn { opacity: 1; }
+        .msg-action-btn:hover { background-color: var(--secondary); }
+
+        /* NEW: Container to pin the dropdown directly to the button */
+        .action-menu-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .msg-dropdown {
+            position: absolute;
+            top: 100%;
+            margin-top: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 120px;
+        }
+
+        /* Fixed positioning: Open to the left for outgoing, right for incoming */
+        .bubble-wrap.outgoing .msg-dropdown { left: 0; }
+        .bubble-wrap.incoming .msg-dropdown { right: 0; }
+
+        .msg-dropdown button {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        .msg-dropdown button:hover { background-color: var(--secondary); }
+        .msg-dropdown .react-row { display: flex; justify-content: space-around; padding: 4px; }
+        .msg-dropdown .react-row span { cursor: pointer; font-size: 1.2em; padding: 4px; border-radius: 8px; }
+        .msg-dropdown .react-row span:hover { background-color: var(--secondary); }
+        .msg-dropdown .divider { height: 1px; background-color: var(--border-color); margin: 4px 0; }
+
+        .bubble-wrap.outgoing { align-self: flex-end; align-items: flex-end; }
+        .bubble-wrap.outgoing .bubble-content-row { flex-direction: row-reverse; }
+        .bubble-wrap.incoming { align-self: flex-start; align-items: flex-start; }
 
         .outgoing .bubble {
             background: var(--primary-gradient);
             color: white;
             border-bottom-right-radius: 4px;
         }
-
         .incoming .bubble {
             background-color: var(--secondary);
             color: var(--text-primary);
             border-bottom-left-radius: 4px;
         }
 
-        /* * ==========================================
-         * INPUT BAR & MULTIMEDIA MENU
-         * ==========================================
-         */
+        /* INPUT BAR */
         .composer {
             display: flex;
             gap: 12px;
@@ -444,7 +478,6 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* Attachment Menu Styling */
         .attachment-menu {
             position: absolute;
             bottom: 70px;
@@ -458,13 +491,11 @@
             padding: 10px;
             z-index: 100;
         }
-
         .attachment-menu.open {
             display: flex;
             flex-direction: column;
             animation: menuSlide var(--speed-normal) var(--ease-out-expo);
         }
-
         @keyframes menuSlide {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -481,26 +512,20 @@
             cursor: pointer;
             color: var(--text-primary);
         }
+        .tray-item:hover { background-color: var(--secondary); }
 
-        .tray-item:hover {
-            background-color: var(--secondary);
+        .typing-indicator {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-style: italic;
         }
+        .typing-indicator.visible { opacity: 1; }
 
-        .tray-item.rec {
-            color: var(--danger);
-            animation: recPulse 1s infinite;
-        }
-
-        @keyframes recPulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        /* * ==========================================
-         * UTILITY: STATUS & MODALS
-         * ==========================================
-         */
+        /* STATUS BADGES */
         .connection-status {
             text-align: center;
             padding: 10px;
@@ -515,7 +540,6 @@
             color: var(--waiting-text);
             animation: pulseFade 2s infinite ease-in-out;
         }
-        
         @keyframes pulseFade {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
@@ -536,8 +560,8 @@
 
         .hidden { display: none !important; }
 
-        /* Fullscreen Camera Modal */
-        #camOverlay {
+        /* OVERLAYS & MODALS */
+        #camOverlay, #imageViewer, #disconnectOverlay {
             position: fixed;
             inset: 0;
             background-color: rgba(0,0,0,0.9);
@@ -548,6 +572,125 @@
             justify-content: center;
             padding: 40px;
         }
+        
+        #disconnectOverlay {
+            position: absolute; /* Relative to container */
+            background-color: var(--surface-glass);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .dc-modal-content {
+            background-color: var(--surface);
+            padding: 40px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .dc-timer {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--danger);
+            margin: 20px 0;
+        }
+
+        /* NEW: Image Preview Overlay & View Once */
+        #imageSendOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 5500;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .preview-card {
+            background-color: var(--surface);
+            padding: 24px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        #previewImgTarget {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            background: #000;
+        }
+
+        .preview-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--secondary);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+        }
+
+        .view-once-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .view-once-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+
+        select.quality-select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 0.85em;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .view-once-btn {
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .view-once-btn:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .view-once-btn.opened {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         #videoPipe {
             width: 100%;
@@ -556,13 +699,7 @@
             background-color: #000;
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
         }
-
-        .cam-actions {
-            margin-top: 32px;
-            display: flex;
-            gap: 24px;
-        }
-
+        .cam-actions { margin-top: 32px; display: flex; gap: 24px; }
         .shutter {
             width: 72px;
             height: 72px;
@@ -574,60 +711,39 @@
             justify-content: center;
             cursor: pointer;
         }
-        
-        .shutter svg { width: 32px; height: 32px; fill: #000; }
+        #imageViewer { cursor: zoom-out; background-color: rgba(0,0,0,0.95); z-index: 6000; }
+        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; }
 
-        /* Lightbox Overlay */
-        #imageViewer {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.95);
-            z-index: 6000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
-        }
-
-        #imageViewer img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 12px;
-        }
     </style>
 </head>
-
 <body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
     
     <div class="container" id="app">
         
-        <!-- Drag Feedback Overlay -->
         <div class="drag-overlay hidden" id="dropHint">Drop your file here</div>
         
-        <!-- App Header -->
         <header class="header">
             <button class="theme-toggle" id="modeSwitch" title="Switch Theme">
                 <svg id="modeIcon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
             </button>
             <h1>Thorium</h1>
-            <p>End-to-End P2P Link</p>
+            <p>Private Chat</p>
         </header>
 
         <main class="content">
             
-            <!-- Setup Initial Screen -->
+            <!-- Setup Screen -->
             <section class="setup-screen fade-in" id="setupView">
-                <h2 class="screen-title">Start a Session</h2>
+                <h2 class="screen-title">Start Chat</h2>
                 
                 <div class="input-wrapper">
                     <label for="identity">Your Name</label>
                     <input type="text" id="identity" placeholder="e.g., Virat">
                 </div>
 
-                <!-- HOST SELECTION AREA -->
                 <div id="hostOptions">
                     <div class="input-wrapper">
-                        <label for="sessionLife">Session Life (Code Expiry)</label>
+                        <label for="sessionLife">Code Expires In</label>
                         <select id="sessionLife" onchange="checkManualLife()">
                             <option value="60">1 Minute (Quick Link)</option>
                             <option value="300" selected>5 Minutes (Standard)</option>
@@ -641,23 +757,21 @@
                     </div>
 
                     <div class="button-group">
-                        <button class="action-trigger" onclick="initiateHosting()">Establish Host</button>
-                        <button class="action-trigger outline" onclick="revealJoinPanel()">Join Host</button>
+                        <button class="action-trigger" onclick="initiateHosting()">Start Chat</button>
+                        <button class="action-trigger outline" onclick="revealJoinPanel()">Join Chat</button>
                     </div>
                 </div>
 
-                <!-- Hosting Progress Sub-section -->
                 <div id="hostingArea" class="hidden">
                     <div class="code-well" id="nodeCode">------</div>
-                    <button class="action-trigger outline" onclick="copyIdentityID()">Copy Code </button>
-                    <div class="connection-status status-badge waiting" id="nodeStatus">Awaiting to connect</div>
+                    <button class="action-trigger outline" onclick="copyIdentityID(this)">Copy Code</button>
+                    <div class="connection-status status-badge waiting" id="nodeStatus">Waiting for friend to connect...</div>
                 </div>
 
-                <!-- Joining Details Sub-section -->
                 <div id="joiningArea" class="hidden">
                     <div class="input-wrapper" style="margin-top: 24px;">
-                        <label for="targetID">Target Node ID</label>
-                        <input type="text" id="targetID" placeholder="Enter peer code">
+                        <label for="targetID">Friend's Code</label>
+                        <input type="text" id="targetID" placeholder="Enter code here">
                     </div>
                     <div class="button-group">
                         <button class="action-trigger" onclick="connectToNode()">Connect</button>
@@ -677,7 +791,6 @@
                 <div class="typing-indicator" id="peerTyping"></div>
                 
                 <div class="composer">
-                    <!-- Multimedia Action Trigger -->
                     <div class="action-container">
                         <button class="action-tray-trigger" onclick="toggleTray()" id="trayIcon" title="Attachments">
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -686,11 +799,11 @@
                         <div class="attachment-menu" id="trayMenu">
                             <div class="tray-item" onclick="startCameraLink()">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                Snap Frame
+                                Take Photo
                             </div>
                             <label class="tray-item">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                                File Library
+                                Send File
                                 <input type="file" id="imagePicker" class="hidden" accept="image/*" onchange="processImageUpload(event)">
                             </label>
                             <div class="tray-item" id="micTrigger" onclick="manageVoiceComms()">
@@ -707,17 +820,18 @@
                     </button>
                 </div>
                 
-                <button class="action-trigger outline" style="margin-top: 16px; font-size: 0.8em; padding: 10px;" onclick="closeSession()">End Connection</button>
-            </section>
+                <button class="action-trigger outline" style="margin-top: 16px; font-size: 0.8em; padding: 10px;" onclick="requestDisconnect()">Disconnect</button>
 
-            <!-- Disconnect Screen -->
-            <section class="disconnect-screen fade-in hidden" id="deathView">
-                <h2 class="screen-title">Node Purged</h2>
-                <p id="cleanupStatus" style="text-align: center; color: var(--text-secondary); margin-bottom: 24px;">Memory scrub in progress...</p>
-                <div class="button-group">
-                    <button class="action-trigger" onclick="redoAction()">Redo Session</button>
-                    <button class="action-trigger outline" onclick="location.reload()">Reset All</button>
+                <!-- Disconnect Undo Modal inside Chat -->
+                <div id="disconnectOverlay">
+                    <div class="dc-modal-content">
+                        <h2 class="screen-title" style="margin-bottom: 10px;">Chat Closing</h2>
+                        <p style="color: var(--text-secondary)">Disconnect initiated. You can undo this action.</p>
+                        <div class="dc-timer" id="dcTimerText">10</div>
+                        <button class="action-trigger" onclick="undoDisconnect()">Undo (Keep Chat Open)</button>
+                    </div>
                 </div>
+
             </section>
         </main>
     </div>
@@ -726,10 +840,34 @@
     <div id="camOverlay">
         <video id="videoPipe" autoplay playsinline></video>
         <div class="cam-actions">
-            <button class="action-trigger outline" style="width: auto;" onclick="haltCamera()">Abort</button>
-            <button class="shutter" onclick="freezeFrame()">
+            <button class="action-trigger outline" style="width: auto;" onclick="haltCamera()">Cancel</button>
+            <button class="shutter" onclick="captureAndPreview()">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
             </button>
+        </div>
+    </div>
+
+    <!-- Image Preview & Send Configuration -->
+    <div id="imageSendOverlay">
+        <div class="preview-card">
+            <h3 class="screen-title" style="margin-bottom: 0; font-size: 1.2em;">Send Photo</h3>
+            <img id="previewImgTarget" src="" alt="Preview">
+            
+            <div class="preview-options">
+                <label class="view-once-toggle">
+                    <input type="checkbox" id="viewOnceCheck">
+                    View Once
+                </label>
+                <select class="quality-select" id="imageQualitySelect">
+                    <option value="standard">Standard (Fast)</option>
+                    <option value="hd">HD (Slow)</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="action-trigger" onclick="confirmSendImage()">Send Photo</button>
+                <button class="action-trigger outline" onclick="cancelSendImage()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -737,28 +875,19 @@
         <img id="viewerImg" src="" alt="Multimedia decrypted view">
     </div>
 
-    <!-- Signaling substrate -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
     
     <script>
-        /**
-         * ==========================================
-         * JAVASCRIPT LOGIC SUBSYSTEM
-         * ==========================================
-         */
-
-        // ------------------------------------------
-        // GLOBAL STATE REGISTRY
-        // ------------------------------------------
-        let nodePeer = null;         // Peer Instance
-        let nodeConn = null;         // Established Link
-        let localAlias = '';         // Local Identity
-        let remoteAlias = 'Peer';    // Remote Identity
-        let nodeKeys = null;         // ECDH Pair
-        let cipherKey = null;        // Derived AES Key
-        let typeTick = null;         // Typing Debounce
-        let lifeTick = null;         // Code Expiration Tick
-        let killLoop = null;         // Global Termination Interval
+        // GLOBAL STATE
+        let nodePeer = null;         
+        let nodeConn = null;         
+        let localAlias = '';         
+        let remoteAlias = 'Friend';    
+        let nodeKeys = null;         
+        let cipherKey = null;        
+        let typeTick = null;         
+        let lifeTick = null;         
+        let killLoop = null;         
         
         // Voice Data
         let audioRecorder = null;
@@ -766,18 +895,20 @@
         let isCapturingAudio = false;
         let streamHandle = null;
 
-        // ------------------------------------------
-        // THEME INTERFACE HANDLERS
-        // ------------------------------------------
+        // Image Sending & View Once State
+        let pendingImageBase64 = null;
+        const viewOnceStore = {};
+
+        // Disconnect Timer Data
+        let dcTimer = null;
+        let dcCountdown = 10;
+
+        // THEME HANDLERS
         const modeSwitch = document.getElementById('modeSwitch');
         const modeIcon = document.getElementById('modeIcon');
-        
         const SUN = "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z";
         const MOON = "M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z";
 
-        /**
-         * Refreshes the SVG path and storage preference.
-         */
         function applyMode() {
             const dark = document.body.classList.contains('dark-mode');
             modeIcon.innerHTML = `<path d="${dark ? SUN : MOON}"/>`;
@@ -789,191 +920,234 @@
             applyMode();
         });
 
-        // Preference recovery
         if(localStorage.getItem('thor-pref') === 'true') { 
             document.body.classList.add('dark-mode'); 
             applyMode(); 
         }
 
-        // ------------------------------------------
-        // CRYPTO CORE (WebCrypto API Wrapper)
-        // ------------------------------------------
-        
-        /**
-         * Generates an Elliptic Curve key pair on the P-256 curve.
-         * @returns {Promise<CryptoKeyPair>} The cryptographic pair.
-         */
+        // CLOSE ANY OPEN MESSAGE MENUS WHEN CLICKING OUTSIDE
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.msg-action-btn') && !e.target.closest('.msg-dropdown')) {
+                document.querySelectorAll('.msg-dropdown').forEach(m => m.classList.add('hidden'));
+            }
+        });
+
+        // CRYPTO CORE
+        function bufferToBase64(buf) {
+            let binary = '';
+            const bytes = new Uint8Array(buf);
+            const chunkSize = 8192; 
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+            }
+            return window.btoa(binary);
+        }
+
+        function base64ToBuffer(b64) {
+            const binary_string = window.atob(b64);
+            const len = binary_string.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary_string.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
         async function fetchNewKeys() { 
             return await window.crypto.subtle.generateKey(
-                { name: "ECDH", namedCurve: "P-256" }, 
-                true, 
-                ["deriveKey"]
+                { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]
             ); 
         }
 
-        /**
-         * Computes the shared symmetric key via DH algorithm.
-         * @param {CryptoKey} priv Local private.
-         * @param {CryptoKey} pub Remote public.
-         */
         async function synthesizeSharedKey(priv, pub) { 
             return await window.crypto.subtle.deriveKey(
-                { name: "ECDH", public: pub }, 
-                priv, 
-                { name: "AES-GCM", length: 256 }, 
-                true, 
-                ["encrypt", "decrypt"]
+                { name: "ECDH", public: pub }, priv, 
+                { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
             ); 
         }
 
-        /**
-         * Wraps plaintext into an encrypted and authenticated GCM packet.
-         * @param {string} raw Raw text data.
-         * @returns {Promise<Object>} The encrypted structure.
-         */
         async function sealPacket(raw) {
             if (!cipherKey) return null;
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const bytes = new TextEncoder().encode(raw);
-            const sealed = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: iv }, 
-                cipherKey, 
-                bytes
-            );
-            return { 
-                ciphertext: Array.from(new Uint8Array(sealed)), 
-                iv: Array.from(iv) 
-            };
+            const sealed = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, cipherKey, bytes);
+            return { ciphertext: bufferToBase64(sealed), iv: bufferToBase64(iv) };
         }
 
-        /**
-         * Deciphers and verifies the GCM packet.
-         * @param {Object} blob The encrypted structure.
-         * @returns {Promise<string|null>} Plaintext or failure.
-         */
         async function unsealPacket(blob) {
             if (!cipherKey) return null;
             try {
                 const dec = await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: new Uint8Array(blob.iv) }, 
-                    cipherKey, 
-                    new Uint8Array(blob.ciphertext)
+                    { name: "AES-GCM", iv: base64ToBuffer(blob.iv) }, cipherKey, base64ToBuffer(blob.ciphertext)
                 );
                 return new TextDecoder().decode(dec);
-            } catch (error) { 
-                console.warn("Security Breach: Unauthorized or Corrupted Packet.", error);
-                return null; 
+            } catch (error) { return null; }
+        }
+
+        async function sendSecurePacket(obj) {
+            if (nodeConn?.open) {
+                const sealed = await sealPacket(JSON.stringify(obj));
+                nodeConn.send(sealed);
             }
         }
 
-        // ------------------------------------------
         // MULTIMEDIA ENGINE
-        // ------------------------------------------
-        
         function toggleTray() { 
             document.getElementById('trayMenu').classList.toggle('open'); 
         }
 
-        // Global blur for menu
         window.addEventListener('mousedown', (e) => { 
             if (!e.target.closest('.action-container')) {
                 document.getElementById('trayMenu').classList.remove('open'); 
             }
         });
 
-        /**
-         * Requests video stream and opens the capture viewport.
-         */
         async function startCameraLink() {
             toggleTray();
             try {
-                streamHandle = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" },
-                    audio: false 
-                });
-                const pipe = document.getElementById('videoPipe');
-                pipe.srcObject = streamHandle;
+                streamHandle = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                document.getElementById('videoPipe').srcObject = streamHandle;
                 document.getElementById('camOverlay').style.display = 'flex';
-            } catch (err) { 
-                alert("Technical Halt: Camera Hardware Restricted.");
-            }
+            } catch (err) { alert("Camera access denied."); }
         }
 
         function haltCamera() {
-            if (streamHandle) {
-                streamHandle.getTracks().forEach(t => t.stop());
-            }
+            if (streamHandle) streamHandle.getTracks().forEach(t => t.stop());
             document.getElementById('camOverlay').style.display = 'none';
         }
 
-        /**
-         * Renders the current frame to canvas and serializes for transport.
-         */
-        function freezeFrame() {
+        function captureAndPreview() {
             const pipe = document.getElementById('videoPipe');
             const sheet = document.createElement('canvas');
             sheet.width = pipe.videoWidth;
             sheet.height = pipe.videoHeight;
-            const brush = sheet.getContext('2d');
-            brush.drawImage(pipe, 0, 0, sheet.width, sheet.height);
-            const b64 = sheet.toDataURL('image/jpeg', 0.82);
-            dispatchMediaPacket(b64, 'img');
+            sheet.getContext('2d').drawImage(pipe, 0, 0, sheet.width, sheet.height);
+            
+            pendingImageBase64 = sheet.toDataURL('image/jpeg', 0.9);
             haltCamera();
+            
+            showImagePreviewModal();
         }
 
-        /**
-         * Orchestrates the audio capture and encryption lifecycle.
-         */
+        function processImageUpload(e) { 
+            const f = e.target.files[0]; 
+            if (f) {
+                const scan = new FileReader();
+                scan.onload = event => {
+                    pendingImageBase64 = event.target.result;
+                    showImagePreviewModal();
+                };
+                scan.readAsDataURL(f);
+                e.target.value = ''; // Reset input
+            }
+        }
+
+        function showImagePreviewModal() {
+            document.getElementById('previewImgTarget').src = pendingImageBase64;
+            document.getElementById('viewOnceCheck').checked = false;
+            document.getElementById('imageQualitySelect').value = 'standard';
+            document.getElementById('imageSendOverlay').style.display = 'flex';
+            toggleTray(); // Close attachments menu
+        }
+
+        function cancelSendImage() {
+            pendingImageBase64 = null;
+            document.getElementById('imageSendOverlay').style.display = 'none';
+        }
+
+        function confirmSendImage() {
+            const isViewOnce = document.getElementById('viewOnceCheck').checked;
+            const isHD = document.getElementById('imageQualitySelect').value === 'hd';
+            document.getElementById('imageSendOverlay').style.display = 'none';
+            
+            if (!pendingImageBase64) return;
+            
+            compressBase64(pendingImageBase64, isHD, (finalBase64) => {
+                dispatchMediaPacket(finalBase64, 'img', isViewOnce);
+                pendingImageBase64 = null;
+            });
+        }
+
+        // Image Compression Engine
+        function compressBase64(b64, isHD, callback) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = isHD ? 1920 : 800; 
+                const quality = isHD ? 0.9 : 0.65;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = b64;
+        }
+
         async function manageVoiceComms() {
             const mic = document.getElementById('micTrigger');
             if (!isCapturingAudio) {
                 try {
                     const sound = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    audioRecorder = new MediaRecorder(sound);
+                    
+                    // Fixed compatibility for multiple browsers (Safari/Chrome/Firefox)
+                    let options = {};
+                    if (MediaRecorder.isTypeSupported('audio/webm')) {
+                        options = { mimeType: 'audio/webm' };
+                    } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        options = { mimeType: 'audio/mp4' };
+                    }
+                    
+                    audioRecorder = new MediaRecorder(sound, options);
                     pcmChunks = [];
                     
-                    audioRecorder.ondataavailable = event => { pcmChunks.push(event.data); };
+                    audioRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) pcmChunks.push(event.data);
+                    };
+                    
                     audioRecorder.onstop = async () => {
-                        const blob = new Blob(pcmChunks, { type: 'audio/webm' });
                         const conv = new FileReader();
-                        conv.onload = async (e) => { dispatchMediaPacket(e.target.result, 'voice'); };
-                        conv.readAsDataURL(blob);
+                        conv.onload = async (e) => dispatchMediaPacket(e.target.result, 'voice');
+                        
+                        // Ensure blob has exact mimeType so the browser creates a playable Data URI
+                        const audioType = audioRecorder.mimeType || 'audio/webm';
+                        conv.readAsDataURL(new Blob(pcmChunks, { type: audioType }));
                         sound.getTracks().forEach(track => track.stop());
                     };
                     
-                    audioRecorder.start();
+                    audioRecorder.start(200); // 200ms slices ensure consistent chunking across devices
                     isCapturingAudio = true;
-                    mic.classList.add('rec');
-                    mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> End Recording';
-                } catch (err) { 
-                    alert("Technical Halt: Audio Hardware Restricted.");
-                }
+                    mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop Recording';
+                } catch (err) { alert("Microphone access denied."); }
             } else {
                 audioRecorder.stop();
                 isCapturingAudio = false;
-                mic.classList.remove('rec');
                 mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v11m0 0a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"/></svg> Voice Note';
                 toggleTray();
             }
         }
 
-        // ------------------------------------------
-        // SESSION ESTABLISHMENT LOGIC
-        // ------------------------------------------
-        
+        // SESSION ESTABLISHMENT
         function checkManualLife() {
             const val = document.getElementById('sessionLife').value;
-            const box = document.getElementById('manualLifeBox');
-            if (val === 'custom') box.classList.remove('hidden');
-            else box.classList.add('hidden');
+            if (val === 'custom') document.getElementById('manualLifeBox').classList.remove('hidden');
+            else document.getElementById('manualLifeBox').classList.add('hidden');
         }
 
         function validateIdentity() {
             const val = document.getElementById('identity').value.trim();
-            if (!val) { 
-                showFeedback('Enter your name first', 'error'); 
-                return false; 
-            }
+            if (!val) { showFeedback('Enter your name first', 'error'); return false; }
             localAlias = val; 
             return true;
         }
@@ -984,25 +1158,23 @@
             setTimeout(() => { log.innerHTML = ''; }, 4500);
         }
 
-        function copyIdentityID() {
+        function copyIdentityID(btnElement) {
             const id = document.getElementById('nodeCode').textContent;
             navigator.clipboard.writeText(id).then(() => {
-                showFeedback('Node Fingerprint copied to clipboard.', 'success');
+                const origText = btnElement.innerText;
+                btnElement.innerText = "Copied!";
+                setTimeout(() => { btnElement.innerText = origText; }, 2000);
             });
         }
 
-        /**
-         * Spawns a new Signaling Node and displays host credentials.
-         */
         async function initiateHosting() {
             if (!validateIdentity()) return;
             
-            // Handle Session Expiry Calculation
-            const lifeSel = document.getElementById('sessionLife').value;
             let secondsLeft = 300;
+            const lifeSel = document.getElementById('sessionLife').value;
             if (lifeSel === 'custom') {
                 const mins = parseInt(document.getElementById('manualMinutes').value);
-                if (isNaN(mins) || mins <= 0) return showFeedback("Enter valid manual minutes.", "error");
+                if (isNaN(mins) || mins <= 0) return showFeedback("Enter valid minutes.", "error");
                 secondsLeft = mins * 60;
             } else {
                 secondsLeft = parseInt(lifeSel);
@@ -1015,22 +1187,18 @@
             nodeKeys = await fetchNewKeys();
             const fingerprint = Math.random().toString(36).substring(2, 8).toUpperCase();
             
-            nodePeer = new Peer('thor-v4-' + fingerprint, { 
-                config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
-            });
+            nodePeer = new Peer('thor-v4-' + fingerprint, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
 
             nodePeer.on('open', () => {
                 document.getElementById('nodeCode').textContent = fingerprint;
-                
-                // Code Expiration Countdown
                 lifeTick = setInterval(() => {
                     if (secondsLeft <= 0) {
                         clearInterval(lifeTick);
-                        closeSession("Session code expired. Node purged.");
+                        finalizeDisconnect("Code expired. Chat closed.");
                     } else {
                         const m = Math.floor(secondsLeft / 60);
                         const s = (secondsLeft % 60).toString().padStart(2, '0');
-                        document.getElementById('nodeStatus').textContent = `Waiting for peer... (${m}:${s})`;
+                        document.getElementById('nodeStatus').textContent = `Waiting for friend... (${m}:${s})`;
                         secondsLeft--;
                     }
                 }, 1000);
@@ -1046,12 +1214,10 @@
         async function connectToNode() {
             if (!validateIdentity()) return;
             const code = document.getElementById('targetID').value.trim().toUpperCase();
-            if (!code) return showFeedback('Valid Session ID required.', 'error');
+            if (!code) return showFeedback('Valid Code required.', 'error');
             
             nodeKeys = await fetchNewKeys();
-            nodePeer = new Peer({ 
-                config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
-            });
+            nodePeer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
             
             nodePeer.on('open', () => { 
                 nodeConn = nodePeer.connect('thor-v4-' + code); 
@@ -1059,7 +1225,7 @@
             });
             
             nodePeer.on('error', () => { 
-                showFeedback('Link Abandoned: Host not found or code expired.', 'error'); 
+                showFeedback('Cannot find chat. Code may be expired.', 'error'); 
                 resetSetupView(); 
             });
         }
@@ -1079,18 +1245,11 @@
             document.getElementById('hostOptions').classList.remove('hidden');
         }
 
-        /**
-         * Key Negotiation Logic.
-         */
         function executeHandshake(isInitiator) {
             nodeConn.on('open', async () => {
                 if (isInitiator) {
                     const jwk = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
-                    nodeConn.send({ 
-                        type: 'hs-init', 
-                        alias: localAlias, 
-                        key: jwk 
-                    });
+                    nodeConn.send({ type: 'hs-init', alias: localAlias, key: jwk });
                 }
             });
             
@@ -1098,22 +1257,13 @@
                 if (incoming.type === 'hs-init' || incoming.type === 'hs-reply') {
                     remoteAlias = incoming.alias;
                     const foreignKey = await window.crypto.subtle.importKey(
-                        "jwk", 
-                        incoming.key, 
-                        { name: "ECDH", namedCurve: "P-256" }, 
-                        true, 
-                        []
+                        "jwk", incoming.key, { name: "ECDH", namedCurve: "P-256" }, true, []
                     );
-                    
                     cipherKey = await synthesizeSharedKey(nodeKeys.privateKey, foreignKey);
                     
                     if (incoming.type === 'hs-init') {
                         const localJWK = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
-                        nodeConn.send({ 
-                            type: 'hs-reply', 
-                            alias: localAlias, 
-                            key: localJWK 
-                        });
+                        nodeConn.send({ type: 'hs-reply', alias: localAlias, key: localJWK });
                     }
                     launchChatroom();
                 } else if (incoming.ciphertext) {
@@ -1122,103 +1272,207 @@
                 }
             });
             
-            nodeConn.on('close', () => closeSession());
+            nodeConn.on('close', () => finalizeDisconnect());
         }
 
         function launchChatroom() {
             document.getElementById('setupView').style.display = 'none';
             document.getElementById('chatView').style.display = 'flex';
-            document.getElementById('linkSuccess').innerHTML = `
-                End to End encrypted chat with <strong>${remoteAlias}</strong>
-            `;
+            document.getElementById('linkSuccess').innerHTML = `Private chat secured with <strong>${remoteAlias}</strong>`;
         }
 
-        /**
-         * Interprets and displays incoming verified payloads.
-         */
+        // DISCONNECT & UNDO LOGIC
+        function requestDisconnect() {
+            showDisconnectTimer();
+            sendSecurePacket({ type: 'intent_disconnect' });
+        }
+
+        function showDisconnectTimer() {
+            document.getElementById('disconnectOverlay').style.display = 'flex';
+            dcCountdown = 10;
+            document.getElementById('dcTimerText').innerText = dcCountdown;
+            
+            dcTimer = setInterval(() => {
+                dcCountdown--;
+                document.getElementById('dcTimerText').innerText = dcCountdown;
+                if (dcCountdown <= 0) {
+                    clearInterval(dcTimer);
+                    finalizeDisconnect();
+                }
+            }, 1000);
+        }
+
+        function undoDisconnect() {
+            clearInterval(dcTimer);
+            document.getElementById('disconnectOverlay').style.display = 'none';
+            sendSecurePacket({ type: 'undo_disconnect' });
+        }
+
+        // DATA ROUTING & ACTIONS
         function handleDataRouting(p) {
-            if (p.type === 'txt') renderBubble(p.content, remoteAlias, 'incoming', p.ts);
-            else if (p.type === 'img') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image');
-            else if (p.type === 'voice') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio');
+            if (p.type === 'txt') renderBubble(p.content, remoteAlias, 'incoming', p.ts, p.msgId);
+            else if (p.type === 'img') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image', p.msgId, p.viewOnce);
+            else if (p.type === 'voice') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio', p.msgId);
             else if (p.type === 'typing') {
                 const tip = document.getElementById('peerTyping');
-                tip.textContent = `${remoteAlias} is typing`;
+                tip.textContent = `${remoteAlias} is typing...`;
                 tip.className = p.active ? 'typing-indicator visible' : 'typing-indicator';
+            }
+            // Message Actions
+            else if (p.type === 'unsend') performUnsendLocal(p.msgId);
+            else if (p.type === 'edit') performEditLocal(p.msgId, p.newText);
+            else if (p.type === 'react') performReactLocal(p.msgId, p.reaction);
+            else if (p.type === 'viewed_once') markViewedOnce(p.msgId);
+            // Disconnect Actions
+            else if (p.type === 'intent_disconnect') showDisconnectTimer();
+            else if (p.type === 'undo_disconnect') {
+                clearInterval(dcTimer);
+                document.getElementById('disconnectOverlay').style.display = 'none';
             }
         }
 
-        // ------------------------------------------
-        // DATA TRANSMISSION
-        // ------------------------------------------
-
+        // MESSAGE SENDING
         async function transmitText() {
             const bar = document.getElementById('userInput');
             const str = bar.value.trim();
             if (!str) return;
             
             const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const p = { type: 'txt', content: str, ts: now };
-            const sealed = await sealPacket(JSON.stringify(p));
+            const msgId = 'm_' + Math.random().toString(36).substr(2, 9);
             
-            if (nodeConn?.open) nodeConn.send(sealed);
-            renderBubble(str, 'You', 'outgoing', now);
+            sendSecurePacket({ type: 'txt', content: str, ts: now, msgId: msgId });
+            renderBubble(str, 'You', 'outgoing', now, msgId);
             
             bar.value = ''; 
             broadcastTyping(true);
         }
 
-        function processImageUpload(e) { 
-            const f = e.target.files[0]; 
-            if (f) {
-                const scan = new FileReader();
-                scan.onload = event => dispatchMediaPacket(event.target.result, 'img');
-                scan.readAsDataURL(f);
+        async function dispatchMediaPacket(data, mediaType, isViewOnce = false) {
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const msgId = 'm_' + Math.random().toString(36).substr(2, 9);
+            sendSecurePacket({ type: mediaType, content: data, ts: now, msgId: msgId, viewOnce: isViewOnce });
+            renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio', msgId, isViewOnce);
+        }
+
+        // RENDERING
+        function createActionsHtml(msgId, isMine) {
+            if (isMine) {
+                return `
+                    <div class="action-menu-container">
+                        <div class="msg-action-btn" onclick="toggleMsgMenu('${msgId}')">⋮</div>
+                        <div class="msg-dropdown hidden" id="menu-${msgId}">
+                            <div class="react-row">
+                                <span onclick="triggerAction('react', '${msgId}', '👍')">👍</span>
+                                <span onclick="triggerAction('react', '${msgId}', '❤️')">❤️</span>
+                                <span onclick="triggerAction('react', '${msgId}', '😂')">😂</span>
+                            </div>
+                            <div class="divider"></div>
+                            <button onclick="triggerAction('edit', '${msgId}')">Edit</button>
+                            <button style="color: var(--danger)" onclick="triggerAction('unsend', '${msgId}')">Unsend</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="action-menu-container">
+                        <div class="msg-action-btn" onclick="toggleMsgMenu('${msgId}')">⋮</div>
+                        <div class="msg-dropdown hidden" id="menu-${msgId}">
+                            <div class="react-row">
+                                <span onclick="triggerAction('react', '${msgId}', '👍')">👍</span>
+                                <span onclick="triggerAction('react', '${msgId}', '❤️')">❤️</span>
+                                <span onclick="triggerAction('react', '${msgId}', '😂')">😂</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        async function dispatchMediaPacket(data, mediaType) {
-            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const p = { type: mediaType, content: data, ts: now };
-            const sealed = await sealPacket(JSON.stringify(p));
-            
-            if (nodeConn?.open) nodeConn.send(sealed);
-            renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio');
+        function toggleMsgMenu(msgId) {
+            const menu = document.getElementById('menu-' + msgId);
+            document.querySelectorAll('.msg-dropdown').forEach(m => { if(m !== menu) m.classList.add('hidden'); });
+            menu.classList.toggle('hidden');
         }
 
-        // ------------------------------------------
-        // RENDER ENGINE
-        // ------------------------------------------
-
-        function renderBubble(txt, owner, side, ts) {
+        function renderBubble(txt, owner, side, ts, msgId) {
             const list = document.getElementById('scrollContainer');
             const wrap = document.createElement('div'); 
             wrap.className = `bubble-wrap ${side}`;
+            wrap.id = msgId;
+            
+            const isMine = (side === 'outgoing');
             wrap.innerHTML = `
-                <div class="bubble">${txt}</div>
-                <div class="meta">${owner} • ${ts}</div>
+                <div class="bubble-content-row">
+                    <div class="bubble">
+                        <span class="msg-text">${txt}</span>
+                        <div class="msg-reactions"></div>
+                    </div>
+                    ${createActionsHtml(msgId, isMine)}
+                </div>
+                <div class="meta">${owner} • ${ts} <span class="edited-tag"></span></div>
             `;
             list.appendChild(wrap); 
             list.scrollTop = list.scrollHeight;
         }
 
-        function renderMedia(src, owner, side, ts, kind) {
+        function renderMedia(src, owner, side, ts, kind, msgId, isViewOnce) {
             const list = document.getElementById('scrollContainer');
             const wrap = document.createElement('div'); 
             wrap.className = `bubble-wrap ${side}`;
+            wrap.id = msgId;
             
             let content = '';
+            const isMine = (side === 'outgoing');
+
             if (kind === 'image') {
-                content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Node Media">`;
+                if (isViewOnce) {
+                    viewOnceStore[msgId] = src;
+                    const btnText = isMine ? "📷 Photo (View Once)" : "📷 View Photo";
+                    content = `<button class="view-once-btn" onclick="openViewOnce('${msgId}', ${isMine})">${btnText}</button>`;
+                } else {
+                    content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Media">`;
+                }
             } else {
                 content = `<audio controls src="${src}"></audio>`;
             }
-            
+
             wrap.innerHTML = `
-                <div class="bubble">${content}</div>
+                <div class="bubble-content-row">
+                    <div class="bubble">
+                        ${content}
+                        <div class="msg-reactions"></div>
+                    </div>
+                    ${createActionsHtml(msgId, isMine)}
+                </div>
                 <div class="meta">${owner} • ${ts}</div>
             `;
             list.appendChild(wrap); 
             list.scrollTop = list.scrollHeight;
+        }
+
+        function openViewOnce(msgId, isMine) {
+            if (!viewOnceStore[msgId]) return;
+            
+            popLightbox(viewOnceStore[msgId]);
+            
+            if (!isMine) {
+                // Remove data so it cannot be opened again
+                delete viewOnceStore[msgId];
+                markViewedOnce(msgId);
+                sendSecurePacket({ type: 'viewed_once', msgId: msgId });
+            }
+        }
+
+        function markViewedOnce(msgId) {
+            const wrap = document.getElementById(msgId);
+            if (wrap) {
+                const btn = wrap.querySelector('.view-once-btn');
+                if (btn) {
+                    btn.innerText = "📷 Opened";
+                    btn.disabled = true;
+                    btn.classList.add('opened');
+                }
+            }
         }
 
         function popLightbox(src) { 
@@ -1226,108 +1480,105 @@
             document.getElementById('imageViewer').style.display = 'flex'; 
         }
 
-        // ------------------------------------------
-        // INTERACTIVITY & TERMINATION
-        // ------------------------------------------
+        // MESSAGE ACTIONS (EDIT, UNSEND, REACT)
+        function triggerAction(action, msgId, extraVal = null) {
+            document.getElementById('menu-' + msgId).classList.add('hidden'); // Close menu
+            
+            if (action === 'unsend') {
+                performUnsendLocal(msgId);
+                sendSecurePacket({ type: 'unsend', msgId: msgId });
+            } 
+            else if (action === 'edit') {
+                const wrap = document.getElementById(msgId);
+                const currentText = wrap.querySelector('.msg-text').innerText;
+                const newText = prompt("Edit your message:", currentText);
+                if (newText && newText.trim() !== "" && newText !== currentText) {
+                    performEditLocal(msgId, newText.trim());
+                    sendSecurePacket({ type: 'edit', msgId: msgId, newText: newText.trim() });
+                }
+            }
+            else if (action === 'react') {
+                performReactLocal(msgId, extraVal);
+                sendSecurePacket({ type: 'react', msgId: msgId, reaction: extraVal });
+            }
+        }
 
+        function performUnsendLocal(msgId) {
+            const el = document.getElementById(msgId);
+            if(el) el.remove();
+        }
+
+        function performEditLocal(msgId, newText) {
+            const el = document.getElementById(msgId);
+            if(el) {
+                const txtNode = el.querySelector('.msg-text');
+                const tagNode = el.querySelector('.edited-tag');
+                if(txtNode) txtNode.innerText = newText;
+                if(tagNode) tagNode.innerText = "(edited)";
+            }
+        }
+
+        function performReactLocal(msgId, reaction) {
+            const el = document.getElementById(msgId);
+            if(el) {
+                const rxnNode = el.querySelector('.msg-reactions');
+                if(rxnNode) {
+                    rxnNode.innerText = reaction;
+                    rxnNode.classList.add('active');
+                }
+            }
+        }
+
+        // INTERACTIVITY
         async function broadcastTyping(stop = false) {
             if (stop) { 
-                const s = await sealPacket(JSON.stringify({ type: 'typing', active: false })); 
-                if (nodeConn?.open) nodeConn.send(s); 
-                clearTimeout(typeTick); 
-                typeTick = null; 
+                sendSecurePacket({ type: 'typing', active: false });
+                clearTimeout(typeTick); typeTick = null; 
                 return; 
             }
-            if (!typeTick) { 
-                const s = await sealPacket(JSON.stringify({ type: 'typing', active: true })); 
-                if (nodeConn?.open) nodeConn.send(s); 
-            }
+            if (!typeTick) sendSecurePacket({ type: 'typing', active: true });
+            
             clearTimeout(typeTick);
             typeTick = setTimeout(async () => { 
-                const s = await sealPacket(JSON.stringify({ type: 'typing', active: false })); 
-                if (nodeConn?.open) nodeConn.send(s); 
+                sendSecurePacket({ type: 'typing', active: false });
                 typeTick = null; 
             }, 2500);
         }
 
         function handleKeySubmit(e) { if (e.key === 'Enter') transmitText(); }
         
-        function handleDragOver(e) { 
-            e.preventDefault(); 
-            document.getElementById('dropHint').classList.remove('hidden'); 
-        }
-        
-        function handleDragLeave() { 
-            document.getElementById('dropHint').classList.add('hidden'); 
-        }
-        
+        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropHint').classList.remove('hidden'); }
+        function handleDragLeave() { document.getElementById('dropHint').classList.add('hidden'); }
         function handleDrop(e) { 
-            e.preventDefault(); 
-            handleDragLeave(); 
+            e.preventDefault(); handleDragLeave(); 
             const files = e.dataTransfer.files; 
             if (files.length > 0 && files[0].type.startsWith('image/')) {
                 const r = new FileReader();
-                r.onload = ev => dispatchMediaPacket(ev.target.result, 'img');
+                r.onload = event => {
+                    pendingImageBase64 = event.target.result;
+                    showImagePreviewModal();
+                };
                 r.readAsDataURL(files[0]);
             }
         }
 
-        /**
-         * Executes a secure session teardown.
-         */
-        function closeSession(msg) {
+        // FINAL DESTRUCTION
+        function finalizeDisconnect(msg) {
             if (nodeConn) nodeConn.close(); 
             if (nodePeer) nodePeer.destroy();
             clearInterval(lifeTick);
+            clearInterval(dcTimer);
             
+            document.getElementById('disconnectOverlay').style.display = 'none';
             document.getElementById('chatView').style.display = 'none';
-            document.getElementById('setupView').style.display = 'none';
-            document.getElementById('deathView').classList.remove('hidden');
             
-            if (msg) document.getElementById('cleanupStatus').textContent = msg;
-
-            let scrub = 10; 
-            const statusLabel = document.getElementById('cleanupStatus');
-            
-            killLoop = setInterval(() => { 
-                scrub--; 
-                if (scrub <= 0) { 
-                    clearInterval(killLoop); 
-                    location.reload(); 
-                } else {
-                    const baseText = msg || "Memory scrub in progress...";
-                    statusLabel.textContent = `${baseText} (${scrub}s)`; 
-                }
-            }, 1000);
-        }
-
-        /**
-         * REDO LOGIC: Resets the state without reloading the whole page.
-         * Clears all termination timers and returns to identity setup.
-         */
-        function redoAction() {
-            // Kill existing reset timer
-            if (killLoop) clearInterval(killLoop);
-            
-            // UI Reset
-            document.getElementById('deathView').classList.add('hidden');
             document.getElementById('setupView').style.display = 'flex';
             document.getElementById('scrollContainer').innerHTML = '';
-            
-            // Logical reset
             resetSetupView();
             
-            // Status Refresh
-            document.getElementById('cleanupStatus').textContent = "Memory scrub in progress...";
+            if (msg) showFeedback(msg, 'error');
         }
 
     </script>
 </body>
-<!--
-    SECURITY DISCLOSURE:
-    Thorium utilizes the client-side SubtleCrypto API. All encryption occurs 
-    within the isolated browser sandbox. No private keys are ever transmitted 
-    across the signaling layer. This specific build includes session life 
-    management to ensure signaling nodes are not left active indefinitely.
--->
 </html>
