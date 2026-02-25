@@ -50,12 +50,13 @@
             --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
             
-            /* Animation Timing */
+            /* Animation Timing & Physics */
             --speed-fast: 0.15s;
             --speed-normal: 0.3s;
             --speed-slow: 0.6s;
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth bouncy spring */
         }
 
         /* DARK MODE - NOW TRUE BLACK */
@@ -107,13 +108,13 @@
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
-            animation: containerEnter var(--speed-slow) var(--ease-out-expo) forwards;
+            animation: containerEnter 0.8s var(--ease-spring) forwards;
             position: relative;
             overflow: hidden;
         }
 
         @keyframes containerEnter {
-            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
@@ -142,10 +143,11 @@
             justify-content: center;
             cursor: pointer;
             z-index: 10;
+            transition: transform var(--speed-normal) var(--ease-spring), background-color var(--speed-fast);
         }
 
         .theme-toggle:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px) scale(1.05);
             background-color: var(--secondary-hover);
         }
 
@@ -193,10 +195,10 @@
             flex-direction: column;
         }
 
-        .fade-in { animation: screenFade var(--speed-normal) var(--ease-in-out) both; }
+        .fade-in { animation: screenFade 0.6s var(--ease-spring) both; }
         @keyframes screenFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* UI ELEMENTS */
@@ -230,12 +232,14 @@
             color: var(--text-primary);
             font-family: inherit;
             outline: none;
+            transition: all var(--speed-normal) var(--ease-out-expo);
         }
 
         .input-wrapper input:focus, .input-wrapper select:focus {
             border-color: #6366f1;
             background-color: var(--surface);
             box-shadow: 0 0 0 4px var(--glow-color);
+            transform: translateY(-2px);
         }
 
         .button-group { display: flex; gap: 16px; margin-top: 8px; }
@@ -254,14 +258,15 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring);
         }
 
         button.action-trigger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 20px -5px var(--glow-color);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 24px -6px var(--glow-color);
         }
 
-        button.action-trigger:active { transform: translateY(0); }
+        button.action-trigger:active { transform: translateY(0) scale(0.98); }
 
         button.action-trigger.outline {
             background-image: none;
@@ -271,8 +276,48 @@
         }
         button.action-trigger.outline:hover { background-color: var(--secondary-hover); }
 
-        /* CHAT INTERFACE */
+        /* CHAT INTERFACE & CALL BAR */
         .chat-screen { display: none; height: 100%; position: relative; }
+        
+        .chat-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--secondary);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chat-top-bar .connection-status {
+            margin-bottom: 0;
+            padding: 0;
+            text-align: left;
+            color: var(--success);
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .call-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.4s var(--ease-spring), background-color 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.15) translateY(-2px);
+            background: var(--secondary-hover);
+        }
 
         .message-viewport {
             flex-grow: 1;
@@ -288,13 +333,13 @@
             display: flex;
             flex-direction: column;
             max-width: 80%;
-            animation: bubblePop 0.4s var(--ease-out-expo) both;
+            animation: bubblePop 0.5s var(--ease-spring) both;
             position: relative;
         }
 
         @keyframes bubblePop {
-            from { opacity: 0; transform: scale(0.9) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            0% { opacity: 0; transform: scale(0.85) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .bubble-content-row {
@@ -311,6 +356,11 @@
             word-wrap: break-word;
             box-shadow: var(--shadow-sm);
             position: relative;
+            transition: transform 0.3s var(--ease-spring);
+        }
+
+        .bubble:hover {
+            transform: scale(1.01);
         }
 
         .bubble img { max-width: 100%; border-radius: 14px; margin: 6px 0; display: block; }
@@ -353,67 +403,113 @@
             font-size: 0.85em;
             box-shadow: var(--shadow-sm);
             display: none;
+            animation: popIn 0.4s var(--ease-spring) both;
         }
         .msg-reactions.active { display: block; }
 
-        /* Message Action Menu */
-        .msg-action-btn {
-            cursor: pointer;
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Quick Actions Menu (Edit, Delete, React) */
+        .msg-quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             opacity: 0;
-            padding: 8px;
+            transform: scale(0.9);
+            transition: opacity var(--speed-fast) var(--ease-out-expo), transform 0.4s var(--ease-spring);
+            flex-wrap: wrap;
+            max-width: 170px; /* Allows wrapping into a neat block */
+        }
+        
+        .bubble-wrap.outgoing .msg-quick-actions {
+            justify-content: flex-end;
+        }
+
+        .bubble-wrap:hover .msg-quick-actions { 
+            opacity: 1; 
+            transform: scale(1);
+        }
+        
+        .quick-action-btn {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
             border-radius: 50%;
-            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
+            color: var(--text-secondary);
         }
         
-        .bubble-wrap:hover .msg-action-btn { opacity: 1; }
-        .msg-action-btn:hover { background-color: var(--secondary); }
+        .quick-action-btn:hover {
+            background: var(--secondary-hover);
+            transform: scale(1.25) translateY(-2px);
+        }
 
-        /* NEW: Container to pin the dropdown directly to the button */
-        .action-menu-container {
-            position: relative;
+        /* INLINE EDIT INPUT STYLING */
+        .edit-input-container {
             display: flex;
             align-items: center;
+            gap: 6px;
+            animation: popIn 0.3s var(--ease-spring) both;
         }
 
-        .msg-dropdown {
-            position: absolute;
-            top: 100%;
-            margin-top: 4px;
-            background: var(--surface);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
-            z-index: 50;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 120px;
+        .edit-input {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.15);
+            color: white;
+            font-size: 0.95em;
+            outline: none;
+            font-family: inherit;
+            width: 100%;
         }
 
-        /* Fixed positioning: Anchor right for outgoing (opens left), anchor left for incoming (opens right) */
-        .bubble-wrap.outgoing .msg-dropdown { right: 0; left: auto; }
-        .bubble-wrap.incoming .msg-dropdown { left: 0; right: auto; }
+        .edit-input:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.25);
+        }
 
-        .msg-dropdown button {
+        .edit-btn {
             background: none;
             border: none;
-            padding: 8px 12px;
-            text-align: left;
-            border-radius: 8px;
             cursor: pointer;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.9em;
+            font-size: 1.1em;
+            padding: 4px;
+            border-radius: 50%;
+            transition: transform 0.3s var(--ease-spring);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
-        .msg-dropdown button:hover { background-color: var(--secondary); }
-        .msg-dropdown .react-row { display: flex; justify-content: space-around; padding: 4px; }
-        .msg-dropdown .react-row span { cursor: pointer; font-size: 1.2em; padding: 4px; border-radius: 8px; }
-        .msg-dropdown .react-row span:hover { background-color: var(--secondary); }
-        .msg-dropdown .divider { height: 1px; background-color: var(--border-color); margin: 4px 0; }
+
+        .edit-btn:hover {
+            transform: scale(1.25);
+        }
+
+        /* READ RECEIPTS */
+        .read-status {
+            font-size: 0.9em;
+            margin-left: 4px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            transition: color 0.4s ease;
+            display: inline-block;
+        }
+        .read-status.seen {
+            color: #3b82f6; /* WhatsApp style blue */
+        }
 
         /* NEW: System Alert Styling for Screenshot Notifications */
         .system-alert {
@@ -428,6 +524,7 @@
             border: 1px solid var(--danger);
             align-self: center;
             box-shadow: var(--shadow-sm);
+            animation: bubblePop 0.5s var(--ease-spring) both;
         }
 
         .bubble-wrap.outgoing { align-self: flex-end; align-items: flex-end; }
@@ -477,6 +574,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
+        }
+        
+        .action-tray-trigger:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--secondary-hover);
         }
 
         .send-pill {
@@ -491,7 +594,14 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: var(--shadow-sm);
+            transition: transform 0.4s var(--ease-spring), box-shadow 0.2s;
         }
+        
+        .send-pill:hover {
+            transform: scale(1.1) translateX(2px);
+            box-shadow: 0 8px 15px -3px var(--glow-color);
+        }
+        .send-pill:active { transform: scale(0.95); }
 
         .attachment-menu {
             position: absolute;
@@ -509,11 +619,11 @@
         .attachment-menu.open {
             display: flex;
             flex-direction: column;
-            animation: menuSlide var(--speed-normal) var(--ease-out-expo);
+            animation: menuSlide 0.5s var(--ease-spring);
         }
         @keyframes menuSlide {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(15px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .tray-item {
@@ -526,8 +636,12 @@
             font-size: 0.9em;
             cursor: pointer;
             color: var(--text-primary);
+            transition: background-color 0.2s, transform 0.2s;
         }
-        .tray-item:hover { background-color: var(--secondary); }
+        .tray-item:hover { 
+            background-color: var(--secondary); 
+            transform: translateX(4px);
+        }
 
         .typing-indicator {
             font-size: 0.85em;
@@ -586,8 +700,14 @@
             align-items: center;
             justify-content: center;
             padding: 40px;
+            animation: fadeOverlay 0.4s ease forwards;
         }
         
+        @keyframes fadeOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         #disconnectOverlay {
             position: absolute; /* Relative to container */
             background-color: var(--surface-glass);
@@ -604,6 +724,7 @@
             border: 1px solid var(--border-color);
             max-width: 400px;
             width: 100%;
+            animation: popIn 0.5s var(--ease-spring) both;
         }
 
         .dc-timer {
@@ -625,6 +746,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            animation: fadeOverlay 0.4s ease forwards;
         }
 
         .preview-card {
@@ -638,6 +760,7 @@
             flex-direction: column;
             gap: 16px;
             border: 1px solid var(--border-color);
+            animation: popIn 0.5s var(--ease-spring) both;
         }
 
         #previewImgTarget {
@@ -696,15 +819,18 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
         }
         
         .view-once-btn:hover {
             background-color: var(--secondary-hover);
+            transform: translateY(-2px);
         }
 
         .view-once-btn.opened {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         #videoPipe {
@@ -725,9 +851,74 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: transform 0.3s var(--ease-spring);
         }
-        #imageViewer { cursor: zoom-out; background-color: rgba(0,0,0,0.95); z-index: 6000; }
-        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; }
+        .shutter:hover { transform: scale(1.1); }
+        
+        #imageViewer { cursor: zoom-out; background-color: rgba(0,0,0,0.95); z-index: 6000; animation: fadeOverlay 0.4s ease forwards; }
+        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; animation: popIn 0.5s var(--ease-spring) both; }
+
+        /* CALL OVERLAY STYLING */
+        #callOverlay {
+            position: fixed; inset: 0;
+            background-color: rgba(0,0,0,0.95);
+            z-index: 7000; display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: white;
+            backdrop-filter: blur(15px);
+            animation: fadeOverlay 0.4s ease forwards;
+        }
+        
+        .call-info { text-align: center; margin-bottom: 30px; animation: popIn 0.6s var(--ease-spring) both; }
+        .call-info h2 { margin-bottom: 8px; font-size: 1.8em; font-weight: 700; color: white; }
+        .call-info p { color: rgba(255,255,255,0.7); font-size: 1.1em; }
+        
+        #callTimer {
+            display: none; 
+            font-size: 1.4em; 
+            margin-top: 12px; 
+            font-family: var(--font-mono); 
+            color: var(--success); 
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+            font-weight: 700;
+        }
+
+        .call-video-container {
+            position: relative; width: 100%; max-width: 720px; height: 50vh;
+            background: #111; border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            animation: popIn 0.6s var(--ease-spring) both;
+        }
+        
+        #remoteVideoNode { width: 100%; height: 100%; object-fit: cover; }
+        
+        #localVideoNode {
+            position: absolute; bottom: 20px; right: 20px;
+            width: 110px; height: 150px; object-fit: cover;
+            border-radius: 14px; border: 2px solid rgba(255,255,255,0.5);
+            background: #222; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transition: transform 0.4s var(--ease-spring);
+        }
+        #localVideoNode:hover { transform: scale(1.05); }
+        
+        .call-controls { 
+            display: flex; gap: 16px; margin-top: 40px; 
+            justify-content: center; flex-wrap: wrap; max-width: 90%;
+            animation: popIn 0.7s var(--ease-spring) both;
+        }
+        
+        .call-btn {
+            width: 64px; height: 64px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: white; transition: transform 0.4s var(--ease-spring), filter 0.2s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .call-btn:hover { transform: translateY(-6px) scale(1.05); filter: brightness(1.1); }
+        .call-btn:active { transform: translateY(0) scale(0.95); }
+        
+        .btn-accept { background-color: var(--success); }
+        .btn-reject, .btn-end { background-color: var(--danger); }
+        .btn-secondary { background-color: rgba(255, 255, 255, 0.2); }
+        .btn-muted { background-color: rgba(255, 255, 255, 0.8); color: #111; }
 
     </style>
 </head>
@@ -799,7 +990,19 @@
 
             <!-- Active Chat Screen -->
             <section class="chat-screen fade-in" id="chatView">
-                <div class="connection-status" id="linkSuccess" style="background-color: var(--secondary); color: var(--success); margin-bottom: 20px;"></div>
+                
+                <!-- NEW CALL BAR -->
+                <div class="chat-top-bar">
+                    <div class="connection-status" id="linkSuccess"></div>
+                    <div class="call-buttons">
+                        <button class="icon-btn" onclick="startCall(false)" title="Audio Call">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        </button>
+                        <button class="icon-btn" onclick="startCall(true)" title="Video Call">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                        </button>
+                    </div>
+                </div>
                 
                 <div class="message-viewport" id="scrollContainer"></div>
                 
@@ -808,7 +1011,7 @@
                 <div class="composer">
                     <div class="action-container">
                         <button class="action-tray-trigger" onclick="toggleTray()" id="trayIcon" title="Attachments">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
                         
                         <div class="attachment-menu" id="trayMenu">
@@ -841,9 +1044,9 @@
                 <div id="disconnectOverlay">
                     <div class="dc-modal-content">
                         <h2 class="screen-title" style="margin-bottom: 10px;">Chat Closing</h2>
-                        <p style="color: var(--text-secondary)">Disconnect initiated. You can undo this action.</p>
+                        <p id="dcModalDesc" style="color: var(--text-secondary)">Disconnect initiated.</p>
                         <div class="dc-timer" id="dcTimerText">10</div>
-                        <button class="action-trigger" onclick="undoDisconnect()">Undo (Keep Chat Open)</button>
+                        <button class="action-trigger" id="dcModalBtn" onclick="undoDisconnect()">Yes, Rejoin Chat</button>
                     </div>
                 </div>
 
@@ -890,20 +1093,55 @@
         <img id="viewerImg" src="" alt="Multimedia decrypted view">
     </div>
 
+    <!-- Call Active / Incoming Overlay -->
+    <div id="callOverlay">
+        <div class="call-info">
+            <h2 id="callStatusText">Incoming Call...</h2>
+            <p id="callPeerName"></p>
+            <div id="callTimer">00:00</div>
+        </div>
+        
+        <div class="call-video-container" id="videoWrapper" style="display:none;">
+            <!-- Remote stream handles audio playback as well as video -->
+            <video id="remoteVideoNode" autoplay playsinline></video>
+            <video id="localVideoNode" autoplay playsinline muted></video>
+        </div>
+        
+        <div class="call-controls" id="callControls">
+            <!-- Dynamically populated via JS depending on call state -->
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
     
     <script>
         // GLOBAL STATE
-        let nodePeer = null;         
-        let nodeConn = null;         
-        let localAlias = '';         
+        let nodePeer = null;        
+        let nodeConn = null;        
+        let localAlias = '';        
         let remoteAlias = 'Friend';    
-        let nodeKeys = null;         
+        let nodeKeys = null;        
         let cipherKey = null;        
-        let typeTick = null;         
-        let lifeTick = null;         
-        let killLoop = null;         
+        let typeTick = null;        
+        let lifeTick = null;        
+        let killLoop = null;        
         
+        // Peer Calling State
+        let remotePeerId = null;
+        let activeCall = null;
+        let callLocalStream = null;
+        let callTimerTick = null;
+        let callSeconds = 0;
+        
+        // Advanced Call Feature State
+        let isMicMuted = false;
+        let isCamOff = false;
+        let isDeafened = false;
+
+        let callSessionActive = false;
+        let callWasAnswered = false;
+        let callIsCaller = false;
+
         // Voice Data
         let audioRecorder = null;
         let pcmChunks = [];
@@ -917,6 +1155,7 @@
         // Disconnect Timer Data
         let dcTimer = null;
         let dcCountdown = 10;
+        let disconnectInitiator = null;
 
         // THEME HANDLERS
         const modeSwitch = document.getElementById('modeSwitch');
@@ -939,13 +1178,6 @@
             document.body.classList.add('dark-mode'); 
             applyMode(); 
         }
-
-        // CLOSE ANY OPEN MESSAGE MENUS WHEN CLICKING OUTSIDE
-        window.addEventListener('click', (e) => {
-            if (!e.target.closest('.msg-action-btn') && !e.target.closest('.msg-dropdown')) {
-                document.querySelectorAll('.msg-dropdown').forEach(m => m.classList.add('hidden'));
-            }
-        });
 
         // CRYPTO CORE
         function bufferToBase64(buf) {
@@ -1005,6 +1237,287 @@
                 nodeConn.send(sealed);
             }
         }
+
+        // PEER CALLING LOGIC & TIMER
+        function startCallTimer() {
+            if (callTimerTick) return; 
+            callSeconds = 0;
+            document.getElementById('callTimer').style.display = 'block';
+            document.getElementById('callTimer').innerText = '00:00';
+            
+            callTimerTick = setInterval(() => {
+                callSeconds++;
+                const hrs = Math.floor(callSeconds / 3600);
+                const mins = Math.floor((callSeconds % 3600) / 60);
+                const secs = callSeconds % 60;
+                
+                let timeStr = '';
+                if (hrs > 0) timeStr += hrs.toString().padStart(2, '0') + ':';
+                timeStr += mins.toString().padStart(2, '0') + ':';
+                timeStr += secs.toString().padStart(2, '0');
+                
+                document.getElementById('callTimer').innerText = timeStr;
+            }, 1000);
+        }
+
+        function stopCallTimer() {
+            if (callTimerTick) {
+                clearInterval(callTimerTick);
+                callTimerTick = null;
+            }
+            document.getElementById('callTimer').style.display = 'none';
+        }
+
+        // Advanced Call Controls
+        function toggleMic() {
+            isMicMuted = !isMicMuted;
+            if (callLocalStream) {
+                callLocalStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
+            }
+            const btn = document.getElementById('micBtn');
+            if (btn) {
+                if (isMicMuted) {
+                    btn.classList.add('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`;
+                } else {
+                    btn.classList.remove('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"></path></svg>`;
+                }
+            }
+        }
+
+        function toggleCam() {
+            isCamOff = !isCamOff;
+            if (callLocalStream) {
+                callLocalStream.getVideoTracks().forEach(track => track.enabled = !isCamOff);
+            }
+            const btn = document.getElementById('camBtn');
+            if (btn) {
+                if (isCamOff) {
+                    btn.classList.add('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 17.16V7l-7 5v5l2.25-1.61"></path><path d="M16 12L23 7v10l-7-5z" opacity="0"></path><rect x="1" y="5" width="11" height="14" rx="2" ry="2"></rect></svg>`;
+                } else {
+                    btn.classList.remove('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`;
+                }
+            }
+        }
+
+        function toggleDeafen() {
+            isDeafened = !isDeafened;
+            const remoteVid = document.getElementById('remoteVideoNode');
+            if(remoteVid) remoteVid.muted = isDeafened;
+            
+            const btn = document.getElementById('deafenBtn');
+            if (btn) {
+                if (isDeafened) {
+                    btn.classList.add('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+                } else {
+                    btn.classList.remove('btn-muted');
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+                }
+            }
+        }
+
+        function setupPeerCallListener() {
+            nodePeer.on('call', incomingCall => {
+                if (activeCall || callSessionActive) {
+                    incomingCall.close();
+                    return;
+                }
+                activeCall = incomingCall;
+                callSessionActive = true;
+                callWasAnswered = false;
+                callIsCaller = false;
+                const isVideo = incomingCall.metadata?.type === 'video';
+                
+                showCallOverlay(`Incoming ${isVideo ? 'Video' : 'Voice'} Call`, true, isVideo);
+                
+                activeCall.on('stream', remoteStream => {
+                    callWasAnswered = true;
+                    document.getElementById('remoteVideoNode').srcObject = remoteStream;
+                    document.getElementById('videoWrapper').style.display = isVideo ? 'flex' : 'none';
+                    updateCallControls('active', isVideo);
+                    document.getElementById('callStatusText').innerText = `Ongoing ${isVideo ? 'Video' : 'Voice'} Call`;
+                    startCallTimer();
+                });
+
+                activeCall.on('close', () => cleanupCall());
+                activeCall.on('error', () => cleanupCall());
+            });
+        }
+
+        async function startCall(isVideo) {
+            if (!remotePeerId) return showFeedback("Cannot call: Missing Friend's details.", "error");
+            if (activeCall || callSessionActive) return;
+
+            callSessionActive = true;
+            callWasAnswered = false;
+            callIsCaller = true;
+
+            try {
+                callLocalStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+                if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
+
+                showCallOverlay(`Calling ${remoteAlias}...`, false, isVideo);
+
+                activeCall = nodePeer.call(remotePeerId, callLocalStream, { metadata: { type: isVideo ? 'video' : 'audio' } });
+                
+                activeCall.on('stream', remoteStream => {
+                    callWasAnswered = true;
+                    document.getElementById('remoteVideoNode').srcObject = remoteStream;
+                    document.getElementById('videoWrapper').style.display = isVideo ? 'flex' : 'none';
+                    document.getElementById('callStatusText').innerText = `Ongoing ${isVideo ? 'Video' : 'Voice'} Call`;
+                    updateCallControls('active', isVideo);
+                    startCallTimer();
+                });
+
+                activeCall.on('close', () => cleanupCall());
+                activeCall.on('error', () => {
+                    cleanupCall();
+                    showFeedback("Call failed to connect.", "error");
+                });
+
+            } catch (e) {
+                showFeedback("Microphone/Camera access denied.", "error");
+                cleanupCall();
+            }
+        }
+
+        async function acceptCall(isVideo) {
+            try {
+                callLocalStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+                if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
+                
+                activeCall.answer(callLocalStream);
+                updateCallControls('active', isVideo);
+            } catch (e) {
+                showFeedback("Microphone/Camera access denied.", "error");
+                rejectCall();
+            }
+        }
+
+        function rejectCall() {
+            if (activeCall) activeCall.close();
+            cleanupCall();
+            sendSecurePacket({ type: 'reject_call' });
+        }
+
+        function endCall() {
+            if (activeCall) activeCall.close();
+            cleanupCall();
+            sendSecurePacket({ type: 'end_call' });
+        }
+
+        function cleanupCall() {
+            if (callSessionActive) {
+                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (callWasAnswered) {
+                    const hrs = Math.floor(callSeconds / 3600);
+                    const mins = Math.floor((callSeconds % 3600) / 60);
+                    const secs = callSeconds % 60;
+                    let durStr = '';
+                    if (hrs > 0) durStr += hrs + 'h ';
+                    if (mins > 0) durStr += mins + 'm ';
+                    durStr += secs + 's';
+                    renderSystemMessage(`📞 Call ended (Duration: ${durStr.trim()})`, now, 'info');
+                } else {
+                    if (callIsCaller) {
+                        renderSystemMessage(`📞 Unanswered call to ${remoteAlias}`, now, 'danger');
+                    } else {
+                        renderSystemMessage(`📞 Missed call from ${remoteAlias}`, now, 'danger');
+                    }
+                }
+                callSessionActive = false;
+            }
+
+            if (callLocalStream) {
+                callLocalStream.getTracks().forEach(t => t.stop());
+                callLocalStream = null;
+            }
+            
+            // Reset Call Config State
+            isMicMuted = false;
+            isCamOff = false;
+            isDeafened = false;
+            
+            activeCall = null;
+            stopCallTimer();
+            document.getElementById('remoteVideoNode').muted = false;
+            document.getElementById('callOverlay').style.display = 'none';
+            document.getElementById('remoteVideoNode').srcObject = null;
+            document.getElementById('localVideoNode').srcObject = null;
+        }
+
+        function showCallOverlay(status, isIncoming, isVideo) {
+            document.getElementById('callOverlay').style.display = 'flex';
+            document.getElementById('callStatusText').innerText = status;
+            document.getElementById('callPeerName').innerText = remoteAlias;
+            document.getElementById('videoWrapper').style.display = 'none';
+            
+            // If making outgoing video call, show local preview instantly
+            if (!isIncoming && isVideo) {
+                document.getElementById('videoWrapper').style.display = 'flex';
+            }
+
+            updateCallControls(isIncoming ? 'incoming' : 'outgoing', isVideo);
+        }
+
+        function updateCallControls(state, isVideo) {
+            const controls = document.getElementById('callControls');
+            if (state === 'incoming') {
+                controls.innerHTML = `
+                    <button class="call-btn btn-reject" onclick="rejectCall()" title="Reject Call">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
+                    </button>
+                    <button class="call-btn btn-accept" onclick="acceptCall(${isVideo})" title="Accept Call">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </button>
+                `;
+            } else if (state === 'outgoing' || state === 'active') {
+                
+                let activeHtml = '';
+                if (state === 'active') {
+                    // Mic Toggle
+                    activeHtml += `
+                        <button class="call-btn btn-secondary ${isMicMuted ? 'btn-muted' : ''}" id="micBtn" onclick="toggleMic()" title="Mute/Unmute Mic">
+                            ${isMicMuted ? 
+                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>` : 
+                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"></path></svg>`}
+                        </button>
+                    `;
+                    
+                    // Video Toggle (only if it's a video call)
+                    if (isVideo) {
+                        activeHtml += `
+                            <button class="call-btn btn-secondary ${isCamOff ? 'btn-muted' : ''}" id="camBtn" onclick="toggleCam()" title="Turn Camera On/Off">
+                                ${isCamOff ? 
+                                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 17.16V7l-7 5v5l2.25-1.61"></path><path d="M16 12L23 7v10l-7-5z" opacity="0"></path><rect x="1" y="5" width="11" height="14" rx="2" ry="2"></rect></svg>` : 
+                                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`}
+                            </button>
+                        `;
+                    }
+
+                    // Deafen Toggle (Mute remote audio)
+                    activeHtml += `
+                        <button class="call-btn btn-secondary ${isDeafened ? 'btn-muted' : ''}" id="deafenBtn" onclick="toggleDeafen()" title="Mute/Unmute Remote Audio">
+                            ${isDeafened ? 
+                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>` : 
+                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`}
+                        </button>
+                    `;
+                }
+
+                controls.innerHTML = `
+                    ${activeHtml}
+                    <button class="call-btn btn-end" onclick="endCall()" title="End Call">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
+                    </button>
+                `;
+            }
+        }
+
 
         // MULTIMEDIA ENGINE
         function toggleTray() { 
@@ -1203,6 +1716,7 @@
             const fingerprint = Math.random().toString(36).substring(2, 8).toUpperCase();
             
             nodePeer = new Peer('thor-v4-' + fingerprint, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
+            setupPeerCallListener();
 
             nodePeer.on('open', () => {
                 document.getElementById('nodeCode').textContent = fingerprint;
@@ -1233,7 +1747,8 @@
             
             nodeKeys = await fetchNewKeys();
             nodePeer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
-            
+            setupPeerCallListener();
+
             nodePeer.on('open', () => { 
                 nodeConn = nodePeer.connect('thor-v4-' + code); 
                 executeHandshake(true); 
@@ -1264,13 +1779,14 @@
             nodeConn.on('open', async () => {
                 if (isInitiator) {
                     const jwk = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
-                    nodeConn.send({ type: 'hs-init', alias: localAlias, key: jwk });
+                    nodeConn.send({ type: 'hs-init', alias: localAlias, key: jwk, peerId: nodePeer.id });
                 }
             });
             
             nodeConn.on('data', async (incoming) => {
                 if (incoming.type === 'hs-init' || incoming.type === 'hs-reply') {
                     remoteAlias = incoming.alias;
+                    remotePeerId = incoming.peerId; 
                     const foreignKey = await window.crypto.subtle.importKey(
                         "jwk", incoming.key, { name: "ECDH", namedCurve: "P-256" }, true, []
                     );
@@ -1278,7 +1794,7 @@
                     
                     if (incoming.type === 'hs-init') {
                         const localJWK = await window.crypto.subtle.exportKey("jwk", nodeKeys.publicKey);
-                        nodeConn.send({ type: 'hs-reply', alias: localAlias, key: localJWK });
+                        nodeConn.send({ type: 'hs-reply', alias: localAlias, key: localJWK, peerId: nodePeer.id });
                     }
                     launchChatroom();
                 } else if (incoming.ciphertext) {
@@ -1287,7 +1803,14 @@
                 }
             });
             
-            nodeConn.on('close', () => finalizeDisconnect());
+            nodeConn.on('close', () => {
+                // Instantly disconnected without clicking button (e.g. closing tab)
+                if (disconnectInitiator !== 'local') {
+                    finalizeDisconnect(`${remoteAlias} disconnected. Would you like to rejoin?`);
+                } else {
+                    finalizeDisconnect(`You disconnected. Would you like to rejoin?`);
+                }
+            });
         }
 
         function launchChatroom() {
@@ -1298,6 +1821,7 @@
 
         // DISCONNECT & UNDO LOGIC
         function requestDisconnect() {
+            disconnectInitiator = 'local';
             showDisconnectTimer();
             sendSecurePacket({ type: 'intent_disconnect' });
         }
@@ -1307,17 +1831,29 @@
             dcCountdown = 10;
             document.getElementById('dcTimerText').innerText = dcCountdown;
             
+            const desc = document.getElementById('dcModalDesc');
+            
+            // Set text dynamically in the modal based on who initiated the disconnect
+            if (disconnectInitiator === 'remote') {
+                desc.innerText = `${remoteAlias} disconnected. Would you like to rejoin?`;
+            } else {
+                desc.innerText = `You disconnected. Would you like to rejoin?`;
+            }
+            
             dcTimer = setInterval(() => {
                 dcCountdown--;
                 document.getElementById('dcTimerText').innerText = dcCountdown;
                 if (dcCountdown <= 0) {
                     clearInterval(dcTimer);
-                    finalizeDisconnect();
+                    // Pass the final message to be displayed as a toast on the home screen
+                    let finalMsg = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Would you like to rejoin?` : `You disconnected. Would you like to rejoin?`;
+                    finalizeDisconnect(finalMsg);
                 }
             }, 1000);
         }
 
         function undoDisconnect() {
+            disconnectInitiator = null;
             clearInterval(dcTimer);
             document.getElementById('disconnectOverlay').style.display = 'none';
             sendSecurePacket({ type: 'undo_disconnect' });
@@ -1325,9 +1861,18 @@
 
         // DATA ROUTING & ACTIONS
         function handleDataRouting(p) {
-            if (p.type === 'txt') renderBubble(p.content, remoteAlias, 'incoming', p.ts, p.msgId);
-            else if (p.type === 'img') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image', p.msgId, p.viewOnce);
-            else if (p.type === 'voice') renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio', p.msgId);
+            if (p.type === 'txt') {
+                renderBubble(p.content, remoteAlias, 'incoming', p.ts, p.msgId);
+                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
+            }
+            else if (p.type === 'img') {
+                renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image', p.msgId, p.viewOnce);
+                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
+            }
+            else if (p.type === 'voice') {
+                renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio', p.msgId);
+                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
+            }
             else if (p.type === 'typing') {
                 const tip = document.getElementById('peerTyping');
                 tip.textContent = `${remoteAlias} is typing...`;
@@ -1338,9 +1883,18 @@
             else if (p.type === 'edit') performEditLocal(p.msgId, p.newText);
             else if (p.type === 'react') performReactLocal(p.msgId, p.reaction);
             else if (p.type === 'viewed_once') markViewedOnce(p.msgId);
+            else if (p.type === 'msg_seen') markMessageSeen(p.msgId);
+            
+            // Call Actions
+            else if (p.type === 'end_call' || p.type === 'reject_call') cleanupCall();
+
             // Disconnect Actions
-            else if (p.type === 'intent_disconnect') showDisconnectTimer();
+            else if (p.type === 'intent_disconnect') {
+                disconnectInitiator = 'remote';
+                showDisconnectTimer();
+            }
             else if (p.type === 'undo_disconnect') {
+                disconnectInitiator = null;
                 clearInterval(dcTimer);
                 document.getElementById('disconnectOverlay').style.display = 'none';
             }
@@ -1373,42 +1927,26 @@
 
         // RENDERING
         function createActionsHtml(msgId, isMine) {
+            const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '🎉'];
+            const reactHtml = emojis.map(e => 
+                `<div class="quick-action-btn" title="React ${e}" onclick="triggerAction('react', '${msgId}', '${e}')">${e}</div>`
+            ).join('');
+
             if (isMine) {
                 return `
-                    <div class="action-menu-container">
-                        <div class="msg-action-btn" onclick="toggleMsgMenu('${msgId}')">⋮</div>
-                        <div class="msg-dropdown hidden" id="menu-${msgId}">
-                            <div class="react-row">
-                                <span onclick="triggerAction('react', '${msgId}', '👍')">👍</span>
-                                <span onclick="triggerAction('react', '${msgId}', '❤️')">❤️</span>
-                                <span onclick="triggerAction('react', '${msgId}', '😂')">😂</span>
-                            </div>
-                            <div class="divider"></div>
-                            <button onclick="triggerAction('edit', '${msgId}')">Edit</button>
-                            <button style="color: var(--danger)" onclick="triggerAction('unsend', '${msgId}')">Unsend</button>
-                        </div>
+                    <div class="msg-quick-actions">
+                        ${reactHtml}
+                        <div class="quick-action-btn" title="Edit" onclick="triggerAction('edit', '${msgId}')">✏️</div>
+                        <div class="quick-action-btn" title="Delete" onclick="triggerAction('unsend', '${msgId}')">🗑️</div>
                     </div>
                 `;
             } else {
                 return `
-                    <div class="action-menu-container">
-                        <div class="msg-action-btn" onclick="toggleMsgMenu('${msgId}')">⋮</div>
-                        <div class="msg-dropdown hidden" id="menu-${msgId}">
-                            <div class="react-row">
-                                <span onclick="triggerAction('react', '${msgId}', '👍')">👍</span>
-                                <span onclick="triggerAction('react', '${msgId}', '❤️')">❤️</span>
-                                <span onclick="triggerAction('react', '${msgId}', '😂')">😂</span>
-                            </div>
-                        </div>
+                    <div class="msg-quick-actions">
+                        ${reactHtml}
                     </div>
                 `;
             }
-        }
-
-        function toggleMsgMenu(msgId) {
-            const menu = document.getElementById('menu-' + msgId);
-            document.querySelectorAll('.msg-dropdown').forEach(m => { if(m !== menu) m.classList.add('hidden'); });
-            menu.classList.toggle('hidden');
         }
 
         function renderBubble(txt, owner, side, ts, msgId) {
@@ -1418,6 +1956,8 @@
             wrap.id = msgId;
             
             const isMine = (side === 'outgoing');
+            const statusHtml = isMine ? `<span class="read-status" id="status-${msgId}">✓</span>` : '';
+
             wrap.innerHTML = `
                 <div class="bubble-content-row">
                     <div class="bubble">
@@ -1426,7 +1966,7 @@
                     </div>
                     ${createActionsHtml(msgId, isMine)}
                 </div>
-                <div class="meta">${owner} • ${ts} <span class="edited-tag"></span></div>
+                <div class="meta">${owner} • ${ts} <span class="edited-tag"></span> ${statusHtml}</div>
             `;
             list.appendChild(wrap); 
             list.scrollTop = list.scrollHeight;
@@ -1440,6 +1980,7 @@
             
             let content = '';
             const isMine = (side === 'outgoing');
+            const statusHtml = isMine ? `<span class="read-status" id="status-${msgId}">✓</span>` : '';
 
             if (kind === 'image') {
                 if (isViewOnce) {
@@ -1461,10 +2002,18 @@
                     </div>
                     ${createActionsHtml(msgId, isMine)}
                 </div>
-                <div class="meta">${owner} • ${ts}</div>
+                <div class="meta">${owner} • ${ts} ${statusHtml}</div>
             `;
             list.appendChild(wrap); 
             list.scrollTop = list.scrollHeight;
+        }
+
+        function markMessageSeen(msgId) {
+            const statusEl = document.getElementById(`status-${msgId}`);
+            if (statusEl) {
+                statusEl.innerHTML = '✓✓';
+                statusEl.classList.add('seen');
+            }
         }
 
         function openViewOnce(msgId, isMine) {
@@ -1499,20 +2048,73 @@
 
         // MESSAGE ACTIONS (EDIT, UNSEND, REACT)
         function triggerAction(action, msgId, extraVal = null) {
-            document.getElementById('menu-' + msgId).classList.add('hidden'); // Close menu
-            
             if (action === 'unsend') {
                 performUnsendLocal(msgId);
                 sendSecurePacket({ type: 'unsend', msgId: msgId });
             } 
             else if (action === 'edit') {
                 const wrap = document.getElementById(msgId);
-                const currentText = wrap.querySelector('.msg-text').innerText;
-                const newText = prompt("Edit your message:", currentText);
-                if (newText && newText.trim() !== "" && newText !== currentText) {
-                    performEditLocal(msgId, newText.trim());
-                    sendSecurePacket({ type: 'edit', msgId: msgId, newText: newText.trim() });
-                }
+                if (!wrap) return;
+                
+                const textNode = wrap.querySelector('.msg-text');
+                
+                // Prevent duplicate edit inputs or trying to edit non-text media
+                if (!textNode || wrap.querySelector('.edit-input-container')) return;
+
+                const currentText = textNode.innerText;
+                textNode.style.display = 'none'; // Hide current text temporarily
+
+                // Create inline editing UI
+                const editContainer = document.createElement('div');
+                editContainer.className = 'edit-input-container';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'edit-input';
+                input.value = currentText;
+                
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'edit-btn';
+                saveBtn.innerHTML = '✅';
+                saveBtn.title = 'Save Edit';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'edit-btn';
+                cancelBtn.innerHTML = '❌';
+                cancelBtn.title = 'Cancel Edit';
+
+                // Handle edit completion
+                const finishEdit = (save) => {
+                    if (save) {
+                        const newText = input.value.trim();
+                        if (newText && newText !== currentText) {
+                            performEditLocal(msgId, newText);
+                            sendSecurePacket({ type: 'edit', msgId: msgId, newText: newText });
+                        }
+                    }
+                    textNode.style.display = ''; // Restore standard text display
+                    editContainer.remove();      // Clean up input
+                };
+
+                // Attach events
+                saveBtn.onclick = () => finishEdit(true);
+                cancelBtn.onclick = () => finishEdit(false);
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') finishEdit(true);
+                    if (e.key === 'Escape') finishEdit(false);
+                };
+
+                // Append everything
+                editContainer.appendChild(input);
+                editContainer.appendChild(saveBtn);
+                editContainer.appendChild(cancelBtn);
+                
+                // Insert directly inside the bubble, exactly where the text was
+                textNode.parentNode.insertBefore(editContainer, textNode.nextSibling);
+                input.focus();
+                
+                // Move cursor to the end of the input field naturally
+                input.selectionStart = input.selectionEnd = input.value.length;
             }
             else if (action === 'react') {
                 performReactLocal(msgId, extraVal);
@@ -1581,6 +2183,8 @@
 
         // FINAL DESTRUCTION
         function finalizeDisconnect(msg) {
+            cleanupCall();
+            remotePeerId = null;
             if (nodeConn) nodeConn.close(); 
             if (nodePeer) nodePeer.destroy();
             clearInterval(lifeTick);
@@ -1597,11 +2201,22 @@
         }
 
         // NEW: SYSTEM MESSAGE RENDERER
-        function renderSystemMessage(msg, ts) {
+        function renderSystemMessage(msg, ts, type = 'danger') {
             const list = document.getElementById('scrollContainer');
             const alertBox = document.createElement('div'); 
             alertBox.className = `system-alert`;
-            alertBox.innerText = `⚠️ ${msg} (${ts})`;
+            
+            if (type === 'info') {
+                alertBox.style.color = 'var(--text-primary)';
+                alertBox.style.borderColor = 'var(--border-color)';
+            }
+            
+            if (msg.startsWith('📞')) {
+                alertBox.innerText = `${msg} (${ts})`;
+            } else {
+                alertBox.innerText = `⚠️ ${msg} (${ts})`;
+            }
+            
             list.appendChild(alertBox); 
             list.scrollTop = list.scrollHeight;
         }
