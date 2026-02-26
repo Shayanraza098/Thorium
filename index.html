@@ -157,17 +157,22 @@
             fill: var(--text-primary);
         }
 
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
         .header h1 {
             font-size: 2.2em;
             font-weight: 800;
             letter-spacing: -0.04em;
-            background-image: var(--primary-gradient);
-            background-size: 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            color: var(--text-primary);
         }
 
         .header p {
@@ -222,7 +227,7 @@
             color: var(--text-secondary);
         }
 
-        .input-wrapper input, .input-wrapper select {
+        .input-wrapper input {
             width: 100%;
             padding: 16px;
             border: 2px solid transparent;
@@ -235,11 +240,90 @@
             transition: all var(--speed-normal) var(--ease-out-expo);
         }
 
-        .input-wrapper input:focus, .input-wrapper select:focus {
+        .input-wrapper input:focus {
             border-color: #6366f1;
             background-color: var(--surface);
             box-shadow: 0 0 0 4px var(--glow-color);
             transform: translateY(-2px);
+        }
+
+        /* CUSTOM SELECT STYLING */
+        .custom-select-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 1em;
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--speed-normal) var(--ease-out-expo);
+        }
+
+        .custom-select-trigger:hover, .custom-select-container.open .custom-select-trigger {
+            background-color: var(--surface);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        .custom-select-trigger .chevron {
+            transition: transform var(--speed-normal) var(--ease-spring);
+        }
+
+        .custom-select-container.open .custom-select-trigger .chevron {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background-color: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.98);
+            transition: all var(--speed-normal) var(--ease-spring);
+            overflow: hidden;
+        }
+
+        .custom-select-container.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .custom-option {
+            padding: 14px 16px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: background-color var(--speed-fast);
+        }
+
+        .custom-option:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .custom-option.selected {
+            background-color: var(--secondary);
+            color: #6366f1;
+            font-weight: 700;
         }
 
         .button-group { display: flex; gap: 16px; margin-top: 8px; }
@@ -344,8 +428,9 @@
 
         .bubble-content-row {
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Align items nicely to the bottom */
             gap: 8px;
+            max-width: 100%; /* Prevent horizontal flex overflow */
         }
 
         .bubble {
@@ -354,9 +439,17 @@
             font-size: 0.98em;
             line-height: 1.55;
             word-wrap: break-word;
+            word-break: break-word; /* Forces long unbroken text to break */
+            overflow-wrap: anywhere; /* Respects container boundaries */
+            min-width: 0; /* Crucial: allows flex items to shrink and wrap */
             box-shadow: var(--shadow-sm);
             position: relative;
             transition: transform 0.3s var(--ease-spring);
+        }
+
+        /* NEW FIX: Apply white-space: pre-wrap ONLY to the text, not the container */
+        .msg-text {
+            white-space: pre-wrap; /* Preserves your paragraph breaks and spaces */
         }
 
         .bubble:hover {
@@ -404,7 +497,9 @@
             box-shadow: var(--shadow-sm);
             display: none;
             animation: popIn 0.4s var(--ease-spring) both;
+            white-space: nowrap; /* Keep emojis on one line */
         }
+        .msg-reactions span { display: inline-block; margin: 0 1px; }
         .msg-reactions.active { display: block; }
 
         @keyframes popIn {
@@ -464,7 +559,7 @@
 
         .edit-input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.4);
             background: rgba(0, 0, 0, 0.15);
@@ -473,6 +568,10 @@
             outline: none;
             font-family: inherit;
             width: 100%;
+            resize: none;
+            max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.4;
         }
 
         .edit-input:focus {
@@ -546,14 +645,14 @@
         .composer {
             display: flex;
             gap: 12px;
-            align-items: center;
+            align-items: flex-end; /* Aligns to bottom as text area grows */
             background-color: var(--secondary);
             padding: 8px;
             border-radius: var(--radius-lg);
             position: relative;
         }
 
-        .composer input {
+        .composer textarea {
             flex: 1;
             background: transparent;
             border: none;
@@ -561,6 +660,11 @@
             padding: 12px;
             font-size: 1em;
             color: var(--text-primary);
+            font-family: inherit;
+            resize: none; /* Auto-resizes via JS */
+            max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.4;
         }
 
         .action-tray-trigger {
@@ -839,6 +943,7 @@
             border-radius: 24px;
             background-color: #000;
             box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            transform: scaleX(-1); /* Mirror the camera preview */
         }
         .cam-actions { margin-top: 32px; display: flex; gap: 24px; }
         .shutter {
@@ -897,8 +1002,9 @@
             border-radius: 14px; border: 2px solid rgba(255,255,255,0.5);
             background: #222; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             transition: transform 0.4s var(--ease-spring);
+            transform: scaleX(-1); /* Mirror the local video in calls */
         }
-        #localVideoNode:hover { transform: scale(1.05); }
+        #localVideoNode:hover { transform: scaleX(-1) scale(1.05); }
         
         .call-controls { 
             display: flex; gap: 16px; margin-top: 40px; 
@@ -932,8 +1038,17 @@
             <button class="theme-toggle" id="modeSwitch" title="Switch Theme">
                 <svg id="modeIcon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
             </button>
-            <h1>Thorium</h1>
-            <p>Secure Session</p>
+            <div class="brand">
+                <svg class="logo-icon" viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                    <path d="M6 10h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2v3l-3-3H6a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z" />
+                    <circle cx="8.5" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                    <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                    <circle cx="15.5" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                </svg>
+                <h1>Thorium</h1>
+            </div>
+            <p>End to End Encrypted</p>
         </header>
 
         <main class="content">
@@ -949,12 +1064,22 @@
 
                 <div id="hostOptions">
                     <div class="input-wrapper">
-                        <label for="sessionLife">Code Expires In</label>
-                        <select id="sessionLife" onchange="checkManualLife()">
-                            <option value="60">1 Minute (Quick Link)</option>
-                            <option value="300" selected>5 Minutes (Standard)</option>
-                            <option value="custom">Manual Minute Entry</option>
-                        </select>
+                        <label>Code Expires In</label>
+                        
+                        <!-- NEW AESTHETIC CUSTOM SELECT COMPONENT -->
+                        <div class="custom-select-container" id="sessionLifeContainer">
+                            <input type="hidden" id="sessionLife" value="300">
+                            <div class="custom-select-trigger" onclick="toggleCustomSelect()">
+                                <span id="sessionLifeDisplay">5 Minutes (Standard)</span>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="custom-select-options" id="sessionLifeOptions">
+                                <div class="custom-option" data-value="60" onclick="selectCustomOption(this)">1 Minute (Quick Link)</div>
+                                <div class="custom-option selected" data-value="300" onclick="selectCustomOption(this)">5 Minutes (Standard)</div>
+                                <div class="custom-option" data-value="custom" onclick="selectCustomOption(this)">Manual Minute Entry</div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="input-wrapper hidden" id="manualLifeBox">
@@ -1031,7 +1156,8 @@
                         </div>
                     </div>
                     
-                    <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKeySubmit(event)" oninput="broadcastTyping()">
+                    <!-- REPLACED INPUT WITH AUTO-EXPANDING TEXTAREA -->
+                    <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKeySubmit(event)" oninput="autoResizeTextarea(this); broadcastTyping()"></textarea>
                     
                     <button class="send-pill" onclick="transmitText()">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -1047,6 +1173,7 @@
                         <p id="dcModalDesc" style="color: var(--text-secondary)">Disconnect initiated.</p>
                         <div class="dc-timer" id="dcTimerText">10</div>
                         <button class="action-trigger" id="dcModalBtn" onclick="undoDisconnect()">Yes, Rejoin Chat</button>
+                        <button class="action-trigger outline" style="margin-top: 12px;" onclick="confirmDisconnect()">No, Continue</button>
                     </div>
                 </div>
 
@@ -1238,6 +1365,41 @@
             }
         }
 
+        // CUSTOM SELECT DROPDOWN LOGIC
+        function toggleCustomSelect() {
+            document.getElementById('sessionLifeContainer').classList.toggle('open');
+        }
+
+        function selectCustomOption(element) {
+            const val = element.getAttribute('data-value');
+            const text = element.innerText;
+            
+            // Update the hidden input that acts as our state holder
+            document.getElementById('sessionLife').value = val;
+            
+            // Update the display text shown to the user
+            document.getElementById('sessionLifeDisplay').innerText = text;
+            
+            // Update the "selected" highlight class
+            const options = document.querySelectorAll('#sessionLifeOptions .custom-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // Close dropdown
+            document.getElementById('sessionLifeContainer').classList.remove('open');
+            
+            // Trigger the original manual life check function
+            checkManualLife();
+        }
+
+        // Close custom select dropdown if clicked outside of it
+        window.addEventListener('click', (e) => {
+            const container = document.getElementById('sessionLifeContainer');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
+
         // PEER CALLING LOGIC & TIMER
         function startCallTimer() {
             if (callTimerTick) return; 
@@ -1320,6 +1482,24 @@
             }
         }
 
+        // Generate high quality media constraints
+        function getMediaConstraints(isVideo) {
+            return {
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                    sampleRate: 48000, // HD 48kHz Audio
+                    channelCount: 2
+                },
+                video: isVideo ? {
+                    width: { ideal: 1280 }, // 720p HD Video
+                    height: { ideal: 720 },
+                    frameRate: { ideal: 30 }
+                } : false
+            };
+        }
+
         function setupPeerCallListener() {
             nodePeer.on('call', incomingCall => {
                 if (activeCall || callSessionActive) {
@@ -1357,7 +1537,7 @@
             callIsCaller = true;
 
             try {
-                callLocalStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+                callLocalStream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(isVideo));
                 if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
 
                 showCallOverlay(`Calling ${remoteAlias}...`, false, isVideo);
@@ -1387,7 +1567,7 @@
 
         async function acceptCall(isVideo) {
             try {
-                callLocalStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+                callLocalStream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(isVideo));
                 if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
                 
                 activeCall.answer(callLocalStream);
@@ -1533,7 +1713,10 @@
         async function startCameraLink() {
             toggleTray();
             try {
-                streamHandle = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                streamHandle = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } }, 
+                    audio: false 
+                });
                 document.getElementById('videoPipe').srcObject = streamHandle;
                 document.getElementById('camOverlay').style.display = 'flex';
             } catch (err) { alert("Camera access denied."); }
@@ -1549,7 +1732,12 @@
             const sheet = document.createElement('canvas');
             sheet.width = pipe.videoWidth;
             sheet.height = pipe.videoHeight;
-            sheet.getContext('2d').drawImage(pipe, 0, 0, sheet.width, sheet.height);
+            
+            const ctx = sheet.getContext('2d');
+            // Flip the canvas context horizontally to match the mirrored video preview
+            ctx.translate(sheet.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(pipe, 0, 0, sheet.width, sheet.height);
             
             pendingImageBase64 = sheet.toDataURL('image/jpeg', 0.9);
             haltCamera();
@@ -1627,7 +1815,13 @@
             const mic = document.getElementById('micTrigger');
             if (!isCapturingAudio) {
                 try {
-                    const sound = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const sound = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            sampleRate: 48000
+                        }
+                    });
                     
                     // Fixed compatibility for multiple browsers (Safari/Chrome/Firefox)
                     let options = {};
@@ -1668,6 +1862,7 @@
 
         // SESSION ESTABLISHMENT
         function checkManualLife() {
+            // Using the hidden input 'sessionLife' instead of the native select
             const val = document.getElementById('sessionLife').value;
             if (val === 'custom') document.getElementById('manualLifeBox').classList.remove('hidden');
             else document.getElementById('manualLifeBox').classList.add('hidden');
@@ -1699,6 +1894,7 @@
             if (!validateIdentity()) return;
             
             let secondsLeft = 300;
+            // Get value from hidden input instead of select element
             const lifeSel = document.getElementById('sessionLife').value;
             if (lifeSel === 'custom') {
                 const mins = parseInt(document.getElementById('manualMinutes').value);
@@ -1859,6 +2055,12 @@
             sendSecurePacket({ type: 'undo_disconnect' });
         }
 
+        function confirmDisconnect() {
+            clearInterval(dcTimer);
+            let finalMsg = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Would you like to rejoin?` : `You disconnected. Would you like to rejoin?`;
+            finalizeDisconnect(finalMsg);
+        }
+
         // DATA ROUTING & ACTIONS
         function handleDataRouting(p) {
             if (p.type === 'txt') {
@@ -1881,7 +2083,7 @@
             // Message Actions
             else if (p.type === 'unsend') performUnsendLocal(p.msgId);
             else if (p.type === 'edit') performEditLocal(p.msgId, p.newText);
-            else if (p.type === 'react') performReactLocal(p.msgId, p.reaction);
+            else if (p.type === 'react') performReactLocal(p.msgId, p.reaction, false);
             else if (p.type === 'viewed_once') markViewedOnce(p.msgId);
             else if (p.type === 'msg_seen') markMessageSeen(p.msgId);
             
@@ -1899,7 +2101,9 @@
                 document.getElementById('disconnectOverlay').style.display = 'none';
             }
             // NEW: Screenshot Alerts
-            else if (p.type === 'screenshot') renderSystemMessage(`${remoteAlias} took a screenshot!`, p.ts);
+            else if (p.type === 'screenshot') {
+                renderSystemMessage(`${remoteAlias} ${p.customMsg || 'took a screenshot!'}`, p.ts);
+            }
         }
 
         // MESSAGE SENDING
@@ -1915,13 +2119,14 @@
             renderBubble(str, 'You', 'outgoing', now, msgId);
             
             bar.value = ''; 
+            bar.style.height = 'auto'; // Reset text area size
             broadcastTyping(true);
         }
 
         async function dispatchMediaPacket(data, mediaType, isViewOnce = false) {
             const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const msgId = 'm_' + Math.random().toString(36).substr(2, 9);
-            sendSecurePacket({ type: mediaType, content: data, ts: now, msgId: msgId, viewOnce: isViewOnce });
+            sendSecurePacket({ type: 'mediaType', content: data, ts: now, msgId: msgId, viewOnce: isViewOnce });
             renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio', msgId, isViewOnce);
         }
 
@@ -2068,10 +2273,21 @@
                 const editContainer = document.createElement('div');
                 editContainer.className = 'edit-input-container';
                 
-                const input = document.createElement('input');
-                input.type = 'text';
+                const input = document.createElement('textarea');
                 input.className = 'edit-input';
                 input.value = currentText;
+                input.rows = 1;
+                
+                // Auto-resize edit field
+                setTimeout(() => {
+                    input.style.height = 'auto';
+                    input.style.height = input.scrollHeight + 'px';
+                }, 0);
+                
+                input.oninput = () => {
+                    input.style.height = 'auto';
+                    input.style.height = input.scrollHeight + 'px';
+                };
                 
                 const saveBtn = document.createElement('button');
                 saveBtn.className = 'edit-btn';
@@ -2100,7 +2316,10 @@
                 saveBtn.onclick = () => finishEdit(true);
                 cancelBtn.onclick = () => finishEdit(false);
                 input.onkeydown = (e) => {
-                    if (e.key === 'Enter') finishEdit(true);
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        finishEdit(true);
+                    }
                     if (e.key === 'Escape') finishEdit(false);
                 };
 
@@ -2117,7 +2336,7 @@
                 input.selectionStart = input.selectionEnd = input.value.length;
             }
             else if (action === 'react') {
-                performReactLocal(msgId, extraVal);
+                performReactLocal(msgId, extraVal, true);
                 sendSecurePacket({ type: 'react', msgId: msgId, reaction: extraVal });
             }
         }
@@ -2137,18 +2356,31 @@
             }
         }
 
-        function performReactLocal(msgId, reaction) {
+        function performReactLocal(msgId, reaction, isMine = true) {
             const el = document.getElementById(msgId);
             if(el) {
                 const rxnNode = el.querySelector('.msg-reactions');
                 if(rxnNode) {
-                    rxnNode.innerText = reaction;
+                    let spanClass = isMine ? 'rxn-mine' : 'rxn-peer';
+                    let span = rxnNode.querySelector('.' + spanClass);
+                    
+                    if (!span) {
+                        span = document.createElement('span');
+                        span.className = spanClass;
+                        rxnNode.appendChild(span);
+                    }
+                    span.innerText = reaction;
                     rxnNode.classList.add('active');
                 }
             }
         }
 
         // INTERACTIVITY
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
         async function broadcastTyping(stop = false) {
             if (stop) { 
                 sendSecurePacket({ type: 'typing', active: false });
@@ -2164,7 +2396,13 @@
             }, 2500);
         }
 
-        function handleKeySubmit(e) { if (e.key === 'Enter') transmitText(); }
+        function handleKeySubmit(e) { 
+            // Allow Shift+Enter for new lines, Enter to send
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                transmitText(); 
+            }
+        }
         
         function handleDragOver(e) { e.preventDefault(); document.getElementById('dropHint').classList.remove('hidden'); }
         function handleDragLeave() { document.getElementById('dropHint').classList.add('hidden'); }
@@ -2222,11 +2460,11 @@
         }
 
         // NEW: SCREENSHOT SHORTCUT DETECTION ENGINE
-        function triggerScreenshotAlert() {
+        function triggerScreenshotAlert(customLogMsg = null, customPeerMsg = null) {
             if (nodeConn?.open) {
                 const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                sendSecurePacket({ type: 'screenshot', ts: now });
-                renderSystemMessage(`You took a screenshot.`, now);
+                sendSecurePacket({ type: 'screenshot', ts: now, customMsg: customPeerMsg });
+                renderSystemMessage(customLogMsg || `You took a screenshot.`, now);
             }
         }
 
@@ -2239,6 +2477,30 @@
         window.addEventListener('keydown', (e) => {
             if (e.metaKey && e.shiftKey && ['3', '4', '5', 's', 'S'].includes(e.key)) {
                 triggerScreenshotAlert();
+            }
+        });
+
+        // MOBILE & TABLET HEURISTIC: Focus Interruption
+        // Browsers block direct hardware screenshot APIs on phones.
+        // Instead, we measure the micro-interruption caused by the OS screenshot flash.
+        let blurTimestamp = 0;
+        window.addEventListener('blur', () => { blurTimestamp = Date.now(); });
+        
+        window.addEventListener('focus', () => {
+            if (blurTimestamp > 0) {
+                const timeAway = Date.now() - blurTimestamp;
+                // If focus is lost for less than 1.5 seconds, it's usually a screenshot flash or quick menu drop-down
+                if (timeAway < 1500) {
+                    triggerScreenshotAlert('Screen capture/overlay detected.', 'might have taken a screenshot or opened a system menu.');
+                }
+                blurTimestamp = 0;
+            }
+        });
+
+        // Detect if user fully leaves/minimizes the app (Screen recording/switching warning)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && nodeConn?.open) {
+                triggerScreenshotAlert('You left the app (Backgrounded).', 'left the app to the background (Possible screen recording).');
             }
         });
 
