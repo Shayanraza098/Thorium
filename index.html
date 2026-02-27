@@ -793,6 +793,23 @@
 
         .hidden { display: none !important; }
 
+        /* DEVELOPER WATERMARK */
+        .developer-watermark {
+            position: fixed;
+            bottom: 24px;
+            right: 28px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--danger);
+            letter-spacing: 0.05em;
+            opacity: 0.6;
+            pointer-events: none; /* Prevents it from interfering with clicks */
+            z-index: 50; /* Keeps it behind popups/modals */
+            transition: opacity var(--speed-normal);
+            text-align: right;
+            line-height: 1.4;
+        }
+
         /* OVERLAYS & MODALS */
         #camOverlay, #imageViewer, #disconnectOverlay {
             position: fixed;
@@ -1030,6 +1047,12 @@
 </head>
 <body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
     
+    <!-- BRANDING WATERMARK -->
+    <div class="developer-watermark">
+        Developed by Shayan<br>
+        <span style="font-size: 0.85em; opacity: 0.9;">POC:-shayanraza.cs@gmail.com</span>
+    </div>
+
     <div class="container" id="app">
         
         <div class="drag-overlay hidden" id="dropHint">Drop your file here</div>
@@ -1059,7 +1082,7 @@
                 
                 <div class="input-wrapper">
                     <label for="identity">Your Name</label>
-                    <input type="text" id="identity" placeholder="e.g., Virat">
+                    <input type="text" id="identity" placeholder="e.g., Shayan">
                 </div>
 
                 <div id="hostOptions">
