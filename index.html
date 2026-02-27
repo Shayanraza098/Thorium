@@ -1930,6 +1930,15 @@
             });
             
             nodePeer.on('connection', conn => { 
+                // SECURITY FIX: Prevent third person (Person C) from interrupting active chat
+                if (nodeConn) {
+                    conn.on('open', () => {
+                        conn.send({ type: 'chat_full' });
+                        setTimeout(() => conn.close(), 500);
+                    });
+                    return;
+                }
+
                 clearInterval(lifeTick);
                 nodeConn = conn; 
                 executeHandshake(false); 
@@ -1980,6 +1989,12 @@
             });
             
             nodeConn.on('data', async (incoming) => {
+                // Instantly disconnect if the room was locked by the host
+                if (incoming.type === 'chat_full') {
+                    finalizeDisconnect('Chat room is already full. You cannot join.');
+                    return;
+                }
+
                 if (incoming.type === 'hs-init' || incoming.type === 'hs-reply') {
                     remoteAlias = incoming.alias;
                     remotePeerId = incoming.peerId; 
@@ -2423,8 +2438,8 @@
         function finalizeDisconnect(msg) {
             cleanupCall();
             remotePeerId = null;
-            if (nodeConn) nodeConn.close(); 
-            if (nodePeer) nodePeer.destroy();
+            if (nodeConn) { nodeConn.close(); nodeConn = null; } 
+            if (nodePeer) { nodePeer.destroy(); nodePeer = null; }
             clearInterval(lifeTick);
             clearInterval(dcTimer);
             
@@ -2489,18 +2504,18 @@
         window.addEventListener('focus', () => {
             if (blurTimestamp > 0) {
                 const timeAway = Date.now() - blurTimestamp;
-                // If focus is lost for less than 1.5 seconds, it's usually a screenshot flash or quick menu drop-down
+                // If focus is lost for less than 1.5 seconds, it's usually a screenshot flash
                 if (timeAway < 1500) {
-                    triggerScreenshotAlert('Screen capture/overlay detected.', 'might have taken a screenshot or opened a system menu.');
+                    triggerScreenshotAlert();
                 }
                 blurTimestamp = 0;
             }
         });
 
-        // Detect if user fully leaves/minimizes the app (Screen recording/switching warning)
+        // Detect if user fully leaves/minimizes the app
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && nodeConn?.open) {
-                triggerScreenshotAlert('You left the app (Backgrounded).', 'left the app to the background (Possible screen recording).');
+                triggerScreenshotAlert('You put the app in the background.', 'put the app in the background.');
             }
         });
 
