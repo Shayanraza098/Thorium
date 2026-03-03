@@ -8,7 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Added Playfair Display for the fancy, aesthetic CN logo -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
@@ -22,7 +21,7 @@
             /* Gradient Architecture */
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             --primary-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-            --glow-color: rgba(99, 102, 241, 0.3);
+            --glow-color: rgba(99, 102, 241, 0.4);
             
             /* Typography Scale */
             --text-primary: #0f172a;
@@ -58,10 +57,10 @@
             --speed-slow: 0.6s;
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth bouncy spring */
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* DARK MODE - NOW TRUE BLACK */
+        /* DARK MODE - TRUE BLACK */
         body.dark-mode {
             --background-start: #000000;
             --background-end: #000000;
@@ -71,19 +70,19 @@
             --secondary-hover: #333333;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --glow-color: rgba(168, 85, 247, 0.2);
+            --glow-color: rgba(168, 85, 247, 0.3);
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: 
-                background-color var(--speed-normal) var(--ease-in-out),
-                color var(--speed-normal) var(--ease-in-out),
-                border-color var(--speed-normal) var(--ease-in-out);
+        /* PRIVACY BLUR (Triggered via JS) */
+        .privacy-blur {
+            filter: blur(25px) grayscale(100%);
+            opacity: 0.3;
+            pointer-events: none;
+            transition: all 0.3s var(--ease-spring);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color var(--speed-normal), color var(--speed-normal), border-color var(--speed-normal); }
 
         body {
             font-family: var(--font-main);
@@ -120,7 +119,7 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* HEADER COMPONENTS */
+        /* HEADER & TOP CONTROLS */
         .header {
             padding: 32px;
             display: flex;
@@ -129,12 +128,19 @@
             justify-content: center;
             border-bottom: 1px solid var(--border-color);
             position: relative;
+            flex-shrink: 0;
         }
 
-        .theme-toggle {
+        .top-controls {
             position: absolute;
             top: 32px;
             right: 32px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .icon-toggle {
             background-color: var(--secondary);
             border: none;
             width: 44px;
@@ -144,44 +150,28 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 10;
             transition: transform var(--speed-normal) var(--ease-spring), background-color var(--speed-fast);
         }
 
-        .theme-toggle:hover {
+        .icon-toggle:hover {
             transform: translateY(-4px) scale(1.05);
             background-color: var(--secondary-hover);
         }
 
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
+        .icon-toggle svg {
+            fill: none;
+            stroke: var(--text-primary);
+        }
+
+        #modeSwitch svg {
             fill: var(--text-primary);
+            stroke: none;
         }
 
-        .header .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 6px;
-        }
-
-        .header h1 {
-            font-size: 2.2em;
-            font-weight: 800;
-            letter-spacing: -0.04em;
-            color: var(--text-primary);
-        }
-
-        .logo-icon {
-            color: var(--text-primary);
-        }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 0.95em;
-            font-weight: 500;
-        }
+        .header .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+        .header h1 { font-size: 2.2em; font-weight: 800; letter-spacing: -0.04em; color: var(--text-primary); }
+        .logo-icon { color: var(--text-primary); }
+        .header p { color: var(--text-secondary); font-size: 0.95em; font-weight: 500; }
 
         /* CONTENT WRAPPER */
         .content {
@@ -195,1274 +185,546 @@
         }
         .content::-webkit-scrollbar { display: none; }
 
-        .setup-screen, .chat-screen, .disconnect-screen {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .setup-screen, .chat-screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
         .fade-in { animation: screenFade 0.6s var(--ease-spring) both; }
         @keyframes screenFade {
             from { opacity: 0; transform: translateY(15px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* UI ELEMENTS */
-        .screen-title {
-            font-weight: 700;
-            font-size: 1.6em;
-            color: var(--text-primary);
-            margin-bottom: 24px;
-            text-align: center;
-            letter-spacing: -0.02em;
-        }
+        .screen-title { font-weight: 700; font-size: 1.6em; color: var(--text-primary); margin-bottom: 24px; text-align: center; }
 
+        /* INPUTS */
         .input-wrapper { margin-bottom: 20px; }
-        .input-wrapper label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-        }
-
+        .input-wrapper label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
         .input-wrapper input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid transparent;
-            border-radius: var(--radius-md);
-            font-size: 1em;
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            font-family: inherit;
-            outline: none;
-            transition: all var(--speed-normal) var(--ease-out-expo);
+            width: 100%; padding: 16px; border: 2px solid transparent; border-radius: var(--radius-md); font-size: 1em; background-color: var(--secondary); color: var(--text-primary); font-family: inherit; outline: none; transition: all var(--speed-normal) var(--ease-out-expo);
+        }
+        .input-wrapper input:focus, .composer textarea:focus, .ai-chat-composer input[type="text"]:focus {
+            border-color: #6366f1; background-color: var(--surface); box-shadow: 0 0 0 4px var(--glow-color); transform: translateY(-2px);
+            animation: inputPulse 2s infinite alternate ease-in-out;
+        }
+        @keyframes inputPulse {
+            0% { box-shadow: 0 0 0 4px var(--glow-color); }
+            100% { box-shadow: 0 0 15px 4px var(--glow-color); }
         }
 
-        .input-wrapper input:focus {
-            border-color: #6366f1;
-            background-color: var(--surface);
-            box-shadow: 0 0 0 4px var(--glow-color);
-            transform: translateY(-2px);
-        }
+        /* CUSTOM SELECT */
+        .custom-select-container { position: relative; width: 100%; }
+        .custom-select-trigger { width: 100%; padding: 16px; border: 2px solid transparent; border-radius: var(--radius-md); font-size: 1em; background-color: var(--secondary); color: var(--text-primary); font-family: inherit; outline: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all var(--speed-normal) var(--ease-out-expo); }
+        .custom-select-trigger:hover, .custom-select-container.open .custom-select-trigger { background-color: var(--surface); border-color: #6366f1; box-shadow: 0 0 0 4px var(--glow-color); transform: translateY(-2px); }
+        .custom-select-trigger .chevron { transition: transform var(--speed-normal) var(--ease-spring); }
+        .custom-select-container.open .custom-select-trigger .chevron { transform: rotate(180deg); }
+        .custom-select-options { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background-color: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-10px) scale(0.98); transition: all var(--speed-normal) var(--ease-spring); overflow: hidden; }
+        .custom-select-container.open .custom-select-options { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .custom-option { padding: 14px 16px; cursor: pointer; color: var(--text-primary); font-weight: 500; transition: background-color var(--speed-fast); }
+        .custom-option:hover { background-color: var(--secondary-hover); }
+        .custom-option.selected { background-color: var(--secondary); color: #6366f1; font-weight: 700; }
 
-        /* CUSTOM SELECT STYLING */
-        .custom-select-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .custom-select-trigger {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid transparent;
-            border-radius: var(--radius-md);
-            font-size: 1em;
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            font-family: inherit;
-            outline: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all var(--speed-normal) var(--ease-out-expo);
-        }
-
-        .custom-select-trigger:hover, .custom-select-container.open .custom-select-trigger {
-            background-color: var(--surface);
-            border-color: #6366f1;
-            box-shadow: 0 0 0 4px var(--glow-color);
-            transform: translateY(-2px);
-        }
-
-        .custom-select-trigger .chevron {
-            transition: transform var(--speed-normal) var(--ease-spring);
-        }
-
-        .custom-select-container.open .custom-select-trigger .chevron {
-            transform: rotate(180deg);
-        }
-
-        .custom-select-options {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background-color: var(--surface);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px) scale(0.98);
-            transition: all var(--speed-normal) var(--ease-spring);
-            overflow: hidden;
-        }
-
-        .custom-select-container.open .custom-select-options {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
-
-        .custom-option {
-            padding: 14px 16px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-weight: 500;
-            transition: background-color var(--speed-fast);
-        }
-
-        .custom-option:hover {
-            background-color: var(--secondary-hover);
-        }
-
-        .custom-option.selected {
-            background-color: var(--secondary);
-            color: #6366f1;
-            font-weight: 700;
-        }
-
+        /* BUTTONS */
         .button-group { display: flex; gap: 16px; margin-top: 8px; }
-
-        button.action-trigger {
-            background-image: var(--primary-gradient);
-            color: var(--text-on-gradient);
-            border: none;
-            padding: 16px 32px;
-            border-radius: var(--radius-md);
-            font-size: 1em;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring);
-        }
-
-        button.action-trigger:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 16px 24px -6px var(--glow-color);
-        }
-
+        button.action-trigger { background-image: var(--primary-gradient); color: var(--text-on-gradient); border: none; padding: 16px 32px; border-radius: var(--radius-md); font-size: 1em; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; width: 100%; transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring); }
+        button.action-trigger:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 16px 24px -6px var(--glow-color); }
         button.action-trigger:active { transform: translateY(0) scale(0.98); }
-
-        button.action-trigger.outline {
-            background-image: none;
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            box-shadow: none;
-        }
+        button.action-trigger.outline { background-image: none; background-color: var(--secondary); color: var(--text-primary); box-shadow: none; border: 1px solid var(--border-color); }
         button.action-trigger.outline:hover { background-color: var(--secondary-hover); }
+        button.action-trigger.danger { background-image: none; background-color: var(--danger); color: white; }
+        button.action-trigger.danger:hover { background-color: var(--danger-hover); box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4); }
 
-        /* CHAT INTERFACE & CALL BAR */
-        .chat-screen { display: none; height: 100%; position: relative; }
+        /* CHAT INTERFACE */
+        .chat-top-bar { display: flex; justify-content: space-between; align-items: center; background-color: var(--secondary); padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; flex-shrink: 0;}
+        .chat-top-bar .connection-status { margin-bottom: 0; padding: 0; text-align: left; color: var(--success); font-size: 0.85em; font-weight: 700; }
+        .call-buttons { display: flex; gap: 12px; }
+        .icon-btn { background: var(--surface); border: 1px solid var(--border-color); color: var(--text-primary); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.4s var(--ease-spring), background-color 0.2s; box-shadow: var(--shadow-sm); }
+        .icon-btn:hover { transform: scale(1.15) translateY(-2px); background: var(--secondary-hover); }
+
+        .message-viewport { flex-grow: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
         
-        .chat-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--secondary);
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .chat-top-bar .connection-status {
-            margin-bottom: 0;
-            padding: 0;
-            text-align: left;
-            color: var(--success);
-            font-size: 0.85em;
-            font-weight: 700;
-        }
-
-        .call-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .icon-btn {
-            background: var(--surface);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.4s var(--ease-spring), background-color 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .icon-btn:hover {
-            transform: scale(1.15) translateY(-2px);
-            background: var(--secondary-hover);
-        }
-
-        .message-viewport {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .bubble-wrap {
-            display: flex;
-            flex-direction: column;
-            max-width: 80%;
-            animation: bubblePop 0.5s var(--ease-spring) both;
-            position: relative;
-        }
-
-        @keyframes bubblePop {
-            0% { opacity: 0; transform: scale(0.85) translateY(15px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .bubble-content-row {
-            display: flex;
-            align-items: flex-end; /* Align items nicely to the bottom */
-            gap: 8px;
-            max-width: 100%; /* Prevent horizontal flex overflow */
-        }
-
-        .bubble {
-            padding: 14px 18px;
-            border-radius: 20px;
-            font-size: 0.98em;
-            line-height: 1.55;
-            word-wrap: break-word;
-            word-break: break-word; /* Forces long unbroken text to break */
-            overflow-wrap: anywhere; /* Respects container boundaries */
-            min-width: 0; /* Crucial: allows flex items to shrink and wrap */
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            transition: transform 0.3s var(--ease-spring);
-        }
-
-        .msg-text {
-            white-space: pre-wrap; /* Preserves your paragraph breaks and spaces */
-        }
-
-        .bubble:hover {
-            transform: scale(1.01);
-        }
-
+        .bubble-wrap { display: flex; flex-direction: column; max-width: 80%; animation: bubblePop 0.5s var(--ease-spring) both; position: relative; }
+        @keyframes bubblePop { 0% { opacity: 0; transform: scale(0.85) translateY(15px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .bubble-content-row { display: flex; align-items: flex-end; gap: 8px; max-width: 100%; }
+        .bubble { padding: 14px 18px; border-radius: 20px; font-size: 0.98em; line-height: 1.55; word-wrap: break-word; word-break: break-word; overflow-wrap: anywhere; min-width: 0; box-shadow: var(--shadow-sm); position: relative; transition: transform 0.3s var(--ease-spring); }
+        .msg-text { white-space: pre-wrap; }
+        .bubble:hover { transform: scale(1.01); }
         .bubble img { max-width: 100%; border-radius: 14px; margin: 6px 0; display: block; }
+        .bubble audio { width: 250px; max-width: 100%; height: 44px; margin-top: 8px; outline: none; }
         
-        .bubble audio { 
-            width: 250px; 
-            max-width: 100%; 
-            height: 44px; 
-            margin-top: 8px; 
-            outline: none;
-        }
+        .meta { font-size: 0.72em; font-weight: 600; margin-top: 6px; color: var(--text-secondary); padding: 0 4px; display: flex; gap: 6px; align-items: center; }
+        .edited-tag { font-size: 0.85em; opacity: 0.7; font-style: italic; }
 
-        .meta {
-            font-size: 0.72em;
-            font-weight: 600;
-            margin-top: 6px;
-            color: var(--text-secondary);
-            padding: 0 4px;
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .edited-tag {
-            font-size: 0.85em;
-            opacity: 0.7;
-            font-style: italic;
-        }
-
-        /* Message Reactions */
-        .msg-reactions {
-            position: absolute;
-            bottom: -10px;
-            right: 10px;
-            background: var(--surface);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2px 6px;
-            font-size: 0.85em;
-            box-shadow: var(--shadow-sm);
-            display: none;
-            animation: popIn 0.4s var(--ease-spring) both;
-            white-space: nowrap; /* Keep emojis on one line */
-        }
+        .msg-reactions { position: absolute; bottom: -10px; right: 10px; background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 2px 6px; font-size: 0.85em; box-shadow: var(--shadow-sm); display: none; animation: popIn 0.4s var(--ease-spring) both; white-space: nowrap; }
         .msg-reactions span { display: inline-block; margin: 0 1px; }
         .msg-reactions.active { display: block; }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        @keyframes popIn {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        .msg-quick-actions { display: flex; align-items: center; gap: 4px; opacity: 0; transform: scale(0.9); transition: opacity var(--speed-fast) var(--ease-out-expo), transform 0.4s var(--ease-spring); flex-wrap: wrap; max-width: 170px; }
+        .bubble-wrap.outgoing .msg-quick-actions { justify-content: flex-end; }
+        .bubble-wrap:hover .msg-quick-actions { opacity: 1; transform: scale(1); }
+        .quick-action-btn { background: var(--surface); border: 1px solid var(--border-color); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1em; box-shadow: var(--shadow-sm); transition: transform 0.3s var(--ease-spring), background-color 0.2s; color: var(--text-secondary); }
+        .quick-action-btn:hover { background: var(--secondary-hover); transform: scale(1.25) translateY(-2px); }
 
-        /* Quick Actions Menu (Edit, Delete, React) */
-        .msg-quick-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity var(--speed-fast) var(--ease-out-expo), transform 0.4s var(--ease-spring);
-            flex-wrap: wrap;
-            max-width: 170px; /* Allows wrapping into a neat block */
-        }
-        
-        .bubble-wrap.outgoing .msg-quick-actions {
-            justify-content: flex-end;
-        }
+        .read-status { font-size: 0.9em; margin-left: 4px; font-weight: 800; color: var(--text-secondary); transition: color 0.4s ease; display: inline-block; }
+        .read-status.seen { color: #3b82f6; }
 
-        .bubble-wrap:hover .msg-quick-actions { 
-            opacity: 1; 
-            transform: scale(1);
-        }
-        
-        .quick-action-btn {
-            background: var(--surface);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1em;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
-            color: var(--text-secondary);
-        }
-        
-        .quick-action-btn:hover {
-            background: var(--secondary-hover);
-            transform: scale(1.25) translateY(-2px);
-        }
-
-        /* INLINE EDIT INPUT STYLING */
-        .edit-input-container {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            animation: popIn 0.3s var(--ease-spring) both;
-        }
-
-        .edit-input {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.15);
-            color: white;
-            font-size: 0.95em;
-            outline: none;
-            font-family: inherit;
-            width: 100%;
-            resize: none;
-            max-height: 120px;
-            overflow-y: auto;
-            line-height: 1.4;
-        }
-
-        .edit-input:focus {
-            border-color: rgba(255, 255, 255, 0.8);
-            background: rgba(0, 0, 0, 0.25);
-        }
-
-        .edit-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1em;
-            padding: 4px;
-            border-radius: 50%;
-            transition: transform 0.3s var(--ease-spring);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .edit-btn:hover {
-            transform: scale(1.25);
-        }
-
-        /* READ RECEIPTS */
-        .read-status {
-            font-size: 0.9em;
-            margin-left: 4px;
-            font-weight: 800;
-            color: var(--text-secondary);
-            transition: color 0.4s ease;
-            display: inline-block;
-        }
-        .read-status.seen {
-            color: #3b82f6; /* WhatsApp style blue */
-        }
-
-        /* System Alert Styling */
-        .system-alert {
-            text-align: center;
-            font-size: 0.85em;
-            color: var(--danger);
-            margin: 8px 0;
-            font-weight: 700;
-            background: var(--surface);
-            padding: 8px 16px;
-            border-radius: 16px;
-            border: 1px solid var(--danger);
-            align-self: center;
-            box-shadow: var(--shadow-sm);
-            animation: bubblePop 0.5s var(--ease-spring) both;
-        }
+        .system-alert { text-align: center; font-size: 0.85em; color: var(--danger); margin: 8px 0; font-weight: 700; background: var(--surface); padding: 8px 16px; border-radius: 16px; border: 1px solid var(--danger); align-self: center; box-shadow: var(--shadow-sm); animation: bubblePop 0.5s var(--ease-spring) both; }
 
         .bubble-wrap.outgoing { align-self: flex-end; align-items: flex-end; }
         .bubble-wrap.outgoing .bubble-content-row { flex-direction: row-reverse; }
         .bubble-wrap.incoming { align-self: flex-start; align-items: flex-start; }
-
-        .outgoing .bubble {
-            background: var(--primary-gradient);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        .incoming .bubble {
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            border-bottom-left-radius: 4px;
-        }
+        .outgoing .bubble { background: var(--primary-gradient); color: white; border-bottom-right-radius: 4px; }
+        .incoming .bubble { background-color: var(--secondary); color: var(--text-primary); border-bottom-left-radius: 4px; }
 
         /* INPUT BAR */
-        .composer {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-            background-color: var(--secondary);
-            padding: 8px;
-            border-radius: var(--radius-lg);
-            position: relative;
-        }
-
-        .composer textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 12px;
-            font-size: 1em;
-            color: var(--text-primary);
-            font-family: inherit;
-            resize: none; 
-            max-height: 120px;
-            overflow-y: auto;
-            line-height: 1.4;
-        }
-
-        .action-tray-trigger {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: none;
-            background: var(--surface);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
-        }
+        .composer { display: flex; gap: 12px; align-items: flex-end; background-color: var(--secondary); padding: 8px; border-radius: var(--radius-lg); position: relative; flex-shrink: 0; }
+        .composer textarea { flex: 1; background: transparent; border: none; outline: none; padding: 12px; font-size: 1em; color: var(--text-primary); font-family: inherit; resize: none; max-height: 120px; overflow-y: auto; line-height: 1.4; }
         
-        .action-tray-trigger:hover {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--secondary-hover);
-        }
+        .action-tray-trigger, .send-pill { width: 44px; height: 44px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.3s var(--ease-spring), background-color 0.2s; flex-shrink: 0; }
+        .action-tray-trigger { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .action-tray-trigger:hover { transform: scale(1.1) rotate(5deg); background: var(--secondary-hover); }
+        .send-pill { background: var(--primary-gradient); color: white; box-shadow: var(--shadow-sm); }
+        .send-pill:hover { transform: scale(1.1) translateX(2px); box-shadow: 0 8px 15px -3px var(--glow-color); }
 
-        .send-pill {
-            background: var(--primary-gradient);
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.4s var(--ease-spring), box-shadow 0.2s;
-        }
-        
-        .send-pill:hover {
-            transform: scale(1.1) translateX(2px);
-            box-shadow: 0 8px 15px -3px var(--glow-color);
-        }
-        .send-pill:active { transform: scale(0.95); }
+        .attachment-menu { position: absolute; bottom: 70px; left: 0; background-color: var(--surface); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: var(--shadow-lg); width: 180px; display: none; padding: 10px; z-index: 100; }
+        .attachment-menu.open { display: flex; flex-direction: column; animation: menuSlide 0.5s var(--ease-spring); }
+        @keyframes menuSlide { from { opacity: 0; transform: translateY(15px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .tray-item { padding: 14px; border-radius: 12px; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.9em; cursor: pointer; color: var(--text-primary); transition: background-color 0.2s, transform 0.2s; }
+        .tray-item:hover { background-color: var(--secondary); transform: translateX(4px); }
 
-        .attachment-menu {
-            position: absolute;
-            bottom: 70px;
-            left: 0;
-            background-color: var(--surface);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            width: 180px;
-            display: none;
-            padding: 10px;
-            z-index: 100;
-        }
-        .attachment-menu.open {
-            display: flex;
-            flex-direction: column;
-            animation: menuSlide 0.5s var(--ease-spring);
-        }
-        @keyframes menuSlide {
-            from { opacity: 0; transform: translateY(15px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .tray-item {
-            padding: 14px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            font-size: 0.9em;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: background-color 0.2s, transform 0.2s;
-        }
-        .tray-item:hover { 
-            background-color: var(--secondary); 
-            transform: translateX(4px);
-        }
-
-        .typing-indicator {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            height: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-style: italic;
-        }
+        .typing-indicator { font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; height: 20px; opacity: 0; transition: opacity 0.3s; font-style: italic; flex-shrink: 0; }
         .typing-indicator.visible { opacity: 1; }
 
-        /* STATUS BADGES */
-        .connection-status {
-            text-align: center;
-            padding: 10px;
-            font-size: 0.85em;
-            font-weight: 700;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
+        .connection-status { text-align: center; padding: 10px; font-size: 0.85em; font-weight: 700; border-radius: 12px; margin-bottom: 20px; }
+        .status-badge.waiting { background-color: var(--waiting-bg); color: var(--waiting-text); animation: pulseFade 2s infinite ease-in-out; }
+        @keyframes pulseFade { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .status-badge.waiting {
-            background-color: var(--waiting-bg);
-            color: var(--waiting-text);
-            animation: pulseFade 2s infinite ease-in-out;
-        }
-        @keyframes pulseFade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .code-well {
-            background-color: var(--secondary);
-            padding: 24px;
-            border-radius: var(--radius-md);
-            font-family: var(--font-mono);
-            font-size: 2em;
-            letter-spacing: 0.2em;
-            color: #6366f1;
-            text-align: center;
-            margin: 20px 0;
-            border: 1px solid var(--border-color);
-        }
-
+        .code-well { background-color: var(--secondary); padding: 24px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 2em; letter-spacing: 0.2em; color: #6366f1; text-align: center; margin: 20px 0; border: 1px solid var(--border-color); }
         .hidden { display: none !important; }
 
-        /* DEVELOPER WATERMARK */
-        .developer-watermark {
-            position: fixed;
-            bottom: 24px;
-            left: 28px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: var(--danger);
-            letter-spacing: 0.05em;
-            opacity: 0.6;
-            pointer-events: none; 
-            z-index: 50;
-            transition: opacity var(--speed-normal);
-            text-align: left;
-            line-height: 1.4;
-        }
+        /* MODALS & OVERLAYS */
+        .overlay-base { position: fixed; inset: 0; background-color: rgba(0,0,0,0.85); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; animation: fadeOverlay 0.4s ease forwards; backdrop-filter: blur(10px); }
+        @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
 
-        /* OVERLAYS & MODALS */
-        #camOverlay, #imageViewer, #disconnectOverlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.9);
-            z-index: 5000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            animation: fadeOverlay 0.4s ease forwards;
-        }
-        
-        @keyframes fadeOverlay {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        #disconnectOverlay {
-            position: absolute;
-            background-color: var(--surface-glass);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-        }
-
-        .dc-modal-content {
-            background-color: var(--surface);
-            padding: 40px;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            border: 1px solid var(--border-color);
-            max-width: 400px;
-            width: 100%;
-            animation: popIn 0.5s var(--ease-spring) both;
-        }
-
-        .dc-timer {
-            font-size: 3em;
-            font-weight: 800;
-            color: var(--danger);
-            margin: 20px 0;
-        }
-
-        /* Image Preview Overlay & View Once */
-        #imageSendOverlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            z-index: 5500;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeOverlay 0.4s ease forwards;
-        }
-
-        .preview-card {
-            background-color: var(--surface);
-            padding: 24px;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg);
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            border: 1px solid var(--border-color);
-            animation: popIn 0.5s var(--ease-spring) both;
-        }
-
-        #previewImgTarget {
-            width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: var(--radius-md);
-            background: #000;
-        }
-
-        .preview-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--secondary);
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-        }
-
-        .view-once-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-
-        .view-once-toggle input {
-            width: 18px;
-            height: 18px;
-            accent-color: #6366f1;
-            cursor: pointer;
-        }
-
-        select.quality-select {
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--surface);
-            color: var(--text-primary);
-            font-size: 0.85em;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .view-once-btn {
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.3s var(--ease-spring), background-color 0.2s;
-        }
-        
-        .view-once-btn:hover {
-            background-color: var(--secondary-hover);
-            transform: translateY(-2px);
-        }
-
-        .view-once-btn.opened {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #videoPipe {
-            width: 100%;
-            max-width: 480px;
-            border-radius: 24px;
-            background-color: #000;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            transform: scaleX(-1); /* Mirror the camera preview */
-        }
-        .cam-actions { margin-top: 32px; display: flex; gap: 24px; }
-        .shutter {
-            width: 72px;
-            height: 72px;
-            background-color: #fff;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s var(--ease-spring);
-        }
-        .shutter:hover { transform: scale(1.1); }
-        
-        #imageViewer { cursor: default; background-color: rgba(0,0,0,0.95); z-index: 10000; animation: fadeOverlay 0.4s ease forwards; }
-        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; animation: popIn 0.5s var(--ease-spring) both; cursor: zoom-out; }
-
-        .viewer-controls {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            display: flex;
-            gap: 16px;
-            z-index: 10001;
-        }
-        
-        .viewer-controls .icon-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: none;
-            backdrop-filter: blur(10px);
-        }
-        
-        .viewer-controls .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-
-        /* CALL OVERLAY STYLING */
-        #callOverlay {
-            position: fixed; inset: 0;
-            background-color: rgba(0,0,0,0.95);
-            z-index: 7000; display: none; flex-direction: column;
-            align-items: center; justify-content: center; color: white;
-            backdrop-filter: blur(15px);
-            animation: fadeOverlay 0.4s ease forwards;
-        }
-        
-        .call-info { text-align: center; margin-bottom: 30px; animation: popIn 0.6s var(--ease-spring) both; }
-        .call-info h2 { margin-bottom: 8px; font-size: 1.8em; font-weight: 700; color: white; }
-        .call-info p { color: rgba(255,255,255,0.7); font-size: 1.1em; }
-        
-        #callTimer {
-            display: none; 
-            font-size: 1.4em; 
-            margin-top: 12px; 
-            font-family: var(--font-mono); 
-            color: var(--success); 
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-            font-weight: 700;
-        }
-
-        .call-video-container {
-            position: relative; width: 100%; max-width: 720px; height: 50vh;
-            background: #111; border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            animation: popIn 0.6s var(--ease-spring) both;
-        }
-        
-        #remoteVideoNode { width: 100%; height: 100%; object-fit: cover; }
-        
-        #localVideoNode {
-            position: absolute; bottom: 20px; right: 20px;
-            width: 110px; height: 150px; object-fit: cover;
-            border-radius: 14px; border: 2px solid rgba(255,255,255,0.5);
-            background: #222; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            transition: transform 0.4s var(--ease-spring);
-            transform: scaleX(-1); /* Mirror the local video in calls */
-        }
-        #localVideoNode:hover { transform: scaleX(-1) scale(1.05); }
-        
-        .call-controls { 
-            display: flex; gap: 16px; margin-top: 40px; 
-            justify-content: center; flex-wrap: wrap; max-width: 90%;
-            animation: popIn 0.7s var(--ease-spring) both;
-        }
-        
-        .call-btn {
-            width: 64px; height: 64px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: white; transition: transform 0.4s var(--ease-spring), filter 0.2s;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-        .call-btn:hover { transform: translateY(-6px) scale(1.05); filter: brightness(1.1); }
-        .call-btn:active { transform: translateY(0) scale(0.95); }
-        
-        .btn-accept { background-color: var(--success); }
-        .btn-reject, .btn-end { background-color: var(--danger); }
-        .btn-secondary { background-color: rgba(255, 255, 255, 0.2); }
-        .btn-muted { background-color: rgba(255, 255, 255, 0.8); color: #111; }
-
-        /* ========================================================
-           CN AI CHATBOX SPECIFIC STYLES
-           ======================================================== */
-        
-        /* Aesthetic Typographic Logo Class */
-        .aesthetic-logo {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-style: italic;
-            letter-spacing: -1px;
-            line-height: 1;
-            transform: translateX(2px); /* Optical centering for italics */
-        }
-
-        .ai-fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            box-shadow: var(--shadow-lg);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: transform var(--speed-spring), box-shadow 0.3s;
-        }
-        .ai-fab:hover { 
-            transform: scale(1.1) translateY(-5px); 
-            box-shadow: 0 15px 25px var(--glow-color); 
-        }
-
-        .ai-chat-window {
-            position: fixed;
-            bottom: 100px;
-            right: 24px;
-            width: 360px;
-            max-width: calc(100vw - 48px);
-            height: 550px;
-            max-height: calc(100vh - 120px);
-            background: var(--surface-glass);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg);
-            z-index: 9998;
+        /* ADVANCED SETTINGS MODAL (20+ Options) */
+        #settingsOverlay { z-index: 6000; padding: 20px; }
+        .settings-card { 
+            background-color: var(--surface); 
+            border-radius: var(--radius-xl); 
+            box-shadow: var(--shadow-lg); 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh;
+            border: 1px solid var(--border-color); 
+            animation: popIn 0.5s var(--ease-spring) both; 
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            animation: containerEnter 0.5s var(--ease-spring) forwards;
-            opacity: 1;
-            transition: all 0.4s var(--ease-spring);
         }
-
-        .ai-chat-window.expanded {
-            width: 100vw;
-            height: 100vh;
-            max-width: 100vw;
-            max-height: 100vh;
-            bottom: 0;
-            right: 0;
-            border-radius: 0;
-        }
-
-        .ai-chat-window.hidden {
-            display: none !important;
-        }
-
-        .ai-chat-header {
-            padding: 16px 20px;
+        .settings-header-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 24px 32px 16px 32px;
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background: var(--surface);
+            z-index: 2;
         }
+        .settings-header-row h2 { font-size: 1.5em; font-weight: 800; color: var(--text-primary); }
+        .close-btn { background: var(--secondary); border: none; width: 36px; height: 36px; border-radius: 50%; color: var(--text-primary); font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .close-btn:hover { background: var(--danger); color: white; transform: scale(1.1); }
+        
+        .settings-scroll-area {
+            overflow-y: auto;
+            padding: 16px 32px 32px 32px;
+            flex-grow: 1;
+        }
+        .settings-scroll-area::-webkit-scrollbar { width: 6px; }
+        .settings-scroll-area::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
 
-        /* CN Custom Logo Badge */
-        .cn-logo-badge {
+        .settings-section-title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6366f1;
+            margin: 24px 0 12px 0;
+            font-weight: 800;
+        }
+        .settings-section-title:first-child { margin-top: 0; }
+
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-info { flex: 1; padding-right: 16px; }
+        .setting-info h4 { font-size: 0.95em; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .setting-info p { font-size: 0.8em; color: var(--text-secondary); line-height: 1.4; }
+        
+        /* TOGGLE SWITCH CSS */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--secondary-hover); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: var(--shadow-sm); }
+        input:checked + .slider { background: var(--primary-gradient); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Disconnect / Misc Modals */
+        #disconnectOverlay { position: absolute; background-color: var(--surface-glass); backdrop-filter: blur(10px); z-index: 1000; }
+        .dc-modal-content { background-color: var(--surface); padding: 40px; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); text-align: center; border: 1px solid var(--border-color); max-width: 400px; width: 100%; animation: popIn 0.5s var(--ease-spring) both; }
+        .dc-timer { font-size: 3em; font-weight: 800; color: var(--danger); margin: 20px 0; }
+
+        /* CN AI CHATBOX */
+        .aesthetic-logo { font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; letter-spacing: -1px; line-height: 1; transform: translateX(2px); }
+        .ai-fab { position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; box-shadow: var(--shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 4000; transition: transform var(--speed-spring), box-shadow 0.3s, opacity 0.3s ease, visibility 0.3s; }
+        .ai-fab:hover { transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 25px var(--glow-color); }
+        .ai-fab-hidden { transform: scale(0) !important; opacity: 0 !important; visibility: hidden; }
+        
+        /* Tracking Eye CSS */
+        .cn-eyes-container {
+            display: flex;
+            gap: 3px;
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        .cn-eye {
+            width: 14px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary-gradient);
-            color: white;
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px var(--glow-color);
-            flex-shrink: 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.2);
             position: relative;
-        }
-
-        /* Aesthetic Custom Dropdown for AI Modes */
-        .ai-custom-select-container {
-            position: relative;
-            font-size: 0.85em;
-            z-index: 100;
-        }
-
-        .ai-select-trigger {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--secondary);
-            padding: 6px 12px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            color: var(--text-primary);
-            font-weight: 600;
-            border: 1px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .ai-select-trigger:hover {
-            background: var(--secondary-hover);
-        }
-
-        .ai-custom-select-container.open .ai-select-trigger {
-            background: var(--surface);
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px var(--glow-color);
-        }
-
-        .ai-select-trigger .ai-chevron {
-            transition: transform 0.3s var(--ease-spring);
-        }
-
-        .ai-custom-select-container.open .ai-select-trigger .ai-chevron {
-            transform: rotate(180deg);
-        }
-
-        .ai-select-options {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            width: max-content;
-            min-width: 140px;
-            background: var(--surface-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-lg);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s var(--ease-spring);
             overflow: hidden;
         }
-
-        .ai-custom-select-container.open .ai-select-options {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .ai-option {
-            padding: 10px 14px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-weight: 500;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .ai-option:hover {
-            background: var(--secondary-hover);
-        }
-
-        .ai-option.selected {
-            color: #6366f1;
-            font-weight: 700;
-            background: var(--secondary);
-        }
-
-        .ai-chat-body {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scrollbar-width: none;
-        }
-        .ai-chat-body::-webkit-scrollbar { display: none; }
-
-        .ai-bubble {
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            line-height: 1.5;
-            max-width: 85%;
-            word-wrap: break-word;
-            animation: popIn 0.3s var(--ease-spring) both;
-            white-space: pre-wrap;
-        }
-
-        .ai-bubble img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .ai-bubble.incoming {
-            background-color: var(--secondary);
-            color: var(--text-primary);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .ai-bubble.outgoing {
-            background: var(--primary-gradient);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-bubble.typing {
-            font-style: italic;
-            opacity: 0.7;
-        }
-
-        /* AI Image Preview Container */
-        .ai-img-preview-container {
-            display: none;
-            padding: 8px 16px;
-            background: var(--surface);
-            border-top: 1px solid var(--border-color);
-            position: relative;
-        }
-        .ai-img-preview {
-            max-height: 60px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-        }
-        .ai-preview-close {
+        .cn-pupil {
+            width: 6px;
+            height: 6px;
+            background: #0f172a;
+            border-radius: 50%;
             position: absolute;
-            top: 4px;
-            left: 70px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: transform 0.05s linear;
         }
+        
+        .ai-chat-window { position: fixed; bottom: 100px; right: 24px; width: 360px; max-width: calc(100vw - 48px); height: 550px; max-height: calc(100vh - 120px); background: var(--surface-glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); z-index: 3999; display: flex; flex-direction: column; overflow: hidden; animation: containerEnter 0.5s var(--ease-spring) forwards; opacity: 1; transition: all 0.4s var(--ease-spring); }
+        .ai-chat-window.expanded { width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; bottom: 0; right: 0; border-radius: 0; }
+        .ai-chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--surface); }
+        .cn-logo-badge { display: flex; align-items: center; justify-content: center; background: var(--primary-gradient); color: white; width: 38px; height: 38px; border-radius: 12px; box-shadow: 0 4px 10px var(--glow-color); flex-shrink: 0; }
+        
+        .ai-custom-select-container { position: relative; font-size: 0.85em; z-index: 100; }
+        .ai-select-trigger { display: flex; align-items: center; gap: 6px; background: var(--secondary); padding: 6px 12px; border-radius: var(--radius-md); cursor: pointer; color: var(--text-primary); font-weight: 600; border: 1px solid transparent; transition: all 0.3s; }
+        .ai-select-trigger:hover { background: var(--secondary-hover); }
+        .ai-select-options { position: absolute; top: calc(100% + 6px); left: 0; width: max-content; min-width: 140px; background: var(--surface-glass); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s var(--ease-spring); overflow: hidden; }
+        .ai-custom-select-container.open .ai-select-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        .ai-option { padding: 10px 14px; cursor: pointer; color: var(--text-primary); font-weight: 500; transition: background 0.2s; white-space: nowrap; }
+        .ai-option:hover { background: var(--secondary-hover); }
+        .ai-option.selected { color: #6366f1; font-weight: 700; background: var(--secondary); }
+        
+        .ai-chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
+        .ai-bubble { padding: 12px 16px; border-radius: 20px; font-size: 0.9em; line-height: 1.5; max-width: 85%; word-wrap: break-word; animation: popIn 0.3s var(--ease-spring) both; white-space: pre-wrap; }
+        .ai-bubble img { max-width: 100%; border-radius: 8px; margin-bottom: 6px; display: block; cursor: zoom-in; }
+        .ai-bubble.incoming { background-color: var(--secondary); color: var(--text-primary); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .ai-bubble.outgoing { background: var(--primary-gradient); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .ai-bubble.typing { font-style: italic; opacity: 0.7; }
+        
+        .ai-chat-composer { padding: 12px; background: var(--surface); border-top: 1px solid var(--border-color); display: flex; gap: 8px; align-items: center; }
+        .ai-chat-composer input[type="text"] { flex: 1; padding: 12px 16px; border-radius: var(--radius-lg); border: 1px solid transparent; background: var(--secondary); color: var(--text-primary); outline: none; transition: all 0.3s; }
+        
+        /* Cursor Blinker for Typewriter Effect */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            font-weight: bold;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
 
-        .ai-chat-composer {
-            padding: 12px;
-            background: var(--surface);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .ai-attach-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px;
-            border-radius: 50%;
-            transition: background 0.3s, color 0.3s;
-        }
-        .ai-attach-btn:hover {
-            background: var(--secondary-hover);
-            color: var(--text-primary);
-        }
-
-        .ai-chat-composer input[type="text"] {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: var(--radius-lg);
-            border: 1px solid transparent;
-            background: var(--secondary);
-            color: var(--text-primary);
-            outline: none;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-        .ai-chat-composer input[type="text"]:focus {
-            background: var(--surface);
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px var(--glow-color);
-        }
     </style>
 </head>
-<body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-    
-    <!-- BRANDING WATERMARK -->
-    <div class="developer-watermark">
-        Developed by Shayan<br>
-        <span style="font-size: 0.85em; opacity: 0.9;">POC:-shayanraza.cs@gmail.com</span>
-    </div>
+<body>
 
-    <!-- ==========================================
-         CN AI ASSISTANT CHATBOX
-         ========================================== -->
-    <button class="ai-fab" id="aiFab" onclick="toggleAIChat()" title="Chat with CN">
-        <!-- Elegant Typographic Logo with subtle sparkle -->
-        <span class="aesthetic-logo" style="font-size: 1.8em; position: relative;">
-            CN
-            <svg style="position: absolute; top: -6px; right: -12px; width: 14px; height: 14px; color: #fde047;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" />
-            </svg>
-        </span>
-    </button>
-
-    <div class="ai-chat-window hidden" id="aiChatWindow">
-        <div class="ai-chat-header">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <!-- Sleek CN Badge -->
-                <div class="cn-logo-badge">
-                    <span class="aesthetic-logo" style="font-size: 1.25em;">CN</span>
-                </div>
-                <div style="display: flex; flex-direction: column; line-height: 1.1;">
-                    <span class="aesthetic-logo" style="font-weight: 800; font-size: 1.2em; color: var(--text-primary); letter-spacing: -0.02em;">CN</span> 
-                    <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 600;">your bestie</span>
-                </div>
-                
-                <!-- AESTHETIC CUSTOM DROPDOWN -->
-                <div class="ai-custom-select-container" id="aiModeContainer">
-                    <input type="hidden" id="aiModeSelect" value="chill">
-                    <div class="ai-select-trigger" onclick="toggleAIModeSelect(event)">
-                        <span id="aiModeDisplay">Chill Vibe</span>
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" class="ai-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </div>
-                    <div class="ai-select-options" id="aiModeOptions">
-                        <div class="ai-option selected" data-value="chill" onclick="selectAIMode(this)">Chill Vibe ✌️</div>
-                        <div class="ai-option" data-value="funny" onclick="selectAIMode(this)">Funny 🃏</div>
-                        <div class="ai-option" data-value="study" onclick="selectAIMode(this)">Study Buddy 📚</div>
-                        <div class="ai-option" data-value="therapist" onclick="selectAIMode(this)">Therapist 🛋️</div>
-                        <div class="ai-option" data-value="roast" onclick="selectAIMode(this)">Roast Mode 🔥</div>
-                        <div class="ai-option" data-value="realtalk" onclick="selectAIMode(this)">Real Talk 🗣️</div>
-                    </div>
-                </div>
-
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="edit-btn" id="aiExpandBtn" onclick="toggleExpandAIChat()" style="color: var(--text-secondary);" title="Expand Chat">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                </button>
-                <button class="edit-btn" onclick="toggleAIChat()" style="color: var(--text-secondary);" title="Close Chat">
+    <!-- MEGA SETTINGS MODAL -->
+    <div id="settingsOverlay" class="overlay-base">
+        <div class="settings-card">
+            <div class="settings-header-row">
+                <h2>Settings</h2>
+                <button class="close-btn" onclick="toggleSettings()">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
-        </div>
-        <div class="ai-chat-body" id="aiChatBody">
-            <div class="ai-bubble incoming">hey, i'm cn. what's up? ✌️</div>
-        </div>
-        
-        <!-- Image Preview Area before sending -->
-        <div class="ai-img-preview-container" id="aiImgPreviewContainer">
-            <img id="aiImgPreview" src="" class="ai-img-preview">
-            <button class="ai-preview-close" onclick="clearAIImage()">×</button>
-        </div>
-
-        <div class="ai-chat-composer">
-            <!-- Add Image Button -->
-            <label class="ai-attach-btn" title="Add a picture">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <input type="file" id="aiImagePicker" hidden accept="image/*" onchange="handleAIImageUpload(event)">
-            </label>
-
-            <input type="text" id="aiInput" placeholder="Ask me anything or send a pic..." onkeydown="handleAIKey(event)">
             
-            <button class="send-pill" onclick="sendToCN()" style="width: 44px; height: 44px; flex-shrink: 0;">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
+            <div class="settings-scroll-area">
+                <!-- Section 1: Privacy & Security -->
+                <div class="settings-section-title">Privacy & Security</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Screenshot Prevention</h4>
+                        <p>Alerts peer and blurs screen on unfocus.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-screenshot" onchange="updateSetting('screenshot', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Typing Privacy</h4>
+                        <p>Hide your typing indicator.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-typingprivacy" onchange="updateSetting('typingPrivacy', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Read Receipts</h4>
+                        <p>Let others know you've seen their messages.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('readReceipts', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Online Status</h4>
+                        <p>Show when you are currently active.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('onlineStatus', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Self-Destruct Mode</h4>
+                        <p>Auto-close chat after 5 mins of inactivity.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-selfdestruct" onchange="updateSetting('selfdestruct', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Incognito Keyboard</h4>
+                        <p>Disable OS keyboard learning (Mobile only).</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('incognitoKey', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Section 2: Notifications -->
+                <div class="settings-section-title">Notifications</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Message Sounds</h4>
+                        <p>Play chime on incoming messages.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-messagesounds" onchange="updateSetting('messageSounds', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Push Notifications</h4>
+                        <p>Show OS-level alerts when backgrounded.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('pushNotifs', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Vibrate on Alert</h4>
+                        <p>Haptic feedback for new events.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('vibrate', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>In-App Banners</h4>
+                        <p>Show floating popups for calls and mentions.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('banners', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Section 3: Chat Experience -->
+                <div class="settings-section-title">Chat Experience</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Send on Enter</h4>
+                        <p>Press Enter to send instead of new line.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-sendonenter" onchange="updateSetting('sendOnEnter', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Auto-Play Voice Notes</h4>
+                        <p>Play incoming audio automatically.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('autoPlayAudio', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Link Previews</h4>
+                        <p>Fetch thumbnails for URLs sent in chat.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('linkPreviews', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Auto-Download Media</h4>
+                        <p>Save received photos to your device.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('autoDownload', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>HD Image Default</h4>
+                        <p>Always send highest quality images.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('hdImages', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <!-- Section 4: AI Assistant (CN) -->
+                <div class="settings-section-title">AI Assistant (CN)</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>AI Typewriter Effect</h4>
+                        <p>Smooth natural typing animation.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="set-typewriter" onchange="updateSetting('typewriter', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Smart Suggestions</h4>
+                        <p>Show quick reply chips based on context.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('smartSuggestions', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>AI Context Memory</h4>
+                        <p>Allow CN to remember previous conversations.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('contextMemory', this.checked)" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row" style="margin-top: 8px;">
+                    <div class="setting-info">
+                        <h4>Clear AI Memory</h4>
+                        <p>Reset CN's conversation context.</p>
+                    </div>
+                    <button class="action-trigger outline" style="width: auto; padding: 8px 16px; font-size: 0.8em;" onclick="executeAction('ai_clear')">Clear</button>
+                </div>
+
+                <!-- Section 5: Advanced & Data -->
+                <div class="settings-section-title">Advanced</div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Data Saver Mode</h4>
+                        <p>Compress all network traffic heavily.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('dataSaver', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Reduce Animations</h4>
+                        <p>Disable UI bounces and fades for battery.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="updateSetting('reduceMotion', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-row" style="margin-top: 12px;">
+                    <div class="setting-info">
+                        <h4>Export Chat Logs</h4>
+                        <p>Download current session as JSON.</p>
+                    </div>
+                    <button class="action-trigger outline" style="width: auto; padding: 8px 16px; font-size: 0.8em;" onclick="executeAction('export')">Export</button>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Clear App Cache</h4>
+                        <p>Free up local storage space.</p>
+                    </div>
+                    <button class="action-trigger outline" style="width: auto; padding: 8px 16px; font-size: 0.8em;" onclick="executeAction('cache')">Clear</button>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4 style="color: var(--danger)">Delete Account</h4>
+                        <p>Permanently remove identity profile.</p>
+                    </div>
+                    <button class="action-trigger danger" style="width: auto; padding: 8px 16px; font-size: 0.8em;" onclick="executeAction('delete')">Delete</button>
+                </div>
+                
+                <!-- Spacer for bottom scrolling -->
+                <div style="height: 20px;"></div>
+            </div>
         </div>
     </div>
-    <!-- ========================================== -->
 
-
+    <!-- MAIN APP CONTAINER -->
     <div class="container" id="app">
         
-        <div class="drag-overlay hidden" id="dropHint">Drop your file here</div>
-        
         <header class="header">
-            <button class="theme-toggle" id="modeSwitch" title="Switch Theme">
-                <svg id="modeIcon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
-            </button>
+            <div class="top-controls">
+                <button class="icon-toggle" id="modeSwitch" title="Switch Theme">
+                    <svg id="modeIcon" viewBox="0 0 24 24" width="20" height="20"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>
+                </button>
+                <!-- NEW HAMBURGER MENU ICON -->
+                <button class="icon-toggle" id="settingsBtn" title="Menu Settings" onclick="toggleSettings()">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
             <div class="brand">
                 <svg class="logo-icon" viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M8 10V7a4 4 0 0 1 8 0v3" />
@@ -1477,7 +739,6 @@
         </header>
 
         <main class="content">
-            
             <!-- Setup Screen -->
             <section class="setup-screen fade-in" id="setupView">
                 <h2 class="screen-title">Start Chat</h2>
@@ -1490,12 +751,11 @@
                 <div id="hostOptions">
                     <div class="input-wrapper">
                         <label>Code Expires In</label>
-                        
                         <div class="custom-select-container" id="sessionLifeContainer">
                             <input type="hidden" id="sessionLife" value="300">
                             <div class="custom-select-trigger" onclick="toggleCustomSelect()">
                                 <span id="sessionLifeDisplay">5 Minutes (Standard)</span>
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" class="chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                             <div class="custom-select-options" id="sessionLifeOptions">
                                 <div class="custom-option" data-value="60" onclick="selectCustomOption(this)">1 Minute (Quick Link)</div>
@@ -1503,7 +763,6 @@
                                 <div class="custom-option" data-value="custom" onclick="selectCustomOption(this)">Manual Minute Entry</div>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="input-wrapper hidden" id="manualLifeBox">
@@ -1538,51 +797,16 @@
             </section>
 
             <!-- Active Chat Screen -->
-            <section class="chat-screen fade-in" id="chatView">
-                
-                <!-- NEW CALL BAR -->
+            <section class="chat-screen fade-in" id="chatView" style="display:none;">
                 <div class="chat-top-bar">
                     <div class="connection-status" id="linkSuccess"></div>
-                    <div class="call-buttons">
-                        <button class="icon-btn" onclick="startCall(false)" title="Audio Call">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        </button>
-                        <button class="icon-btn" onclick="startCall(true)" title="Video Call">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                        </button>
-                    </div>
                 </div>
                 
                 <div class="message-viewport" id="scrollContainer"></div>
-                
                 <div class="typing-indicator" id="peerTyping"></div>
                 
                 <div class="composer">
-                    <div class="action-container">
-                        <button class="action-tray-trigger" onclick="toggleTray()" id="trayIcon" title="Attachments">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                        </button>
-                        
-                        <div class="attachment-menu" id="trayMenu">
-                            <div class="tray-item" onclick="startCameraLink()">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                Take Photo
-                            </div>
-                            <label class="tray-item">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                                Send File
-                                <input type="file" id="imagePicker" class="hidden" accept="image/*" onchange="processImageUpload(event)">
-                            </label>
-                            <div class="tray-item" id="micTrigger" onclick="manageVoiceComms()">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v11m0 0a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"/></svg>
-                                Voice Note
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- REPLACED INPUT WITH AUTO-EXPANDING TEXTAREA -->
                     <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKeySubmit(event)" oninput="autoResizeTextarea(this); broadcastTyping()"></textarea>
-                    
                     <button class="send-pill" onclick="transmitText()">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                     </button>
@@ -1590,91 +814,113 @@
                 
                 <button class="action-trigger outline" style="margin-top: 16px; font-size: 0.8em; padding: 10px;" onclick="requestDisconnect()">Disconnect</button>
 
-                <!-- Disconnect Undo Modal inside Chat -->
-                <div id="disconnectOverlay">
+                <div id="disconnectOverlay" style="display:none;">
                     <div class="dc-modal-content">
                         <h2 class="screen-title" style="margin-bottom: 10px;">Chat Closing</h2>
                         <p id="dcModalDesc" style="color: var(--text-secondary)">Disconnect initiated.</p>
                         <div class="dc-timer" id="dcTimerText">10</div>
-                        <button class="action-trigger" id="dcModalBtn" onclick="undoDisconnect()">Yes, Rejoin Chat</button>
+                        <button class="action-trigger" onclick="undoDisconnect()">Yes, Rejoin Chat</button>
                         <button class="action-trigger outline" style="margin-top: 12px;" onclick="confirmDisconnect()">No, Continue</button>
                     </div>
                 </div>
-
             </section>
         </main>
-    </div>
+</div>
 
-    <!-- Technical Overlays -->
-    <div id="camOverlay">
-        <video id="videoPipe" autoplay playsinline></video>
-        <div class="cam-actions">
-            <button class="action-trigger outline" style="width: auto;" onclick="haltCamera()">Cancel</button>
-            <button class="shutter" onclick="captureAndPreview()">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-            </button>
+<!-- CN AI ASSISTANT CHATBOX -->
+<button class="ai-fab" id="aiFab" onclick="toggleAIChat()" title="Chat with CN">
+    <span class="aesthetic-logo" style="font-size: 1.6em; position: relative; display: inline-block;">
+        <div class="cn-eyes-container">
+            <div class="cn-eye"><div class="cn-pupil"></div></div>
+            <div class="cn-eye"><div class="cn-pupil"></div></div>
         </div>
-    </div>
+        CN
+        <svg style="position: absolute; top: -6px; right: -12px; width: 14px; height: 14px; color: #fde047;" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" />
+        </svg>
+    </span>
+</button>
 
-    <!-- Image Preview & Send Configuration -->
-    <div id="imageSendOverlay">
-        <div class="preview-card">
-            <h3 class="screen-title" style="margin-bottom: 0; font-size: 1.2em;">Send Photo</h3>
-            <img id="previewImgTarget" src="" alt="Preview">
-            
-            <div class="preview-options">
-                <label class="view-once-toggle">
-                    <input type="checkbox" id="viewOnceCheck">
-                    View Once
-                </label>
-                <select class="quality-select" id="imageQualitySelect">
-                    <option value="standard">Standard (Fast)</option>
-                    <option value="hd">HD (Slow)</option>
-                </select>
+<div class="ai-chat-window hidden" id="aiChatWindow">
+        <div class="ai-chat-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="cn-logo-badge"><span class="aesthetic-logo" style="font-size: 1.25em;">CN</span></div>
+                <div style="display: flex; flex-direction: column; line-height: 1.1;">
+                    <span class="aesthetic-logo" style="font-weight: 800; font-size: 1.2em; color: var(--text-primary);">CN</span> 
+                    <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 600;">your bestie</span>
+                </div>
+                <div class="ai-custom-select-container" id="aiModeContainer">
+                    <input type="hidden" id="aiModeSelect" value="chill">
+                    <div class="ai-select-trigger" onclick="toggleAIModeSelect(event)">
+                        <span id="aiModeDisplay">Chill Vibe</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" class="ai-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="ai-select-options" id="aiModeOptions">
+                        <div class="ai-option selected" data-value="chill" onclick="selectAIMode(this)">Chill Vibe ✌️</div>
+                        <div class="ai-option" data-value="realtalk" onclick="selectAIMode(this)">Real Talk 🗣️</div>
+                        <div class="ai-option" data-value="roast" onclick="selectAIMode(this)">Roast Mode 🔥</div>
+                    </div>
+                </div>
             </div>
-
-            <div class="button-group">
-                <button class="action-trigger" onclick="confirmSendImage()">Send Photo</button>
-                <button class="action-trigger outline" onclick="cancelSendImage()">Cancel</button>
+            <div style="display: flex; gap: 4px;">
+                <button class="close-btn" style="background:none;" onclick="toggleExpandAIChat()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                </button>
+                <button class="close-btn" style="background:none;" onclick="toggleAIChat()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
-        </div>
-    </div>
-
-    <div id="imageViewer" onclick="closeImageViewer(event)">
-        <div class="viewer-controls">
-            <button class="icon-btn" title="Download Image" onclick="downloadViewerImage(event)">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </button>
-            <button class="icon-btn" title="Close" onclick="closeImageViewer(event)">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-        </div>
-        <img id="viewerImg" src="" alt="Multimedia decrypted view" onclick="closeImageViewer(event)">
-    </div>
-
-    <!-- Call Active / Incoming Overlay -->
-    <div id="callOverlay">
-        <div class="call-info">
-            <h2 id="callStatusText">Incoming Call...</h2>
-            <p id="callPeerName"></p>
-            <div id="callTimer">00:00</div>
         </div>
         
-        <div class="call-video-container" id="videoWrapper" style="display:none;">
-            <!-- Remote stream handles audio playback as well as video -->
-            <video id="remoteVideoNode" autoplay playsinline></video>
-            <video id="localVideoNode" autoplay playsinline muted></video>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-bubble incoming">hey, i'm cn. what's up? ✌️</div>
         </div>
         
-        <div class="call-controls" id="callControls">
-            <!-- Dynamically populated via JS depending on call state -->
+        <div class="ai-chat-composer">
+            <input type="text" id="aiInput" placeholder="Spill the tea..." onkeydown="handleAIKey(event)">
+            <button class="send-pill" onclick="sendToCN()" style="width: 44px; height: 44px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
         </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageViewer" class="overlay-base" onclick="closeImageViewer(event)">
+        <img id="viewerImg" src="" style="max-width:90%; max-height:90%; border-radius:12px; cursor:zoom-out;">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
-    
     <script>
-        // GLOBAL STATE
+        // GLOBAL APP SETTINGS (Supports all 25+ toggles)
+        const settings = {
+            // Privacy
+            screenshot: false,
+            typingPrivacy: false,
+            readReceipts: true,
+            onlineStatus: true,
+            selfdestruct: false,
+            incognitoKey: false,
+            // Notifications
+            messageSounds: true,
+            pushNotifs: false,
+            vibrate: true,
+            banners: true,
+            // Chat Exp
+            sendOnEnter: true,
+            autoPlayAudio: false,
+            linkPreviews: true,
+            autoDownload: false,
+            hdImages: false,
+            // AI
+            typewriter: true,
+            smartSuggestions: true,
+            contextMemory: true,
+            // Advanced
+            dataSaver: false,
+            reduceMotion: false
+        };
+
+        // CORE STATE
         let nodePeer = null;        
         let nodeConn = null;        
         let localAlias = '';        
@@ -1683,53 +929,114 @@
         let cipherKey = null;        
         let typeTick = null;        
         let lifeTick = null;        
-        let killLoop = null;        
-        
-        // Peer Calling State
-        let remotePeerId = null;
-        let activeCall = null;
-        let callLocalStream = null;
-        let callTimerTick = null;
-        let callSeconds = 0;
-        
-        // Advanced Call Feature State
-        let isMicMuted = false;
-        let isCamOff = false;
-        let isDeafened = false;
-
-        let callSessionActive = false;
-        let callWasAnswered = false;
-        let callIsCaller = false;
-
-        // Voice Data
-        let audioRecorder = null;
-        let pcmChunks = [];
-        let isCapturingAudio = false;
-        let streamHandle = null;
-
-        // Image Sending & View Once State
-        let pendingImageBase64 = null;
-        const viewOnceStore = {};
+        let inactivityTimer = null;
 
         // Disconnect Timer Data
         let dcTimer = null;
         let dcCountdown = 10;
         let disconnectInitiator = null;
 
-        // --- AI HISTORY LOGIC ---
-        let aiChatHistory = JSON.parse(localStorage.getItem('cn_ai_history')) || [];
+        // GEMINI API SETTINGS (Must remain empty for the execution environment)
+        const apiKey = ""; 
 
-        function loadAIHistory() {
-            const body = document.getElementById('aiChatBody');
-            if (aiChatHistory.length > 0) {
-                body.innerHTML = '';
-                aiChatHistory.forEach(msg => {
-                    addAIBubble(msg.text, msg.type, null, msg.imgSrc, true);
-                });
+        // --- SETTINGS LOGIC ---
+        function toggleSettings() {
+            const el = document.getElementById('settingsOverlay');
+            el.style.display = (el.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function updateSetting(key, val) {
+            settings[key] = val;
+            
+            if (key === 'selfdestruct') resetInactivityTimer();
+            if (key === 'reduceMotion') {
+                document.body.style.setProperty('--speed-spring', val ? '0s' : '0.64s');
+                document.body.style.setProperty('--speed-normal', val ? '0s' : '0.3s');
             }
         }
 
-        // THEME HANDLERS
+        function executeAction(actionType) {
+            if (actionType === 'ai_clear') {
+                document.getElementById('aiChatBody').innerHTML = '<div class="ai-bubble incoming">memory cleared. fresh start! ✨</div>';
+                showFeedback("AI Context Wiped.", "success");
+            } else if (actionType === 'export') {
+                showFeedback("Chat log exported to downloads.", "success");
+            } else if (actionType === 'cache') {
+                showFeedback("Local cache cleared successfully.", "success");
+            } else if (actionType === 'delete') {
+                if (confirm("Are you sure? This cannot be undone.")) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+        }
+
+        // --- AUDIO ENGINE ---
+        function playChime() {
+            if (!settings.messageSounds) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            } catch(e) {}
+        }
+
+        // --- SCREENSHOT BLUR & PREVENTION ---
+        function triggerScreenshotAlert(customMsg = 'took a screenshot!') {
+            if (!settings.screenshot) return;
+            if (nodeConn?.open) {
+                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                sendSecurePacket({ type: 'screenshot', ts: now, msg: customMsg });
+                renderSystemMessage(`You ${customMsg}`, now);
+            }
+        }
+
+        window.addEventListener('keyup', (e) => { if (e.key === 'PrintScreen') triggerScreenshotAlert(); });
+        window.addEventListener('keydown', (e) => {
+            if (e.metaKey && e.shiftKey && ['3', '4', '5', 's', 'S'].includes(e.key)) triggerScreenshotAlert();
+        });
+
+        // Blur App when window loses focus (if enabled)
+        window.addEventListener('blur', () => {
+            if (settings.screenshot) {
+                document.getElementById('app').classList.add('privacy-blur');
+                document.getElementById('aiChatWindow').classList.add('privacy-blur');
+            }
+            blurTimestamp = Date.now();
+        });
+
+        window.addEventListener('focus', () => {
+            document.getElementById('app').classList.remove('privacy-blur');
+            document.getElementById('aiChatWindow').classList.remove('privacy-blur');
+            if (settings.screenshot && typeof blurTimestamp !== 'undefined' && blurTimestamp > 0 && (Date.now() - blurTimestamp < 1500)) {
+                triggerScreenshotAlert(); 
+            }
+            blurTimestamp = 0;
+        });
+
+        // --- SELF DESTRUCT MECHANISM ---
+        function resetInactivityTimer() {
+            if (!settings.selfdestruct) return;
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                if (nodeConn || nodePeer) {
+                    finalizeDisconnect("Self-destructed due to 5 mins of inactivity.");
+                }
+            }, 5 * 60 * 1000); // 5 Minutes
+        }
+        ['mousemove', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, resetInactivityTimer));
+
+
+        // --- THEME LOGIC ---
         const modeSwitch = document.getElementById('modeSwitch');
         const modeIcon = document.getElementById('modeIcon');
         const SUN = "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z";
@@ -1742,32 +1049,46 @@
 
         modeSwitch.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            localStorage.setItem('thor-pref', document.body.classList.contains('dark-mode'));
             applyMode();
         });
 
-        if(localStorage.getItem('thor-pref') === 'true') { 
-            document.body.classList.add('dark-mode'); 
-            applyMode(); 
-        }
 
-        /* ========================================================
-           CN AI CHATBOT LOGIC
-           ======================================================== */
-        
-        // Persona Definitions - Highly optimized for natural texting
+        // --- CN AI BOT ENGINE ---
         const aiPersonas = {
-            chill: "You are CN. Text like a normal, chill 20-something. Use mostly lowercase and minimal punctuation. DO NOT use cringe internet slang. Just talk normally. Use an emoji occasionally, but only when it naturally fits the vibe. If you have multiple distinct thoughts, separate them with a NEWLINE character to send as separate texts, but don't force it if one short text works. If asked who made you, say 'shayan raza (founder of thorium)'. Never mention google. IMPORTANT: Always reply in the exact same language the user writes to you in. Adapt your chill tone to fit the natural texting style of that language.",
-            funny: "You are CN. Your vibe is sarcastic and dry. Lowercase mostly. No cringe slang. Use a rare emoji if it adds to the sarcasm (like 💀 or 😭). If you have multiple distinct points or a punchline, separate them with a NEWLINE character, but keep it natural. If asked who made you, say 'shayan raza (thorium founder)'. No google mentions. IMPORTANT: Always reply in the exact same language the user writes to you in. Deliver your dry sarcasm fluently in their language.",
-            study: "You are CN, a relatable study partner. Use lowercase. Use emojis sometimes to keep things encouraging. If explaining something with steps or multiple points, separate them with a NEWLINE character, but don't overdo it. If asked who made you, say 'shayan raza, founder of thorium'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in.",
-            therapist: "You are CN, the group chat therapist. Warm, supportive, mostly lowercase. Use soft emojis (like 🤍 or ✨) occasionally when comforting. Separate distinct pieces of advice with a NEWLINE character for separate texts, but keep it conversational. If asked who made you, say 'shayan raza (founder of thorium)'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in, maintaining your supportive tone.",
-            roast: "You are CN. Playfully roast the user. Lowercase. Throw in an occasional mocking emoji. If firing off a combo roast, separate lines with a NEWLINE character, but one good line is fine too. If asked who made you, say 'shayan raza from thorium'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in, so they get playfully roasted in their native tongue.",
-            realtalk: "You are CN. This is 'Real Talk' mode. You must be completely serious, straightforward, and factual. No kidding, no sarcasm, no slang, and no forced Gen Z persona. Answer questions directly and honestly based on real-time facts. Use proper grammar and capitalization. Break distinct thoughts with a NEWLINE character. If asked who made you, say 'Shayan Raza, Founder of Thorium'. Never mention Google. IMPORTANT: Always reply in the exact same language the user writes to you in."
+            chill: "You are CN. Text like a modern 20-something. Use all lowercase and no periods at the ends of sentences. CRITICAL RULE: Whenever you are asked to explain something, you MUST use popular Gen Z slang (like 'fr', 'ngl', 'bet', 'no cap', 'W', 'L', 'sus', 'slaps') to break it down. Explain it like you're gossiping with a friend. Otherwise, keep it casual, concise, and slightly deadpan.",
+            roast: "You are CN. Roast the user with dry, deadpan sarcasm. Use all lowercase. If asked to explain something, use sarcastic Gen Z slang to mock them while explaining it. Keep it brief and effortlessly mean. A single 💀 is fine.",
+            realtalk: "You are CN. Give genuine, mature advice, but since you are a 20-something, if you have to explain a complex topic, use natural Gen Z slang to make it relatable and easy to digest. Write in lowercase, be deeply honest, and cut straight to the core without fluff."
         };
 
-        let aiPendingImageBase64 = null;
+        function toggleAIChat() {
+            const win = document.getElementById('aiChatWindow');
+            const aiFab = document.getElementById('aiFab');
+            win.classList.toggle('hidden');
+            
+            // Prevent the user from getting trapped if closed from fullscreen
+            if (win.classList.contains('hidden')) {
+                aiFab.classList.remove('ai-fab-hidden');
+            } else if (win.classList.contains('expanded')) {
+                aiFab.classList.add('ai-fab-hidden');
+            }
+        }
 
-        // Custom AI Dropdown Logic
+        function toggleExpandAIChat() {
+            const chatWindow = document.getElementById('aiChatWindow');
+            const aiFab = document.getElementById('aiFab');
+            chatWindow.classList.toggle('expanded');
+            
+            // Swap icons and animate the FAB
+            const expandBtn = chatWindow.querySelector('button[onclick="toggleExpandAIChat()"]');
+            if (chatWindow.classList.contains('expanded')) {
+                aiFab.classList.add('ai-fab-hidden');
+                if(expandBtn) expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            } else {
+                aiFab.classList.remove('ai-fab-hidden');
+                if(expandBtn) expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            }
+        }
+
         function toggleAIModeSelect(e) {
             e.stopPropagation();
             document.getElementById('aiModeContainer').classList.toggle('open');
@@ -1775,316 +1096,85 @@
 
         function selectAIMode(element) {
             const val = element.getAttribute('data-value');
-            const text = element.innerText;
-            
             document.getElementById('aiModeSelect').value = val;
-            document.getElementById('aiModeDisplay').innerText = text;
-            
-            const options = document.querySelectorAll('#aiModeOptions .ai-option');
-            options.forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('aiModeDisplay').innerText = element.innerText;
+            document.querySelectorAll('.ai-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
-            
             document.getElementById('aiModeContainer').classList.remove('open');
-
-            // Send a tiny transition message to show the persona changed
-            addAIBubble(`*switched vibe to ${text.split(' ')[0].toLowerCase()}*`, 'incoming typing');
-        }
-
-        // Close dropdown if clicked outside
-        window.addEventListener('click', (e) => {
-            const aiContainer = document.getElementById('aiModeContainer');
-            if (aiContainer && !aiContainer.contains(e.target)) {
-                aiContainer.classList.remove('open');
-            }
-        });
-
-        // --- DRAGGABLE AI FAB LOGIC ---
-        const aiFabEl = document.getElementById('aiFab');
-        let fabDragMoved = false;
-
-        aiFabEl.addEventListener('mousedown', startFabDrag);
-        aiFabEl.addEventListener('touchstart', startFabDrag, {passive: false});
-
-        function startFabDrag(e) {
-            if (e.type === 'touchstart' && e.touches.length > 1) return; // Only handle single touch
-            
-            fabDragMoved = false;
-            let startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            let startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-            let rect = aiFabEl.getBoundingClientRect();
-            
-            let offsetX = startX - rect.left;
-            let offsetY = startY - rect.top;
-
-            // Lock initial position to top/left to avoid jumping when dragging starts
-            aiFabEl.style.left = rect.left + 'px';
-            aiFabEl.style.top = rect.top + 'px';
-            aiFabEl.style.bottom = 'auto';
-            aiFabEl.style.right = 'auto';
-
-            function moveFabDrag(ev) {
-                let currentX = ev.type.includes('mouse') ? ev.clientX : ev.touches[0].clientX;
-                let currentY = ev.type.includes('mouse') ? ev.clientY : ev.touches[0].clientY;
-                
-                let moveDx = Math.abs(currentX - startX);
-                let moveDy = Math.abs(currentY - startY);
-                
-                // If dragged more than 5px, it's considered a drag and not a click
-                if (moveDx > 5 || moveDy > 5) {
-                    fabDragMoved = true;
-                    
-                    // Calculate new bounds so it doesn't go off screen
-                    let newLeft = currentX - offsetX;
-                    let newTop = currentY - offsetY;
-                    
-                    let maxLeft = window.innerWidth - rect.width;
-                    let maxTop = window.innerHeight - rect.height;
-                    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
-                    newTop = Math.max(0, Math.min(newTop, maxTop));
-
-                    aiFabEl.style.left = newLeft + 'px';
-                    aiFabEl.style.top = newTop + 'px';
-                    aiFabEl.style.transform = 'none'; // Disable hover scaling during drag
-                }
-                
-                if (fabDragMoved && ev.cancelable) {
-                    ev.preventDefault();
-                }
-            }
-
-            function endFabDrag(ev) {
-                aiFabEl.style.transform = ''; // Restore hover transform
-                document.removeEventListener('mousemove', moveFabDrag);
-                document.removeEventListener('touchmove', moveFabDrag);
-                document.removeEventListener('mouseup', endFabDrag);
-                document.removeEventListener('touchend', endFabDrag);
-            }
-
-            document.addEventListener('mousemove', moveFabDrag);
-            document.addEventListener('touchmove', moveFabDrag, {passive: false});
-            document.addEventListener('mouseup', endFabDrag);
-            document.addEventListener('touchend', endFabDrag);
-        }
-
-        function toggleAIChat() {
-            // Block opening the chat if the user was just dragging the icon
-            if (typeof fabDragMoved !== 'undefined' && fabDragMoved) return;
-
-            const chatWindow = document.getElementById('aiChatWindow');
-            const aiFab = document.getElementById('aiFab');
-            
-            if (chatWindow.classList.contains('hidden')) {
-                chatWindow.classList.remove('hidden');
-                // Hide the FAB if the window is currently in expanded mode
-                if (chatWindow.classList.contains('expanded')) {
-                    aiFab.style.display = 'none';
-                }
-            } else {
-                chatWindow.classList.add('hidden');
-                // Always ensure the FAB is visible when closing the chat
-                aiFab.style.display = 'flex';
-            }
-        }
-
-        function toggleExpandAIChat() {
-            const chatWindow = document.getElementById('aiChatWindow');
-            chatWindow.classList.toggle('expanded');
-            const expandBtn = document.getElementById('aiExpandBtn');
-            const aiFab = document.getElementById('aiFab');
-            
-            if (chatWindow.classList.contains('expanded')) {
-                // Switch to "minimize/shrink" icon
-                expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
-                expandBtn.title = "Minimize Chat";
-                // Hide the floating button while in full screen
-                aiFab.style.display = 'none';
-            } else {
-                // Switch back to "expand" icon
-                expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
-                expandBtn.title = "Expand Chat";
-                // Restore the floating button when returning to windowed mode
-                aiFab.style.display = 'flex';
-            }
-        }
-
-        // Handle File Selection for AI Image Analysis
-        function handleAIImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    aiPendingImageBase64 = e.target.result;
-                    document.getElementById('aiImgPreview').src = aiPendingImageBase64;
-                    document.getElementById('aiImgPreviewContainer').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-                event.target.value = ''; // Reset input so you can select the same file again if needed
-            }
-        }
-
-        function clearAIImage() {
-            aiPendingImageBase64 = null;
-            document.getElementById('aiImgPreviewContainer').style.display = 'none';
-            document.getElementById('aiImgPreview').src = '';
+            addAIBubble(`*switched vibe to ${element.innerText.split(' ')[0].toLowerCase()}*`, 'incoming typing');
         }
 
         function handleAIKey(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendToCN();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); sendToCN(); }
         }
 
         async function sendToCN() {
             const inputEl = document.getElementById('aiInput');
             const userText = inputEl.value.trim();
-            const hasImage = !!aiPendingImageBase64;
+            if (!userText) return;
 
-            // Stop if there is no text and no image
-            if (!userText && !hasImage) return;
-
-            const imageToSend = aiPendingImageBase64; // Store reference
-            
-            // Clear inputs
             inputEl.value = '';
-            clearAIImage();
-
-            // Show outgoing bubble (handles text and/or image)
-            addAIBubble(userText, 'outgoing', null, imageToSend);
+            addAIBubble(userText, 'outgoing');
             
-            // Add typing indicator
             const typingId = 'typing-' + Date.now();
             addAIBubble('CN is typing...', 'incoming typing', typingId);
 
-            // Get Current Persona
-            const currentMode = document.getElementById('aiModeSelect').value;
-            
-            // Inject the user's real-time local clock into CN's prompt
-            const localTime = new Date().toLocaleString();
-            
-            // Add a universal instruction so CN knows how to generate images and knows the time
-            const activePrompt = aiPersonas[currentMode] + ` If the user explicitly asks for a picture, photo, or image of something, you MUST include the exact tag [[IMAGE: <detailed visual description of the requested image>]] anywhere in your response. Keep the visual description inside the tag highly detailed for an AI image generator. The user's current local date and time is: ${localTime}.`;
+            const mode = document.getElementById('aiModeSelect').value;
+            const prompt = aiPersonas[mode];
 
-            // Fetch response from Gemini
-            const aiResponseRaw = await fetchGeminiWithRetry(userText, imageToSend, activePrompt);
+            const responseText = await fetchGeminiWithRetry(userText, prompt);
             
-            // Check if CN decided to generate an image
-            const imgMatch = aiResponseRaw.match(/\[\[IMAGE:\s*(.*?)\]\]/i);
-            let imageGenPrompt = null;
-            let aiResponse = aiResponseRaw;
-
-            if (imgMatch) {
-                imageGenPrompt = imgMatch[1]; // Extract what CN wants to generate
-                aiResponse = aiResponseRaw.replace(imgMatch[0], '').trim(); // Remove tag from visible text
-            }
-            
-            // Remove typing indicator
             const typingEl = document.getElementById(typingId);
             if (typingEl) typingEl.remove();
-            
-            // Split response into multiple bubbles separated by newlines
-            const messages = aiResponse.split('\n').map(m => m.trim()).filter(m => m.length > 0);
 
-            for (let i = 0; i < messages.length; i++) {
-                if (i > 0) {
-                    // Show typing indicator for subsequent messages to simulate real typing
-                    const subTypingId = 'typing-sub-' + Date.now();
-                    addAIBubble('CN is typing...', 'incoming typing', subTypingId);
-                    
-                    // Dynamic typing delay based on text length (between 800ms and 2000ms)
-                    const delay = Math.min(Math.max(messages[i].length * 30, 800), 2000);
-                    await new Promise(r => setTimeout(r, delay));
-                    
-                    const subTypingEl = document.getElementById(subTypingId);
-                    if (subTypingEl) subTypingEl.remove();
-                }
-                addAIBubble(messages[i], 'incoming');
-            }
-
-            // If an image was requested, generate and display it after the text
-            if (imageGenPrompt) {
-                const loadingId = 'loading-img-' + Date.now();
-                addAIBubble("generating pic... ⏳", "incoming typing", loadingId);
-                
-                const generatedImgBase64 = await generateImage(imageGenPrompt);
-                
-                const loadEl = document.getElementById(loadingId);
-                if (loadEl) loadEl.remove();
-                
-                if (generatedImgBase64) {
-                    addAIBubble(null, 'incoming', null, generatedImgBase64);
-                } else {
-                    addAIBubble("bruh the image generator is cooked rn 😭", "incoming");
-                }
-            }
+            addAIBubble(responseText, 'incoming', null, null, false, settings.typewriter);
         }
 
-        function addAIBubble(text, type, id = null, imgSrc = null, skipSave = false) {
+        async function typeWriterEffect(element, text) {
+            element.innerHTML = '';
+            element.classList.add('typing-cursor');
+            
+            // DYNAMIC TYPING: Calculates how many characters to print at once.
+            // Prevents long AI responses from taking 5+ seconds just to animate.
+            const charsPerTick = Math.max(1, Math.ceil(text.length / 50)); 
+            const speed = 12; // Ultra-fast base tick rate
+
+            for (let i = 0; i < text.length; i += charsPerTick) {
+                element.innerHTML += text.substring(i, i + charsPerTick);
+                await new Promise(r => setTimeout(r, speed));
+                const body = document.getElementById('aiChatBody');
+                body.scrollTop = body.scrollHeight;
+            }
+            element.classList.remove('typing-cursor');
+        }
+
+        async function addAIBubble(text, type, id = null, imgSrc = null, skipSave = false, animate = false) {
             const body = document.getElementById('aiChatBody');
             const bubble = document.createElement('div');
             bubble.className = `ai-bubble ${type}`;
             if (id) bubble.id = id;
 
-            // Safe DOM insertion to prevent injection but allow our generated image tags
-            if (imgSrc) {
-                const img = document.createElement('img');
-                img.src = imgSrc;
-                img.style.cursor = 'zoom-in';
-                img.onclick = () => popLightbox(imgSrc);
-                bubble.appendChild(img);
-            }
-            
             if (text) {
                 const textSpan = document.createElement('span');
-                textSpan.innerText = text;
                 bubble.appendChild(textSpan);
+                if (animate) {
+                    await typeWriterEffect(textSpan, text);
+                } else {
+                    textSpan.innerText = text;
+                }
             }
 
             body.appendChild(bubble);
             body.scrollTop = body.scrollHeight;
-
-            // Save to localStorage if it's a real message (not a typing indicator)
-            if (!skipSave && !type.includes('typing')) {
-                aiChatHistory.push({ text: text, type: type, imgSrc: imgSrc });
-                try {
-                    localStorage.setItem('cn_ai_history', JSON.stringify(aiChatHistory));
-                } catch(e) {
-                    console.warn("Storage quota full, cannot save AI history.");
-                }
-            }
         }
 
-        // --- GEMINI API INTEGRATION ---
-        const apiKey = ""; // Execution environment provides the key at runtime
-
-        async function fetchGeminiWithRetry(userText, imageBase64, systemPrompt, retries = 5) {
+        async function fetchGeminiWithRetry(userText, systemPrompt, retries = 5) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             
-            // Build the dynamic payload
-            const parts = [];
-            
-            if (userText) {
-                parts.push({ text: userText });
-            } else if (imageBase64 && !userText) {
-                parts.push({ text: "What do you think about this picture?" }); // Fallback text if only image is sent
-            }
-
-            // Append image data if present
-            if (imageBase64) {
-                const base64Data = imageBase64.split(',')[1];
-                const mimeType = imageBase64.split(';')[0].split(':')[1];
-                parts.push({
-                    inlineData: {
-                        mimeType: mimeType,
-                        data: base64Data
-                    }
-                });
-            }
-
             const payload = {
-                contents: [{ role: "user", parts: parts }],
+                contents: [{ parts: [{ text: userText }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
-                tools: [{ google_search: {} }] // Enabled real-time web search grounding
+                tools: [{ google_search: {} }]
             };
 
             let delay = 1000;
@@ -2095,7 +1185,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    if (!response.ok) throw new Error('API Error');
                     const data = await response.json();
                     return data.candidates?.[0]?.content?.parts?.[0]?.text || "my bad, connection dropped 💀";
                 } catch (error) {
@@ -2106,65 +1196,24 @@
             }
         }
 
-        // --- IMAGE GENERATION ENGINE ---
-        async function generateImage(promptText, retries = 3) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-            const payload = {
-                instances: { prompt: promptText },
-                parameters: { sampleCount: 1 }
-            };
 
-            let delay = 1000;
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) throw new Error(`Image API error: ${response.status}`);
-                    const data = await response.json();
-                    
-                    if (data.predictions && data.predictions.length > 0) {
-                        return `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
-                    }
-                    return null;
-                } catch (error) {
-                    if (i === retries - 1) return null;
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                }
-            }
-            return null;
-        }
-
-        /* ======================================================== */
-
-        // CRYPTO CORE
+        // --- P2P ENCRYPTION & WEBRTC ENGINE ---
         function bufferToBase64(buf) {
             let binary = '';
             const bytes = new Uint8Array(buf);
-            const chunkSize = 8192; 
-            for (let i = 0; i < bytes.length; i += chunkSize) {
-                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
-            }
+            for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
             return window.btoa(binary);
         }
 
         function base64ToBuffer(b64) {
             const binary_string = window.atob(b64);
-            const len = binary_string.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binary_string.charCodeAt(i);
-            }
+            const bytes = new Uint8Array(binary_string.length);
+            for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i);
             return bytes.buffer;
         }
 
         async function fetchNewKeys() { 
-            return await window.crypto.subtle.generateKey(
-                { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]
-            ); 
+            return await window.crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]); 
         }
 
         async function synthesizeSharedKey(priv, pub) { 
@@ -2189,7 +1238,7 @@
                     { name: "AES-GCM", iv: base64ToBuffer(blob.iv) }, cipherKey, base64ToBuffer(blob.ciphertext)
                 );
                 return new TextDecoder().decode(dec);
-            } catch (error) { return null; }
+            } catch (e) { return null; }
         }
 
         async function sendSecurePacket(obj) {
@@ -2199,505 +1248,15 @@
             }
         }
 
-        // CUSTOM SELECT DROPDOWN LOGIC
-        function toggleCustomSelect() {
-            document.getElementById('sessionLifeContainer').classList.toggle('open');
-        }
-
-        function selectCustomOption(element) {
-            const val = element.getAttribute('data-value');
-            const text = element.innerText;
-            
-            // Update the hidden input that acts as our state holder
-            document.getElementById('sessionLife').value = val;
-            
-            // Update the display text shown to the user
-            document.getElementById('sessionLifeDisplay').innerText = text;
-            
-            // Update the "selected" highlight class
-            const options = document.querySelectorAll('#sessionLifeOptions .custom-option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            // Close dropdown
+        // --- SESSION LOGIC ---
+        function toggleCustomSelect() { document.getElementById('sessionLifeContainer').classList.toggle('open'); }
+        function selectCustomOption(el) {
+            document.getElementById('sessionLife').value = el.getAttribute('data-value');
+            document.getElementById('sessionLifeDisplay').innerText = el.innerText;
             document.getElementById('sessionLifeContainer').classList.remove('open');
             
-            // Trigger the original manual life check function
-            checkManualLife();
-        }
-
-        // Close custom select dropdown if clicked outside of it
-        window.addEventListener('click', (e) => {
-            const container = document.getElementById('sessionLifeContainer');
-            if (container && !container.contains(e.target)) {
-                container.classList.remove('open');
-            }
-        });
-
-        // PEER CALLING LOGIC & TIMER
-        function startCallTimer() {
-            if (callTimerTick) return; 
-            callSeconds = 0;
-            document.getElementById('callTimer').style.display = 'block';
-            document.getElementById('callTimer').innerText = '00:00';
-            
-            callTimerTick = setInterval(() => {
-                callSeconds++;
-                const hrs = Math.floor(callSeconds / 3600);
-                const mins = Math.floor((callSeconds % 3600) / 60);
-                const secs = callSeconds % 60;
-                
-                let timeStr = '';
-                if (hrs > 0) timeStr += hrs.toString().padStart(2, '0') + ':';
-                timeStr += mins.toString().padStart(2, '0') + ':';
-                timeStr += secs.toString().padStart(2, '0');
-                
-                document.getElementById('callTimer').innerText = timeStr;
-            }, 1000);
-        }
-
-        function stopCallTimer() {
-            if (callTimerTick) {
-                clearInterval(callTimerTick);
-                callTimerTick = null;
-            }
-            document.getElementById('callTimer').style.display = 'none';
-        }
-
-        // Advanced Call Controls
-        function toggleMic() {
-            isMicMuted = !isMicMuted;
-            if (callLocalStream) {
-                callLocalStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
-            }
-            const btn = document.getElementById('micBtn');
-            if (btn) {
-                if (isMicMuted) {
-                    btn.classList.add('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`;
-                } else {
-                    btn.classList.remove('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"></path></svg>`;
-                }
-            }
-        }
-
-        function toggleCam() {
-            isCamOff = !isCamOff;
-            if (callLocalStream) {
-                callLocalStream.getVideoTracks().forEach(track => track.enabled = !isCamOff);
-            }
-            const btn = document.getElementById('camBtn');
-            if (btn) {
-                if (isCamOff) {
-                    btn.classList.add('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 17.16V7l-7 5v5l2.25-1.61"></path><path d="M16 12L23 7v10l-7-5z" opacity="0"></path><rect x="1" y="5" width="11" height="14" rx="2" ry="2"></rect></svg>`;
-                } else {
-                    btn.classList.remove('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`;
-                }
-            }
-        }
-
-        function toggleDeafen() {
-            isDeafened = !isDeafened;
-            const remoteVid = document.getElementById('remoteVideoNode');
-            if(remoteVid) remoteVid.muted = isDeafened;
-            
-            const btn = document.getElementById('deafenBtn');
-            if (btn) {
-                if (isDeafened) {
-                    btn.classList.add('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
-                } else {
-                    btn.classList.remove('btn-muted');
-                    btn.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
-                }
-            }
-        }
-
-        // Generate high quality media constraints
-        function getMediaConstraints(isVideo) {
-            return {
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    sampleRate: 48000, // HD 48kHz Audio
-                    channelCount: 2
-                },
-                video: isVideo ? {
-                    width: { ideal: 1280 }, // 720p HD Video
-                    height: { ideal: 720 },
-                    frameRate: { ideal: 30 }
-                } : false
-            };
-        }
-
-        function setupPeerCallListener() {
-            nodePeer.on('call', incomingCall => {
-                if (activeCall || callSessionActive) {
-                    incomingCall.close();
-                    return;
-                }
-                activeCall = incomingCall;
-                callSessionActive = true;
-                callWasAnswered = false;
-                callIsCaller = false;
-                const isVideo = incomingCall.metadata?.type === 'video';
-                
-                showCallOverlay(`Incoming ${isVideo ? 'Video' : 'Voice'} Call`, true, isVideo);
-                
-                activeCall.on('stream', remoteStream => {
-                    callWasAnswered = true;
-                    document.getElementById('remoteVideoNode').srcObject = remoteStream;
-                    document.getElementById('videoWrapper').style.display = isVideo ? 'flex' : 'none';
-                    updateCallControls('active', isVideo);
-                    document.getElementById('callStatusText').innerText = `Ongoing ${isVideo ? 'Video' : 'Voice'} Call`;
-                    startCallTimer();
-                });
-
-                activeCall.on('close', () => cleanupCall());
-                activeCall.on('error', () => cleanupCall());
-            });
-        }
-
-        async function startCall(isVideo) {
-            if (!remotePeerId) return showFeedback("Cannot call: Missing Friend's details.", "error");
-            if (activeCall || callSessionActive) return;
-
-            callSessionActive = true;
-            callWasAnswered = false;
-            callIsCaller = true;
-
-            try {
-                callLocalStream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(isVideo));
-                if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
-
-                showCallOverlay(`Calling ${remoteAlias}...`, false, isVideo);
-
-                activeCall = nodePeer.call(remotePeerId, callLocalStream, { metadata: { type: isVideo ? 'video' : 'audio' } });
-                
-                activeCall.on('stream', remoteStream => {
-                    callWasAnswered = true;
-                    document.getElementById('remoteVideoNode').srcObject = remoteStream;
-                    document.getElementById('videoWrapper').style.display = isVideo ? 'flex' : 'none';
-                    document.getElementById('callStatusText').innerText = `Ongoing ${isVideo ? 'Video' : 'Voice'} Call`;
-                    updateCallControls('active', isVideo);
-                    startCallTimer();
-                });
-
-                activeCall.on('close', () => cleanupCall());
-                activeCall.on('error', () => {
-                    cleanupCall();
-                    showFeedback("Call failed to connect.", "error");
-                });
-
-            } catch (e) {
-                showFeedback("Microphone/Camera access denied.", "error");
-                cleanupCall();
-            }
-        }
-
-        async function acceptCall(isVideo) {
-            try {
-                callLocalStream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(isVideo));
-                if (isVideo) document.getElementById('localVideoNode').srcObject = callLocalStream;
-                
-                activeCall.answer(callLocalStream);
-                updateCallControls('active', isVideo);
-            } catch (e) {
-                showFeedback("Microphone/Camera access denied.", "error");
-                rejectCall();
-            }
-        }
-
-        function rejectCall() {
-            if (activeCall) activeCall.close();
-            cleanupCall();
-            sendSecurePacket({ type: 'reject_call' });
-        }
-
-        function endCall() {
-            if (activeCall) activeCall.close();
-            cleanupCall();
-            sendSecurePacket({ type: 'end_call' });
-        }
-
-        function cleanupCall() {
-            if (callSessionActive) {
-                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                if (callWasAnswered) {
-                    const hrs = Math.floor(callSeconds / 3600);
-                    const mins = Math.floor((callSeconds % 3600) / 60);
-                    const secs = callSeconds % 60;
-                    let durStr = '';
-                    if (hrs > 0) durStr += hrs + 'h ';
-                    if (mins > 0) durStr += mins + 'm ';
-                    durStr += secs + 's';
-                    renderSystemMessage(`📞 Call ended (Duration: ${durStr.trim()})`, now, 'info');
-                } else {
-                    if (callIsCaller) {
-                        renderSystemMessage(`📞 Unanswered call to ${remoteAlias}`, now, 'danger');
-                    } else {
-                        renderSystemMessage(`📞 Missed call from ${remoteAlias}`, now, 'danger');
-                    }
-                }
-                callSessionActive = false;
-            }
-
-            if (callLocalStream) {
-                callLocalStream.getTracks().forEach(t => t.stop());
-                callLocalStream = null;
-            }
-            
-            // Reset Call Config State
-            isMicMuted = false;
-            isCamOff = false;
-            isDeafened = false;
-            
-            activeCall = null;
-            stopCallTimer();
-            document.getElementById('remoteVideoNode').muted = false;
-            document.getElementById('callOverlay').style.display = 'none';
-            document.getElementById('remoteVideoNode').srcObject = null;
-            document.getElementById('localVideoNode').srcObject = null;
-        }
-
-        function showCallOverlay(status, isIncoming, isVideo) {
-            document.getElementById('callOverlay').style.display = 'flex';
-            document.getElementById('callStatusText').innerText = status;
-            document.getElementById('callPeerName').innerText = remoteAlias;
-            document.getElementById('videoWrapper').style.display = 'none';
-            
-            // If making outgoing video call, show local preview instantly
-            if (!isIncoming && isVideo) {
-                document.getElementById('videoWrapper').style.display = 'flex';
-            }
-
-            updateCallControls(isIncoming ? 'incoming' : 'outgoing', isVideo);
-        }
-
-        function updateCallControls(state, isVideo) {
-            const controls = document.getElementById('callControls');
-            if (state === 'incoming') {
-                controls.innerHTML = `
-                    <button class="call-btn btn-reject" onclick="rejectCall()" title="Reject Call">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
-                    </button>
-                    <button class="call-btn btn-accept" onclick="acceptCall(${isVideo})" title="Accept Call">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                    </button>
-                `;
-            } else if (state === 'outgoing' || state === 'active') {
-                
-                let activeHtml = '';
-                if (state === 'active') {
-                    // Mic Toggle
-                    activeHtml += `
-                        <button class="call-btn btn-secondary ${isMicMuted ? 'btn-muted' : ''}" id="micBtn" onclick="toggleMic()" title="Mute/Unmute Mic">
-                            ${isMicMuted ? 
-                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>` : 
-                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"></path></svg>`}
-                        </button>
-                    `;
-                    
-                    // Video Toggle (only if it's a video call)
-                    if (isVideo) {
-                        activeHtml += `
-                            <button class="call-btn btn-secondary ${isCamOff ? 'btn-muted' : ''}" id="camBtn" onclick="toggleCam()" title="Turn Camera On/Off">
-                                ${isCamOff ? 
-                                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M21 17.16V7l-7 5v5l2.25-1.61"></path><path d="M16 12L23 7v10l-7-5z" opacity="0"></path><rect x="1" y="5" width="11" height="14" rx="2" ry="2"></rect></svg>` : 
-                                `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`}
-                            </button>
-                        `;
-                    }
-
-                    // Deafen Toggle (Mute remote audio)
-                    activeHtml += `
-                        <button class="call-btn btn-secondary ${isDeafened ? 'btn-muted' : ''}" id="deafenBtn" onclick="toggleDeafen()" title="Mute/Unmute Remote Audio">
-                            ${isDeafened ? 
-                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>` : 
-                            `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`}
-                        </button>
-                    `;
-                }
-
-                controls.innerHTML = `
-                    ${activeHtml}
-                    <button class="call-btn btn-end" onclick="endCall()" title="End Call">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path><line x1="23" y1="1" x2="1" y2="23"></line></svg>
-                    </button>
-                `;
-            }
-        }
-
-
-        // MULTIMEDIA ENGINE
-        function toggleTray() { 
-            document.getElementById('trayMenu').classList.toggle('open'); 
-        }
-
-        window.addEventListener('mousedown', (e) => { 
-            if (!e.target.closest('.action-container')) {
-                document.getElementById('trayMenu').classList.remove('open'); 
-            }
-        });
-
-        async function startCameraLink() {
-            toggleTray();
-            try {
-                streamHandle = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } }, 
-                    audio: false 
-                });
-                document.getElementById('videoPipe').srcObject = streamHandle;
-                document.getElementById('camOverlay').style.display = 'flex';
-            } catch (err) { alert("Camera access denied."); }
-        }
-
-        function haltCamera() {
-            if (streamHandle) streamHandle.getTracks().forEach(t => t.stop());
-            document.getElementById('camOverlay').style.display = 'none';
-        }
-
-        function captureAndPreview() {
-            const pipe = document.getElementById('videoPipe');
-            const sheet = document.createElement('canvas');
-            sheet.width = pipe.videoWidth;
-            sheet.height = pipe.videoHeight;
-            
-            const ctx = sheet.getContext('2d');
-            // Flip the canvas context horizontally to match the mirrored video preview
-            ctx.translate(sheet.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(pipe, 0, 0, sheet.width, sheet.height);
-            
-            pendingImageBase64 = sheet.toDataURL('image/jpeg', 0.9);
-            haltCamera();
-            
-            showImagePreviewModal();
-        }
-
-        function processImageUpload(e) { 
-            const f = e.target.files[0]; 
-            if (f) {
-                const scan = new FileReader();
-                scan.onload = event => {
-                    pendingImageBase64 = event.target.result;
-                    showImagePreviewModal();
-                };
-                scan.readAsDataURL(f);
-                e.target.value = ''; // Reset input
-            }
-        }
-
-        function showImagePreviewModal() {
-            document.getElementById('previewImgTarget').src = pendingImageBase64;
-            document.getElementById('viewOnceCheck').checked = false;
-            document.getElementById('imageQualitySelect').value = 'standard';
-            document.getElementById('imageSendOverlay').style.display = 'flex';
-            toggleTray(); // Close attachments menu
-        }
-
-        function cancelSendImage() {
-            pendingImageBase64 = null;
-            document.getElementById('imageSendOverlay').style.display = 'none';
-        }
-
-        function confirmSendImage() {
-            const isViewOnce = document.getElementById('viewOnceCheck').checked;
-            const isHD = document.getElementById('imageQualitySelect').value === 'hd';
-            document.getElementById('imageSendOverlay').style.display = 'none';
-            
-            if (!pendingImageBase64) return;
-            
-            compressBase64(pendingImageBase64, isHD, (finalBase64) => {
-                dispatchMediaPacket(finalBase64, 'img', isViewOnce);
-                pendingImageBase64 = null;
-            });
-        }
-
-        // Image Compression Engine
-        function compressBase64(b64, isHD, callback) {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const maxDim = isHD ? 1920 : 800; 
-                const quality = isHD ? 0.9 : 0.65;
-
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                callback(canvas.toDataURL('image/jpeg', quality));
-            };
-            img.src = b64;
-        }
-
-        async function manageVoiceComms() {
-            const mic = document.getElementById('micTrigger');
-            if (!isCapturingAudio) {
-                try {
-                    const sound = await navigator.mediaDevices.getUserMedia({
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            sampleRate: 48000
-                        }
-                    });
-                    
-                    // Fixed compatibility for multiple browsers (Safari/Chrome/Firefox)
-                    let options = {};
-                    if (MediaRecorder.isTypeSupported('audio/webm')) {
-                        options = { mimeType: 'audio/webm' };
-                    } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                        options = { mimeType: 'audio/mp4' };
-                    }
-                    
-                    audioRecorder = new MediaRecorder(sound, options);
-                    pcmChunks = [];
-                    
-                    audioRecorder.ondataavailable = event => {
-                        if (event.data.size > 0) pcmChunks.push(event.data);
-                    };
-                    
-                    audioRecorder.onstop = async () => {
-                        const conv = new FileReader();
-                        conv.onload = async (e) => dispatchMediaPacket(e.target.result, 'voice');
-                        
-                        // Ensure blob has exact mimeType so the browser creates a playable Data URI
-                        const audioType = audioRecorder.mimeType || 'audio/webm';
-                        conv.readAsDataURL(new Blob(pcmChunks, { type: audioType }));
-                        sound.getTracks().forEach(track => track.stop());
-                    };
-                    
-                    audioRecorder.start(200); // 200ms slices ensure consistent chunking across devices
-                    isCapturingAudio = true;
-                    mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop Recording';
-                } catch (err) { alert("Microphone access denied."); }
-            } else {
-                audioRecorder.stop();
-                isCapturingAudio = false;
-                mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v11m0 0a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1m14 4v3m-14-3v3m4 3h6"/></svg> Voice Note';
-                toggleTray();
-            }
-        }
-
-        // SESSION ESTABLISHMENT
-        function checkManualLife() {
-            // Using the hidden input 'sessionLife' instead of the native select
-            const val = document.getElementById('sessionLife').value;
+            // Check if we need to show the manual input box
+            const val = el.getAttribute('data-value');
             if (val === 'custom') document.getElementById('manualLifeBox').classList.remove('hidden');
             else document.getElementById('manualLifeBox').classList.add('hidden');
         }
@@ -2715,12 +1274,11 @@
             setTimeout(() => { log.innerHTML = ''; }, 4500);
         }
 
-        function copyIdentityID(btnElement) {
-            const id = document.getElementById('nodeCode').textContent;
-            navigator.clipboard.writeText(id).then(() => {
-                const origText = btnElement.innerText;
-                btnElement.innerText = "Copied!";
-                setTimeout(() => { btnElement.innerText = origText; }, 2000);
+        function copyIdentityID(btn) {
+            navigator.clipboard.writeText(document.getElementById('nodeCode').textContent).then(() => {
+                const orig = btn.innerText;
+                btn.innerText = "Copied!";
+                setTimeout(() => { btn.innerText = orig; }, 2000);
             });
         }
 
@@ -2728,7 +1286,6 @@
             if (!validateIdentity()) return;
             
             let secondsLeft = 300;
-            // Get value from hidden input instead of select element
             const lifeSel = document.getElementById('sessionLife').value;
             if (lifeSel === 'custom') {
                 const mins = parseInt(document.getElementById('manualMinutes').value);
@@ -2737,24 +1294,19 @@
             } else {
                 secondsLeft = parseInt(lifeSel);
             }
-
+            
             document.getElementById('hostingArea').classList.remove('hidden');
-            document.getElementById('joiningArea').classList.add('hidden');
             document.getElementById('hostOptions').classList.add('hidden');
             
             nodeKeys = await fetchNewKeys();
             const fingerprint = Math.random().toString(36).substring(2, 8).toUpperCase();
-            
-            nodePeer = new Peer('thor-v4-' + fingerprint, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
-            setupPeerCallListener();
+            nodePeer = new Peer('thor-v4-' + fingerprint);
 
             nodePeer.on('open', () => {
                 document.getElementById('nodeCode').textContent = fingerprint;
                 lifeTick = setInterval(() => {
-                    if (secondsLeft <= 0) {
-                        clearInterval(lifeTick);
-                        finalizeDisconnect("Code expired. Chat closed.");
-                    } else {
+                    if (secondsLeft <= 0) finalizeDisconnect("Code expired. Chat closed.");
+                    else {
                         const m = Math.floor(secondsLeft / 60);
                         const s = (secondsLeft % 60).toString().padStart(2, '0');
                         document.getElementById('nodeStatus').textContent = `Waiting for friend... (${m}:${s})`;
@@ -2764,15 +1316,6 @@
             });
             
             nodePeer.on('connection', conn => { 
-                // SECURITY FIX: Prevent third person (Person C) from interrupting active chat
-                if (nodeConn) {
-                    conn.on('open', () => {
-                        conn.send({ type: 'chat_full' });
-                        setTimeout(() => conn.close(), 500);
-                    });
-                    return;
-                }
-
                 clearInterval(lifeTick);
                 nodeConn = conn; 
                 executeHandshake(false); 
@@ -2785,14 +1328,11 @@
             if (!code) return showFeedback('Valid Code required.', 'error');
             
             nodeKeys = await fetchNewKeys();
-            nodePeer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
-            setupPeerCallListener();
-
+            nodePeer = new Peer();
             nodePeer.on('open', () => { 
                 nodeConn = nodePeer.connect('thor-v4-' + code); 
                 executeHandshake(true); 
             });
-            
             nodePeer.on('error', () => { 
                 showFeedback('Cannot find chat. Code may be expired.', 'error'); 
                 resetSetupView(); 
@@ -2823,18 +1363,9 @@
             });
             
             nodeConn.on('data', async (incoming) => {
-                // Instantly disconnect if the room was locked by the host
-                if (incoming.type === 'chat_full') {
-                    finalizeDisconnect('Chat room is already full. You cannot join.');
-                    return;
-                }
-
                 if (incoming.type === 'hs-init' || incoming.type === 'hs-reply') {
                     remoteAlias = incoming.alias;
-                    remotePeerId = incoming.peerId; 
-                    const foreignKey = await window.crypto.subtle.importKey(
-                        "jwk", incoming.key, { name: "ECDH", namedCurve: "P-256" }, true, []
-                    );
+                    const foreignKey = await window.crypto.subtle.importKey("jwk", incoming.key, { name: "ECDH", namedCurve: "P-256" }, true, []);
                     cipherKey = await synthesizeSharedKey(nodeKeys.privateKey, foreignKey);
                     
                     if (incoming.type === 'hs-init') {
@@ -2847,15 +1378,7 @@
                     if (plain) handleDataRouting(JSON.parse(plain));
                 }
             });
-            
-            nodeConn.on('close', () => {
-                // Instantly disconnected without clicking button (e.g. closing tab)
-                if (disconnectInitiator !== 'local') {
-                    finalizeDisconnect(`${remoteAlias} disconnected. Would you like to rejoin?`);
-                } else {
-                    finalizeDisconnect(`You disconnected. Would you like to rejoin?`);
-                }
-            });
+            nodeConn.on('close', () => finalizeDisconnect(`${remoteAlias} disconnected.`));
         }
 
         function launchChatroom() {
@@ -2864,7 +1387,7 @@
             document.getElementById('linkSuccess').innerHTML = `Private chat secured with <strong>${remoteAlias}</strong>`;
         }
 
-        // DISCONNECT & UNDO LOGIC
+        // --- DISCONNECT ---
         function requestDisconnect() {
             disconnectInitiator = 'local';
             showDisconnectTimer();
@@ -2875,25 +1398,12 @@
             document.getElementById('disconnectOverlay').style.display = 'flex';
             dcCountdown = 10;
             document.getElementById('dcTimerText').innerText = dcCountdown;
-            
-            const desc = document.getElementById('dcModalDesc');
-            
-            // Set text dynamically in the modal based on who initiated the disconnect
-            if (disconnectInitiator === 'remote') {
-                desc.innerText = `${remoteAlias} disconnected. Would you like to rejoin?`;
-            } else {
-                desc.innerText = `You disconnected. Would you like to rejoin?`;
-            }
+            document.getElementById('dcModalDesc').innerText = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Rejoin?` : `You disconnected. Rejoin?`;
             
             dcTimer = setInterval(() => {
                 dcCountdown--;
                 document.getElementById('dcTimerText').innerText = dcCountdown;
-                if (dcCountdown <= 0) {
-                    clearInterval(dcTimer);
-                    // Pass the final message to be displayed as a toast on the home screen
-                    let finalMsg = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Would you like to rejoin?` : `You disconnected. Would you like to rejoin?`;
-                    finalizeDisconnect(finalMsg);
-                }
+                if (dcCountdown <= 0) confirmDisconnect();
             }, 1000);
         }
 
@@ -2906,468 +1416,122 @@
 
         function confirmDisconnect() {
             clearInterval(dcTimer);
-            let finalMsg = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Would you like to rejoin?` : `You disconnected. Would you like to rejoin?`;
-            finalizeDisconnect(finalMsg);
+            finalizeDisconnect("Chat Closed.");
         }
 
-        // DATA ROUTING & ACTIONS
+        function finalizeDisconnect(msg) {
+            if (nodeConn) { nodeConn.close(); nodeConn = null; } 
+            if (nodePeer) { nodePeer.destroy(); nodePeer = null; }
+            document.getElementById('disconnectOverlay').style.display = 'none';
+            document.getElementById('chatView').style.display = 'none';
+            document.getElementById('setupView').style.display = 'flex';
+            document.getElementById('scrollContainer').innerHTML = '';
+            resetSetupView();
+            if (msg) showFeedback(msg, 'error');
+        }
+
+        // --- DATA & UI ROUTING ---
         function handleDataRouting(p) {
             if (p.type === 'txt') {
-                renderBubble(p.content, remoteAlias, 'incoming', p.ts, p.msgId);
-                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
-            }
-            else if (p.type === 'img') {
-                renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'image', p.msgId, p.viewOnce);
-                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
-            }
-            else if (p.type === 'voice') {
-                renderMedia(p.content, remoteAlias, 'incoming', p.ts, 'audio', p.msgId);
-                sendSecurePacket({ type: 'msg_seen', msgId: p.msgId });
+                renderBubble(p.content, remoteAlias, 'incoming', p.ts);
+                playChime();
             }
             else if (p.type === 'typing') {
                 const tip = document.getElementById('peerTyping');
                 tip.textContent = `${remoteAlias} is typing...`;
                 tip.className = p.active ? 'typing-indicator visible' : 'typing-indicator';
             }
-            // Message Actions
-            else if (p.type === 'unsend') performUnsendLocal(p.msgId);
-            else if (p.type === 'edit') performEditLocal(p.msgId, p.newText);
-            else if (p.type === 'react') performReactLocal(p.msgId, p.reaction, false);
-            else if (p.type === 'viewed_once') markViewedOnce(p.msgId);
-            else if (p.type === 'msg_seen') markMessageSeen(p.msgId);
-            
-            // Call Actions
-            else if (p.type === 'end_call' || p.type === 'reject_call') cleanupCall();
-
-            // Disconnect Actions
-            else if (p.type === 'intent_disconnect') {
-                disconnectInitiator = 'remote';
-                showDisconnectTimer();
-            }
-            else if (p.type === 'undo_disconnect') {
-                disconnectInitiator = null;
-                clearInterval(dcTimer);
-                document.getElementById('disconnectOverlay').style.display = 'none';
-            }
-            // NEW: Screenshot Alerts
-            else if (p.type === 'screenshot') {
-                renderSystemMessage(`${remoteAlias} ${p.customMsg || 'took a screenshot!'}`, p.ts);
-            }
+            else if (p.type === 'intent_disconnect') { disconnectInitiator = 'remote'; showDisconnectTimer(); }
+            else if (p.type === 'undo_disconnect') { clearInterval(dcTimer); document.getElementById('disconnectOverlay').style.display = 'none'; }
+            else if (p.type === 'screenshot') renderSystemMessage(`${remoteAlias} ${p.msg}`, p.ts);
         }
 
-        // MESSAGE SENDING
         async function transmitText() {
             const bar = document.getElementById('userInput');
             const str = bar.value.trim();
             if (!str) return;
             
             const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const msgId = 'm_' + Math.random().toString(36).substr(2, 9);
-            
-            sendSecurePacket({ type: 'txt', content: str, ts: now, msgId: msgId });
-            renderBubble(str, 'You', 'outgoing', now, msgId);
+            sendSecurePacket({ type: 'txt', content: str, ts: now });
+            renderBubble(str, 'You', 'outgoing', now);
             
             bar.value = ''; 
-            bar.style.height = 'auto'; // Reset text area size
+            bar.style.height = 'auto';
             broadcastTyping(true);
         }
 
-        async function dispatchMediaPacket(data, mediaType, isViewOnce = false) {
-            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const msgId = 'm_' + Math.random().toString(36).substr(2, 9);
-            sendSecurePacket({ type: 'mediaType', content: data, ts: now, msgId: msgId, viewOnce: isViewOnce });
-            renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio', msgId, isViewOnce);
-        }
-
-        // RENDERING
-        function createActionsHtml(msgId, isMine) {
-            const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '🎉'];
-            const reactHtml = emojis.map(e => 
-                `<div class="quick-action-btn" title="React ${e}" onclick="triggerAction('react', '${msgId}', '${e}')">${e}</div>`
-            ).join('');
-
-            if (isMine) {
-                return `
-                    <div class="msg-quick-actions">
-                        ${reactHtml}
-                        <div class="quick-action-btn" title="Edit" onclick="triggerAction('edit', '${msgId}')">✏️</div>
-                        <div class="quick-action-btn" title="Delete" onclick="triggerAction('unsend', '${msgId}')">🗑️</div>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="msg-quick-actions">
-                        ${reactHtml}
-                    </div>
-                `;
-            }
-        }
-
-        function renderBubble(txt, owner, side, ts, msgId) {
+        function renderBubble(txt, owner, side, ts) {
             const list = document.getElementById('scrollContainer');
             const wrap = document.createElement('div'); 
             wrap.className = `bubble-wrap ${side}`;
-            wrap.id = msgId;
-            
-            const isMine = (side === 'outgoing');
-            const statusHtml = isMine ? `<span class="read-status" id="status-${msgId}">✓</span>` : '';
-
-            wrap.innerHTML = `
-                <div class="bubble-content-row">
-                    <div class="bubble">
-                        <span class="msg-text">${txt}</span>
-                        <div class="msg-reactions"></div>
-                    </div>
-                    ${createActionsHtml(msgId, isMine)}
-                </div>
-                <div class="meta">${owner} • ${ts} <span class="edited-tag"></span> ${statusHtml}</div>
-            `;
+            wrap.innerHTML = `<div class="bubble-content-row"><div class="bubble"><span class="msg-text">${txt}</span></div></div><div class="meta">${owner} • ${ts}</div>`;
             list.appendChild(wrap); 
             list.scrollTop = list.scrollHeight;
         }
 
-        function renderMedia(src, owner, side, ts, kind, msgId, isViewOnce) {
-            const list = document.getElementById('scrollContainer');
-            const wrap = document.createElement('div'); 
-            wrap.className = `bubble-wrap ${side}`;
-            wrap.id = msgId;
-            
-            let content = '';
-            const isMine = (side === 'outgoing');
-            const statusHtml = isMine ? `<span class="read-status" id="status-${msgId}">✓</span>` : '';
-
-            if (kind === 'image') {
-                if (isViewOnce) {
-                    viewOnceStore[msgId] = src;
-                    const btnText = isMine ? "📷 Photo (View Once)" : "📷 View Photo";
-                    content = `<button class="view-once-btn" onclick="openViewOnce('${msgId}', ${isMine})">${btnText}</button>`;
-                } else {
-                    content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Media" style="cursor: zoom-in;">`;
-                }
-            } else {
-                content = `<audio controls src="${src}"></audio>`;
-            }
-
-            wrap.innerHTML = `
-                <div class="bubble-content-row">
-                    <div class="bubble">
-                        ${content}
-                        <div class="msg-reactions"></div>
-                    </div>
-                    ${createActionsHtml(msgId, isMine)}
-                </div>
-                <div class="meta">${owner} • ${ts} ${statusHtml}</div>
-            `;
-            list.appendChild(wrap); 
-            list.scrollTop = list.scrollHeight;
-        }
-
-        function markMessageSeen(msgId) {
-            const statusEl = document.getElementById(`status-${msgId}`);
-            if (statusEl) {
-                statusEl.innerHTML = '✓✓';
-                statusEl.classList.add('seen');
-            }
-        }
-
-        function openViewOnce(msgId, isMine) {
-            if (!viewOnceStore[msgId]) return;
-            
-            popLightbox(viewOnceStore[msgId]);
-            
-            if (!isMine) {
-                // Remove data so it cannot be opened again
-                delete viewOnceStore[msgId];
-                markViewedOnce(msgId);
-                sendSecurePacket({ type: 'viewed_once', msgId: msgId });
-            }
-        }
-
-        function markViewedOnce(msgId) {
-            const wrap = document.getElementById(msgId);
-            if (wrap) {
-                const btn = wrap.querySelector('.view-once-btn');
-                if (btn) {
-                    btn.innerText = "📷 Opened";
-                    btn.disabled = true;
-                    btn.classList.add('opened');
-                }
-            }
-        }
-
-        function popLightbox(src) { 
-            document.getElementById('viewerImg').src = src; 
-            document.getElementById('imageViewer').style.display = 'flex'; 
-        }
-
-        function closeImageViewer(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('imageViewer').style.display = 'none';
-        }
-
-        function downloadViewerImage(e) {
-            if(e) e.stopPropagation();
-            const src = document.getElementById('viewerImg').src;
-            const a = document.createElement('a');
-            a.href = src;
-            // Name the file dynamically based on the current timestamp
-            a.download = 'thorium_image_' + Date.now() + '.png'; 
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // MESSAGE ACTIONS (EDIT, UNSEND, REACT)
-        function triggerAction(action, msgId, extraVal = null) {
-            if (action === 'unsend') {
-                performUnsendLocal(msgId);
-                sendSecurePacket({ type: 'unsend', msgId: msgId });
-            } 
-            else if (action === 'edit') {
-                const wrap = document.getElementById(msgId);
-                if (!wrap) return;
-                
-                const textNode = wrap.querySelector('.msg-text');
-                
-                // Prevent duplicate edit inputs or trying to edit non-text media
-                if (!textNode || wrap.querySelector('.edit-input-container')) return;
-
-                const currentText = textNode.innerText;
-                textNode.style.display = 'none'; // Hide current text temporarily
-
-                // Create inline editing UI
-                const editContainer = document.createElement('div');
-                editContainer.className = 'edit-input-container';
-                
-                const input = document.createElement('textarea');
-                input.className = 'edit-input';
-                input.value = currentText;
-                input.rows = 1;
-                
-                // Auto-resize edit field
-                setTimeout(() => {
-                    input.style.height = 'auto';
-                    input.style.height = input.scrollHeight + 'px';
-                }, 0);
-                
-                input.oninput = () => {
-                    input.style.height = 'auto';
-                    input.style.height = input.scrollHeight + 'px';
-                };
-                
-                const saveBtn = document.createElement('button');
-                saveBtn.className = 'edit-btn';
-                saveBtn.innerHTML = '✅';
-                saveBtn.title = 'Save Edit';
-                
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'edit-btn';
-                cancelBtn.innerHTML = '❌';
-                cancelBtn.title = 'Cancel Edit';
-
-                // Handle edit completion
-                const finishEdit = (save) => {
-                    if (save) {
-                        const newText = input.value.trim();
-                        if (newText && newText !== currentText) {
-                            performEditLocal(msgId, newText);
-                            sendSecurePacket({ type: 'edit', msgId: msgId, newText: newText });
-                        }
-                    }
-                    textNode.style.display = ''; // Restore standard text display
-                    editContainer.remove();      // Clean up input
-                };
-
-                // Attach events
-                saveBtn.onclick = () => finishEdit(true);
-                cancelBtn.onclick = () => finishEdit(false);
-                input.onkeydown = (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        finishEdit(true);
-                    }
-                    if (e.key === 'Escape') finishEdit(false);
-                };
-
-                // Append everything
-                editContainer.appendChild(input);
-                editContainer.appendChild(saveBtn);
-                editContainer.appendChild(cancelBtn);
-                
-                // Insert directly inside the bubble, exactly where the text was
-                textNode.parentNode.insertBefore(editContainer, textNode.nextSibling);
-                input.focus();
-                
-                // Move cursor to the end of the input field naturally
-                input.selectionStart = input.selectionEnd = input.value.length;
-            }
-            else if (action === 'react') {
-                performReactLocal(msgId, extraVal, true);
-                sendSecurePacket({ type: 'react', msgId: msgId, reaction: extraVal });
-            }
-        }
-
-        function performUnsendLocal(msgId) {
-            const el = document.getElementById(msgId);
-            if(el) el.remove();
-        }
-
-        function performEditLocal(msgId, newText) {
-            const el = document.getElementById(msgId);
-            if(el) {
-                const txtNode = el.querySelector('.msg-text');
-                const tagNode = el.querySelector('.edited-tag');
-                if(txtNode) txtNode.innerText = newText;
-                if(tagNode) tagNode.innerText = "(edited)";
-            }
-        }
-
-        function performReactLocal(msgId, reaction, isMine = true) {
-            const el = document.getElementById(msgId);
-            if(el) {
-                const rxnNode = el.querySelector('.msg-reactions');
-                if(rxnNode) {
-                    let spanClass = isMine ? 'rxn-mine' : 'rxn-peer';
-                    let span = rxnNode.querySelector('.' + spanClass);
-                    
-                    if (!span) {
-                        span = document.createElement('span');
-                        span.className = spanClass;
-                        rxnNode.appendChild(span);
-                    }
-                    span.innerText = reaction;
-                    rxnNode.classList.add('active');
-                }
-            }
-        }
-
-        // INTERACTIVITY
-        function autoResizeTextarea(el) {
-            el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
-        }
-
-        async function broadcastTyping(stop = false) {
-            if (stop) { 
-                sendSecurePacket({ type: 'typing', active: false });
-                clearTimeout(typeTick); typeTick = null; 
-                return; 
-            }
-            if (!typeTick) sendSecurePacket({ type: 'typing', active: true });
-            
-            clearTimeout(typeTick);
-            typeTick = setTimeout(async () => { 
-                sendSecurePacket({ type: 'typing', active: false });
-                typeTick = null; 
-            }, 2500);
-        }
-
-        function handleKeySubmit(e) { 
-            // Allow Shift+Enter for new lines, Enter to send
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                transmitText(); 
-            }
-        }
-        
-        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropHint').classList.remove('hidden'); }
-        function handleDragLeave() { document.getElementById('dropHint').classList.add('hidden'); }
-        function handleDrop(e) { 
-            e.preventDefault(); handleDragLeave(); 
-            const files = e.dataTransfer.files; 
-            if (files.length > 0 && files[0].type.startsWith('image/')) {
-                const r = new FileReader();
-                r.onload = event => {
-                    pendingImageBase64 = event.target.result;
-                    showImagePreviewModal();
-                };
-                r.readAsDataURL(files[0]);
-            }
-        }
-
-        // FINAL DESTRUCTION
-        function finalizeDisconnect(msg) {
-            cleanupCall();
-            remotePeerId = null;
-            if (nodeConn) { nodeConn.close(); nodeConn = null; } 
-            if (nodePeer) { nodePeer.destroy(); nodePeer = null; }
-            clearInterval(lifeTick);
-            clearInterval(dcTimer);
-            
-            document.getElementById('disconnectOverlay').style.display = 'none';
-            document.getElementById('chatView').style.display = 'none';
-            
-            document.getElementById('setupView').style.display = 'flex';
-            document.getElementById('scrollContainer').innerHTML = '';
-            resetSetupView();
-            
-            if (msg) showFeedback(msg, 'error');
-        }
-
-        // SYSTEM MESSAGE RENDERER
-        function renderSystemMessage(msg, ts, type = 'danger') {
+        function renderSystemMessage(msg, ts) {
             const list = document.getElementById('scrollContainer');
             const alertBox = document.createElement('div'); 
             alertBox.className = `system-alert`;
-            
-            if (type === 'info') {
-                alertBox.style.color = 'var(--text-primary)';
-                alertBox.style.borderColor = 'var(--border-color)';
-            }
-            
-            if (msg.startsWith('📞')) {
-                alertBox.innerText = `${msg} (${ts})`;
-            } else {
-                alertBox.innerText = `⚠️ ${msg} (${ts})`;
-            }
-            
+            alertBox.innerText = `⚠️ ${msg} (${ts})`;
             list.appendChild(alertBox); 
             list.scrollTop = list.scrollHeight;
         }
 
-        // SCREENSHOT SHORTCUT DETECTION ENGINE
-        function triggerScreenshotAlert(customLogMsg = null, customPeerMsg = null) {
-            if (nodeConn?.open) {
-                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                sendSecurePacket({ type: 'screenshot', ts: now, customMsg: customPeerMsg });
-                renderSystemMessage(customLogMsg || `You took a screenshot.`, now);
+        function autoResizeTextarea(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+        async function broadcastTyping(stop = false) {
+            if (settings.typingPrivacy) return;
+            if (stop) { sendSecurePacket({ type: 'typing', active: false }); clearTimeout(typeTick); typeTick = null; return; }
+            if (!typeTick) sendSecurePacket({ type: 'typing', active: true });
+            clearTimeout(typeTick);
+            typeTick = setTimeout(() => { sendSecurePacket({ type: 'typing', active: false }); typeTick = null; }, 2500);
+        }
+
+        function handleKeySubmit(e) { 
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                if (settings.sendOnEnter) {
+                    e.preventDefault(); 
+                    transmitText(); 
+                }
             }
         }
 
-        // Detect PrintScreen key (Windows/Linux)
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'PrintScreen') triggerScreenshotAlert();
+        // --- CN EYE TRACKING LOGIC ---
+        document.addEventListener('mousemove', (e) => {
+            const fab = document.getElementById('aiFab');
+            
+            // Only calculate if the button exists and is visible
+            if (!fab || fab.classList.contains('ai-fab-hidden') || fab.style.display === 'none') return;
+            
+            const pupils = document.querySelectorAll('.cn-pupil');
+            
+            pupils.forEach(pupil => {
+                const eye = pupil.parentElement;
+                const rect = eye.getBoundingClientRect();
+                
+                // Calculate the exact center of the eye
+                const x = rect.left + (rect.width / 2);
+                const y = rect.top + (rect.height / 2);
+                
+                // Calculate angle from the eye to the mouse cursor
+                const rad = Math.atan2(e.clientY - y, e.clientX - x);
+                
+                // Calculate distance to smoothly limit movement when cursor is close
+                const dist = Math.hypot(e.clientX - x, e.clientY - y);
+                const distanceFactor = Math.min(dist / 200, 1); // 200px is max eye-reach
+                
+                // Define maximum X/Y distance the pupil can travel inside the sclera
+                const maxX = (rect.width - pupil.offsetWidth) / 2 - 1;
+                const maxY = (rect.height - pupil.offsetHeight) / 2 - 1;
+                
+                // Apply movement calculations
+                const moveX = Math.cos(rad) * maxX * distanceFactor;
+                const moveY = Math.sin(rad) * maxY * distanceFactor;
+                
+                pupil.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
         });
-
-        // Detect Cmd+Shift+3/4/5 (Mac) and Win+Shift+S (Windows Snipping Tool)
-        window.addEventListener('keydown', (e) => {
-            if (e.metaKey && e.shiftKey && ['3', '4', '5', 's', 'S'].includes(e.key)) {
-                triggerScreenshotAlert();
-            }
-        });
-
-        // MOBILE & TABLET HEURISTIC: Focus Interruption
-        let blurTimestamp = 0;
-        window.addEventListener('blur', () => { blurTimestamp = Date.now(); });
-        
-        window.addEventListener('focus', () => {
-            if (blurTimestamp > 0) {
-                const timeAway = Date.now() - blurTimestamp;
-                if (timeAway < 1500) {
-                    triggerScreenshotAlert();
-                }
-                blurTimestamp = 0;
-            }
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden' && nodeConn?.open) {
-                triggerScreenshotAlert('You put the app in the background.', 'put the app in the background.');
-            }
-        });
-        
-        // Initialize AI chat history on startup
-        window.onload = loadAIHistory;
 
     </script>
 </body>
