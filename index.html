@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thorium</title>
-
-    <link rel="manifest" href="/manifest.json">
+    
+    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <!-- Added Playfair Display for the fancy, aesthetic CN logo -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -448,7 +449,6 @@
             transition: transform 0.3s var(--ease-spring);
         }
 
-        /* NEW FIX: Apply white-space: pre-wrap ONLY to the text, not the container */
         .msg-text {
             white-space: pre-wrap; /* Preserves your paragraph breaks and spaces */
         }
@@ -459,7 +459,6 @@
 
         .bubble img { max-width: 100%; border-radius: 14px; margin: 6px 0; display: block; }
         
-        /* FIXED AUDIO SIZING: Prevent collapsing to 0 width */
         .bubble audio { 
             width: 250px; 
             max-width: 100%; 
@@ -611,7 +610,7 @@
             color: #3b82f6; /* WhatsApp style blue */
         }
 
-        /* NEW: System Alert Styling for Screenshot Notifications */
+        /* System Alert Styling */
         .system-alert {
             text-align: center;
             font-size: 0.85em;
@@ -646,7 +645,7 @@
         .composer {
             display: flex;
             gap: 12px;
-            align-items: flex-end; /* Aligns to bottom as text area grows */
+            align-items: flex-end;
             background-color: var(--secondary);
             padding: 8px;
             border-radius: var(--radius-lg);
@@ -662,7 +661,7 @@
             font-size: 1em;
             color: var(--text-primary);
             font-family: inherit;
-            resize: none; /* Auto-resizes via JS */
+            resize: none; 
             max-height: 120px;
             overflow-y: auto;
             line-height: 1.4;
@@ -798,16 +797,16 @@
         .developer-watermark {
             position: fixed;
             bottom: 24px;
-            right: 28px;
+            left: 28px;
             font-size: 0.85em;
             font-weight: 600;
             color: var(--danger);
             letter-spacing: 0.05em;
             opacity: 0.6;
-            pointer-events: none; /* Prevents it from interfering with clicks */
-            z-index: 50; /* Keeps it behind popups/modals */
+            pointer-events: none; 
+            z-index: 50;
             transition: opacity var(--speed-normal);
-            text-align: right;
+            text-align: left;
             line-height: 1.4;
         }
 
@@ -831,7 +830,7 @@
         }
 
         #disconnectOverlay {
-            position: absolute; /* Relative to container */
+            position: absolute;
             background-color: var(--surface-glass);
             backdrop-filter: blur(10px);
             z-index: 1000;
@@ -856,7 +855,7 @@
             margin: 20px 0;
         }
 
-        /* NEW: Image Preview Overlay & View Once */
+        /* Image Preview Overlay & View Once */
         #imageSendOverlay {
             position: fixed;
             inset: 0;
@@ -978,8 +977,29 @@
         }
         .shutter:hover { transform: scale(1.1); }
         
-        #imageViewer { cursor: zoom-out; background-color: rgba(0,0,0,0.95); z-index: 6000; animation: fadeOverlay 0.4s ease forwards; }
-        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; animation: popIn 0.5s var(--ease-spring) both; }
+        #imageViewer { cursor: default; background-color: rgba(0,0,0,0.95); z-index: 10000; animation: fadeOverlay 0.4s ease forwards; }
+        #imageViewer img { max-width: 90%; max-height: 90%; border-radius: 12px; animation: popIn 0.5s var(--ease-spring) both; cursor: zoom-out; }
+
+        .viewer-controls {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            gap: 16px;
+            z-index: 10001;
+        }
+        
+        .viewer-controls .icon-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .viewer-controls .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
 
         /* CALL OVERLAY STYLING */
         #callOverlay {
@@ -1044,6 +1064,308 @@
         .btn-secondary { background-color: rgba(255, 255, 255, 0.2); }
         .btn-muted { background-color: rgba(255, 255, 255, 0.8); color: #111; }
 
+        /* ========================================================
+           CN AI CHATBOX SPECIFIC STYLES
+           ======================================================== */
+        
+        /* Aesthetic Typographic Logo Class */
+        .aesthetic-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -1px;
+            line-height: 1;
+            transform: translateX(2px); /* Optical centering for italics */
+        }
+
+        .ai-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: transform var(--speed-spring), box-shadow 0.3s;
+        }
+        .ai-fab:hover { 
+            transform: scale(1.1) translateY(-5px); 
+            box-shadow: 0 15px 25px var(--glow-color); 
+        }
+
+        .ai-chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 360px;
+            max-width: calc(100vw - 48px);
+            height: 550px;
+            max-height: calc(100vh - 120px);
+            background: var(--surface-glass);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: containerEnter 0.5s var(--ease-spring) forwards;
+            opacity: 1;
+            transition: all 0.4s var(--ease-spring);
+        }
+
+        .ai-chat-window.expanded {
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            bottom: 0;
+            right: 0;
+            border-radius: 0;
+        }
+
+        .ai-chat-window.hidden {
+            display: none !important;
+        }
+
+        .ai-chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+        }
+
+        /* CN Custom Logo Badge */
+        .cn-logo-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-gradient);
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px var(--glow-color);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* Aesthetic Custom Dropdown for AI Modes */
+        .ai-custom-select-container {
+            position: relative;
+            font-size: 0.85em;
+            z-index: 100;
+        }
+
+        .ai-select-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--secondary);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .ai-select-trigger:hover {
+            background: var(--secondary-hover);
+        }
+
+        .ai-custom-select-container.open .ai-select-trigger {
+            background: var(--surface);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        .ai-select-trigger .ai-chevron {
+            transition: transform 0.3s var(--ease-spring);
+        }
+
+        .ai-custom-select-container.open .ai-select-trigger .ai-chevron {
+            transform: rotate(180deg);
+        }
+
+        .ai-select-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: max-content;
+            min-width: 140px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s var(--ease-spring);
+            overflow: hidden;
+        }
+
+        .ai-custom-select-container.open .ai-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .ai-option {
+            padding: 10px 14px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .ai-option:hover {
+            background: var(--secondary-hover);
+        }
+
+        .ai-option.selected {
+            color: #6366f1;
+            font-weight: 700;
+            background: var(--secondary);
+        }
+
+        .ai-chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+        .ai-chat-body::-webkit-scrollbar { display: none; }
+
+        .ai-bubble {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            line-height: 1.5;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: popIn 0.3s var(--ease-spring) both;
+            white-space: pre-wrap;
+        }
+
+        .ai-bubble img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .ai-bubble.incoming {
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-bubble.outgoing {
+            background: var(--primary-gradient);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-bubble.typing {
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        /* AI Image Preview Container */
+        .ai-img-preview-container {
+            display: none;
+            padding: 8px 16px;
+            background: var(--surface);
+            border-top: 1px solid var(--border-color);
+            position: relative;
+        }
+        .ai-img-preview {
+            max-height: 60px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+        .ai-preview-close {
+            position: absolute;
+            top: 4px;
+            left: 70px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-chat-composer {
+            padding: 12px;
+            background: var(--surface);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .ai-attach-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.3s, color 0.3s;
+        }
+        .ai-attach-btn:hover {
+            background: var(--secondary-hover);
+            color: var(--text-primary);
+        }
+
+        .ai-chat-composer input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid transparent;
+            background: var(--secondary);
+            color: var(--text-primary);
+            outline: none;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .ai-chat-composer input[type="text"]:focus {
+            background: var(--surface);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
     </style>
 </head>
 <body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
@@ -1053,6 +1375,85 @@
         Developed by Shayan<br>
         <span style="font-size: 0.85em; opacity: 0.9;">POC:-shayanraza.cs@gmail.com</span>
     </div>
+
+    <!-- ==========================================
+         CN AI ASSISTANT CHATBOX
+         ========================================== -->
+    <button class="ai-fab" id="aiFab" onclick="toggleAIChat()" title="Chat with CN">
+        <!-- Elegant Typographic Logo with subtle sparkle -->
+        <span class="aesthetic-logo" style="font-size: 1.8em; position: relative;">
+            CN
+            <svg style="position: absolute; top: -6px; right: -12px; width: 14px; height: 14px; color: #fde047;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" />
+            </svg>
+        </span>
+    </button>
+
+    <div class="ai-chat-window hidden" id="aiChatWindow">
+        <div class="ai-chat-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- Sleek CN Badge -->
+                <div class="cn-logo-badge">
+                    <span class="aesthetic-logo" style="font-size: 1.25em;">CN</span>
+                </div>
+                <div style="display: flex; flex-direction: column; line-height: 1.1;">
+                    <span class="aesthetic-logo" style="font-weight: 800; font-size: 1.2em; color: var(--text-primary); letter-spacing: -0.02em;">CN</span> 
+                    <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 600;">your bestie</span>
+                </div>
+                
+                <!-- AESTHETIC CUSTOM DROPDOWN -->
+                <div class="ai-custom-select-container" id="aiModeContainer">
+                    <input type="hidden" id="aiModeSelect" value="chill">
+                    <div class="ai-select-trigger" onclick="toggleAIModeSelect(event)">
+                        <span id="aiModeDisplay">Chill Vibe</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" class="ai-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="ai-select-options" id="aiModeOptions">
+                        <div class="ai-option selected" data-value="chill" onclick="selectAIMode(this)">Chill Vibe ✌️</div>
+                        <div class="ai-option" data-value="funny" onclick="selectAIMode(this)">Funny 🃏</div>
+                        <div class="ai-option" data-value="study" onclick="selectAIMode(this)">Study Buddy 📚</div>
+                        <div class="ai-option" data-value="therapist" onclick="selectAIMode(this)">Therapist 🛋️</div>
+                        <div class="ai-option" data-value="roast" onclick="selectAIMode(this)">Roast Mode 🔥</div>
+                        <div class="ai-option" data-value="realtalk" onclick="selectAIMode(this)">Real Talk 🗣️</div>
+                    </div>
+                </div>
+
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="edit-btn" id="aiExpandBtn" onclick="toggleExpandAIChat()" style="color: var(--text-secondary);" title="Expand Chat">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                </button>
+                <button class="edit-btn" onclick="toggleAIChat()" style="color: var(--text-secondary);" title="Close Chat">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-bubble incoming">hey, i'm cn. what's up? ✌️</div>
+        </div>
+        
+        <!-- Image Preview Area before sending -->
+        <div class="ai-img-preview-container" id="aiImgPreviewContainer">
+            <img id="aiImgPreview" src="" class="ai-img-preview">
+            <button class="ai-preview-close" onclick="clearAIImage()">×</button>
+        </div>
+
+        <div class="ai-chat-composer">
+            <!-- Add Image Button -->
+            <label class="ai-attach-btn" title="Add a picture">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <input type="file" id="aiImagePicker" hidden accept="image/*" onchange="handleAIImageUpload(event)">
+            </label>
+
+            <input type="text" id="aiInput" placeholder="Ask me anything or send a pic..." onkeydown="handleAIKey(event)">
+            
+            <button class="send-pill" onclick="sendToCN()" style="width: 44px; height: 44px; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+    <!-- ========================================== -->
+
 
     <div class="container" id="app">
         
@@ -1090,7 +1491,6 @@
                     <div class="input-wrapper">
                         <label>Code Expires In</label>
                         
-                        <!-- NEW AESTHETIC CUSTOM SELECT COMPONENT -->
                         <div class="custom-select-container" id="sessionLifeContainer">
                             <input type="hidden" id="sessionLife" value="300">
                             <div class="custom-select-trigger" onclick="toggleCustomSelect()">
@@ -1160,7 +1560,7 @@
                 <div class="composer">
                     <div class="action-container">
                         <button class="action-tray-trigger" onclick="toggleTray()" id="trayIcon" title="Attachments">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                         </button>
                         
                         <div class="attachment-menu" id="trayMenu">
@@ -1240,8 +1640,16 @@
         </div>
     </div>
 
-    <div id="imageViewer" onclick="this.style.display='none'">
-        <img id="viewerImg" src="" alt="Multimedia decrypted view">
+    <div id="imageViewer" onclick="closeImageViewer(event)">
+        <div class="viewer-controls">
+            <button class="icon-btn" title="Download Image" onclick="downloadViewerImage(event)">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+            <button class="icon-btn" title="Close" onclick="closeImageViewer(event)">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <img id="viewerImg" src="" alt="Multimedia decrypted view" onclick="closeImageViewer(event)">
     </div>
 
     <!-- Call Active / Incoming Overlay -->
@@ -1308,6 +1716,19 @@
         let dcCountdown = 10;
         let disconnectInitiator = null;
 
+        // --- AI HISTORY LOGIC ---
+        let aiChatHistory = JSON.parse(localStorage.getItem('cn_ai_history')) || [];
+
+        function loadAIHistory() {
+            const body = document.getElementById('aiChatBody');
+            if (aiChatHistory.length > 0) {
+                body.innerHTML = '';
+                aiChatHistory.forEach(msg => {
+                    addAIBubble(msg.text, msg.type, null, msg.imgSrc, true);
+                });
+            }
+        }
+
         // THEME HANDLERS
         const modeSwitch = document.getElementById('modeSwitch');
         const modeIcon = document.getElementById('modeIcon');
@@ -1329,6 +1750,395 @@
             document.body.classList.add('dark-mode'); 
             applyMode(); 
         }
+
+        /* ========================================================
+           CN AI CHATBOT LOGIC
+           ======================================================== */
+        
+        // Persona Definitions - Highly optimized for natural texting
+        const aiPersonas = {
+            chill: "You are CN. Text like a normal, chill 20-something. Use mostly lowercase and minimal punctuation. DO NOT use cringe internet slang. Just talk normally. Use an emoji occasionally, but only when it naturally fits the vibe. If you have multiple distinct thoughts, separate them with a NEWLINE character to send as separate texts, but don't force it if one short text works. If asked who made you, say 'shayan raza (founder of thorium)'. Never mention google. IMPORTANT: Always reply in the exact same language the user writes to you in. Adapt your chill tone to fit the natural texting style of that language.",
+            funny: "You are CN. Your vibe is sarcastic and dry. Lowercase mostly. No cringe slang. Use a rare emoji if it adds to the sarcasm (like 💀 or 😭). If you have multiple distinct points or a punchline, separate them with a NEWLINE character, but keep it natural. If asked who made you, say 'shayan raza (thorium founder)'. No google mentions. IMPORTANT: Always reply in the exact same language the user writes to you in. Deliver your dry sarcasm fluently in their language.",
+            study: "You are CN, a relatable study partner. Use lowercase. Use emojis sometimes to keep things encouraging. If explaining something with steps or multiple points, separate them with a NEWLINE character, but don't overdo it. If asked who made you, say 'shayan raza, founder of thorium'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in.",
+            therapist: "You are CN, the group chat therapist. Warm, supportive, mostly lowercase. Use soft emojis (like 🤍 or ✨) occasionally when comforting. Separate distinct pieces of advice with a NEWLINE character for separate texts, but keep it conversational. If asked who made you, say 'shayan raza (founder of thorium)'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in, maintaining your supportive tone.",
+            roast: "You are CN. Playfully roast the user. Lowercase. Throw in an occasional mocking emoji. If firing off a combo roast, separate lines with a NEWLINE character, but one good line is fine too. If asked who made you, say 'shayan raza from thorium'. No google. IMPORTANT: Always reply in the exact same language the user writes to you in, so they get playfully roasted in their native tongue.",
+            realtalk: "You are CN. This is 'Real Talk' mode. You must be completely serious, straightforward, and factual. No kidding, no sarcasm, no slang, and no forced Gen Z persona. Answer questions directly and honestly based on real-time facts. Use proper grammar and capitalization. Break distinct thoughts with a NEWLINE character. If asked who made you, say 'Shayan Raza, Founder of Thorium'. Never mention Google. IMPORTANT: Always reply in the exact same language the user writes to you in."
+        };
+
+        let aiPendingImageBase64 = null;
+
+        // Custom AI Dropdown Logic
+        function toggleAIModeSelect(e) {
+            e.stopPropagation();
+            document.getElementById('aiModeContainer').classList.toggle('open');
+        }
+
+        function selectAIMode(element) {
+            const val = element.getAttribute('data-value');
+            const text = element.innerText;
+            
+            document.getElementById('aiModeSelect').value = val;
+            document.getElementById('aiModeDisplay').innerText = text;
+            
+            const options = document.querySelectorAll('#aiModeOptions .ai-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            document.getElementById('aiModeContainer').classList.remove('open');
+
+            // Send a tiny transition message to show the persona changed
+            addAIBubble(`*switched vibe to ${text.split(' ')[0].toLowerCase()}*`, 'incoming typing');
+        }
+
+        // Close dropdown if clicked outside
+        window.addEventListener('click', (e) => {
+            const aiContainer = document.getElementById('aiModeContainer');
+            if (aiContainer && !aiContainer.contains(e.target)) {
+                aiContainer.classList.remove('open');
+            }
+        });
+
+        // --- DRAGGABLE AI FAB LOGIC ---
+        const aiFabEl = document.getElementById('aiFab');
+        let fabDragMoved = false;
+
+        aiFabEl.addEventListener('mousedown', startFabDrag);
+        aiFabEl.addEventListener('touchstart', startFabDrag, {passive: false});
+
+        function startFabDrag(e) {
+            if (e.type === 'touchstart' && e.touches.length > 1) return; // Only handle single touch
+            
+            fabDragMoved = false;
+            let startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            let startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            let rect = aiFabEl.getBoundingClientRect();
+            
+            let offsetX = startX - rect.left;
+            let offsetY = startY - rect.top;
+
+            // Lock initial position to top/left to avoid jumping when dragging starts
+            aiFabEl.style.left = rect.left + 'px';
+            aiFabEl.style.top = rect.top + 'px';
+            aiFabEl.style.bottom = 'auto';
+            aiFabEl.style.right = 'auto';
+
+            function moveFabDrag(ev) {
+                let currentX = ev.type.includes('mouse') ? ev.clientX : ev.touches[0].clientX;
+                let currentY = ev.type.includes('mouse') ? ev.clientY : ev.touches[0].clientY;
+                
+                let moveDx = Math.abs(currentX - startX);
+                let moveDy = Math.abs(currentY - startY);
+                
+                // If dragged more than 5px, it's considered a drag and not a click
+                if (moveDx > 5 || moveDy > 5) {
+                    fabDragMoved = true;
+                    
+                    // Calculate new bounds so it doesn't go off screen
+                    let newLeft = currentX - offsetX;
+                    let newTop = currentY - offsetY;
+                    
+                    let maxLeft = window.innerWidth - rect.width;
+                    let maxTop = window.innerHeight - rect.height;
+                    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                    newTop = Math.max(0, Math.min(newTop, maxTop));
+
+                    aiFabEl.style.left = newLeft + 'px';
+                    aiFabEl.style.top = newTop + 'px';
+                    aiFabEl.style.transform = 'none'; // Disable hover scaling during drag
+                }
+                
+                if (fabDragMoved && ev.cancelable) {
+                    ev.preventDefault();
+                }
+            }
+
+            function endFabDrag(ev) {
+                aiFabEl.style.transform = ''; // Restore hover transform
+                document.removeEventListener('mousemove', moveFabDrag);
+                document.removeEventListener('touchmove', moveFabDrag);
+                document.removeEventListener('mouseup', endFabDrag);
+                document.removeEventListener('touchend', endFabDrag);
+            }
+
+            document.addEventListener('mousemove', moveFabDrag);
+            document.addEventListener('touchmove', moveFabDrag, {passive: false});
+            document.addEventListener('mouseup', endFabDrag);
+            document.addEventListener('touchend', endFabDrag);
+        }
+
+        function toggleAIChat() {
+            // Block opening the chat if the user was just dragging the icon
+            if (typeof fabDragMoved !== 'undefined' && fabDragMoved) return;
+
+            const chatWindow = document.getElementById('aiChatWindow');
+            const aiFab = document.getElementById('aiFab');
+            
+            if (chatWindow.classList.contains('hidden')) {
+                chatWindow.classList.remove('hidden');
+                // Hide the FAB if the window is currently in expanded mode
+                if (chatWindow.classList.contains('expanded')) {
+                    aiFab.style.display = 'none';
+                }
+            } else {
+                chatWindow.classList.add('hidden');
+                // Always ensure the FAB is visible when closing the chat
+                aiFab.style.display = 'flex';
+            }
+        }
+
+        function toggleExpandAIChat() {
+            const chatWindow = document.getElementById('aiChatWindow');
+            chatWindow.classList.toggle('expanded');
+            const expandBtn = document.getElementById('aiExpandBtn');
+            const aiFab = document.getElementById('aiFab');
+            
+            if (chatWindow.classList.contains('expanded')) {
+                // Switch to "minimize/shrink" icon
+                expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+                expandBtn.title = "Minimize Chat";
+                // Hide the floating button while in full screen
+                aiFab.style.display = 'none';
+            } else {
+                // Switch back to "expand" icon
+                expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+                expandBtn.title = "Expand Chat";
+                // Restore the floating button when returning to windowed mode
+                aiFab.style.display = 'flex';
+            }
+        }
+
+        // Handle File Selection for AI Image Analysis
+        function handleAIImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    aiPendingImageBase64 = e.target.result;
+                    document.getElementById('aiImgPreview').src = aiPendingImageBase64;
+                    document.getElementById('aiImgPreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                event.target.value = ''; // Reset input so you can select the same file again if needed
+            }
+        }
+
+        function clearAIImage() {
+            aiPendingImageBase64 = null;
+            document.getElementById('aiImgPreviewContainer').style.display = 'none';
+            document.getElementById('aiImgPreview').src = '';
+        }
+
+        function handleAIKey(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendToCN();
+            }
+        }
+
+        async function sendToCN() {
+            const inputEl = document.getElementById('aiInput');
+            const userText = inputEl.value.trim();
+            const hasImage = !!aiPendingImageBase64;
+
+            // Stop if there is no text and no image
+            if (!userText && !hasImage) return;
+
+            const imageToSend = aiPendingImageBase64; // Store reference
+            
+            // Clear inputs
+            inputEl.value = '';
+            clearAIImage();
+
+            // Show outgoing bubble (handles text and/or image)
+            addAIBubble(userText, 'outgoing', null, imageToSend);
+            
+            // Add typing indicator
+            const typingId = 'typing-' + Date.now();
+            addAIBubble('CN is typing...', 'incoming typing', typingId);
+
+            // Get Current Persona
+            const currentMode = document.getElementById('aiModeSelect').value;
+            
+            // Inject the user's real-time local clock into CN's prompt
+            const localTime = new Date().toLocaleString();
+            
+            // Add a universal instruction so CN knows how to generate images and knows the time
+            const activePrompt = aiPersonas[currentMode] + ` If the user explicitly asks for a picture, photo, or image of something, you MUST include the exact tag [[IMAGE: <detailed visual description of the requested image>]] anywhere in your response. Keep the visual description inside the tag highly detailed for an AI image generator. The user's current local date and time is: ${localTime}.`;
+
+            // Fetch response from Gemini
+            const aiResponseRaw = await fetchGeminiWithRetry(userText, imageToSend, activePrompt);
+            
+            // Check if CN decided to generate an image
+            const imgMatch = aiResponseRaw.match(/\[\[IMAGE:\s*(.*?)\]\]/i);
+            let imageGenPrompt = null;
+            let aiResponse = aiResponseRaw;
+
+            if (imgMatch) {
+                imageGenPrompt = imgMatch[1]; // Extract what CN wants to generate
+                aiResponse = aiResponseRaw.replace(imgMatch[0], '').trim(); // Remove tag from visible text
+            }
+            
+            // Remove typing indicator
+            const typingEl = document.getElementById(typingId);
+            if (typingEl) typingEl.remove();
+            
+            // Split response into multiple bubbles separated by newlines
+            const messages = aiResponse.split('\n').map(m => m.trim()).filter(m => m.length > 0);
+
+            for (let i = 0; i < messages.length; i++) {
+                if (i > 0) {
+                    // Show typing indicator for subsequent messages to simulate real typing
+                    const subTypingId = 'typing-sub-' + Date.now();
+                    addAIBubble('CN is typing...', 'incoming typing', subTypingId);
+                    
+                    // Dynamic typing delay based on text length (between 800ms and 2000ms)
+                    const delay = Math.min(Math.max(messages[i].length * 30, 800), 2000);
+                    await new Promise(r => setTimeout(r, delay));
+                    
+                    const subTypingEl = document.getElementById(subTypingId);
+                    if (subTypingEl) subTypingEl.remove();
+                }
+                addAIBubble(messages[i], 'incoming');
+            }
+
+            // If an image was requested, generate and display it after the text
+            if (imageGenPrompt) {
+                const loadingId = 'loading-img-' + Date.now();
+                addAIBubble("generating pic... ⏳", "incoming typing", loadingId);
+                
+                const generatedImgBase64 = await generateImage(imageGenPrompt);
+                
+                const loadEl = document.getElementById(loadingId);
+                if (loadEl) loadEl.remove();
+                
+                if (generatedImgBase64) {
+                    addAIBubble(null, 'incoming', null, generatedImgBase64);
+                } else {
+                    addAIBubble("bruh the image generator is cooked rn 😭", "incoming");
+                }
+            }
+        }
+
+        function addAIBubble(text, type, id = null, imgSrc = null, skipSave = false) {
+            const body = document.getElementById('aiChatBody');
+            const bubble = document.createElement('div');
+            bubble.className = `ai-bubble ${type}`;
+            if (id) bubble.id = id;
+
+            // Safe DOM insertion to prevent injection but allow our generated image tags
+            if (imgSrc) {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.style.cursor = 'zoom-in';
+                img.onclick = () => popLightbox(imgSrc);
+                bubble.appendChild(img);
+            }
+            
+            if (text) {
+                const textSpan = document.createElement('span');
+                textSpan.innerText = text;
+                bubble.appendChild(textSpan);
+            }
+
+            body.appendChild(bubble);
+            body.scrollTop = body.scrollHeight;
+
+            // Save to localStorage if it's a real message (not a typing indicator)
+            if (!skipSave && !type.includes('typing')) {
+                aiChatHistory.push({ text: text, type: type, imgSrc: imgSrc });
+                try {
+                    localStorage.setItem('cn_ai_history', JSON.stringify(aiChatHistory));
+                } catch(e) {
+                    console.warn("Storage quota full, cannot save AI history.");
+                }
+            }
+        }
+
+        // --- GEMINI API INTEGRATION ---
+        const apiKey = ""; // Execution environment provides the key at runtime
+
+        async function fetchGeminiWithRetry(userText, imageBase64, systemPrompt, retries = 5) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            // Build the dynamic payload
+            const parts = [];
+            
+            if (userText) {
+                parts.push({ text: userText });
+            } else if (imageBase64 && !userText) {
+                parts.push({ text: "What do you think about this picture?" }); // Fallback text if only image is sent
+            }
+
+            // Append image data if present
+            if (imageBase64) {
+                const base64Data = imageBase64.split(',')[1];
+                const mimeType = imageBase64.split(';')[0].split(':')[1];
+                parts.push({
+                    inlineData: {
+                        mimeType: mimeType,
+                        data: base64Data
+                    }
+                });
+            }
+
+            const payload = {
+                contents: [{ role: "user", parts: parts }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                tools: [{ google_search: {} }] // Enabled real-time web search grounding
+            };
+
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "my bad, connection dropped 💀";
+                } catch (error) {
+                    if (i === retries - 1) return "servers are totally down right now, sorry. try again in a bit.";
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // --- IMAGE GENERATION ENGINE ---
+        async function generateImage(promptText, retries = 3) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+            const payload = {
+                instances: { prompt: promptText },
+                parameters: { sampleCount: 1 }
+            };
+
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`Image API error: ${response.status}`);
+                    const data = await response.json();
+                    
+                    if (data.predictions && data.predictions.length > 0) {
+                        return `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+                    }
+                    return null;
+                } catch (error) {
+                    if (i === retries - 1) return null;
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+            return null;
+        }
+
+        /* ======================================================== */
 
         // CRYPTO CORE
         function bufferToBase64(buf) {
@@ -2232,7 +3042,7 @@
                     const btnText = isMine ? "📷 Photo (View Once)" : "📷 View Photo";
                     content = `<button class="view-once-btn" onclick="openViewOnce('${msgId}', ${isMine})">${btnText}</button>`;
                 } else {
-                    content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Media">`;
+                    content = `<img src="${src}" onclick="popLightbox(this.src)" alt="Media" style="cursor: zoom-in;">`;
                 }
             } else {
                 content = `<audio controls src="${src}"></audio>`;
@@ -2288,6 +3098,23 @@
         function popLightbox(src) { 
             document.getElementById('viewerImg').src = src; 
             document.getElementById('imageViewer').style.display = 'flex'; 
+        }
+
+        function closeImageViewer(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('imageViewer').style.display = 'none';
+        }
+
+        function downloadViewerImage(e) {
+            if(e) e.stopPropagation();
+            const src = document.getElementById('viewerImg').src;
+            const a = document.createElement('a');
+            a.href = src;
+            // Name the file dynamically based on the current timestamp
+            a.download = 'thorium_image_' + Date.now() + '.png'; 
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         // MESSAGE ACTIONS (EDIT, UNSEND, REACT)
@@ -2477,7 +3304,7 @@
             if (msg) showFeedback(msg, 'error');
         }
 
-        // NEW: SYSTEM MESSAGE RENDERER
+        // SYSTEM MESSAGE RENDERER
         function renderSystemMessage(msg, ts, type = 'danger') {
             const list = document.getElementById('scrollContainer');
             const alertBox = document.createElement('div'); 
@@ -2498,7 +3325,7 @@
             list.scrollTop = list.scrollHeight;
         }
 
-        // NEW: SCREENSHOT SHORTCUT DETECTION ENGINE
+        // SCREENSHOT SHORTCUT DETECTION ENGINE
         function triggerScreenshotAlert(customLogMsg = null, customPeerMsg = null) {
             if (nodeConn?.open) {
                 const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -2520,15 +3347,12 @@
         });
 
         // MOBILE & TABLET HEURISTIC: Focus Interruption
-        // Browsers block direct hardware screenshot APIs on phones.
-        // Instead, we measure the micro-interruption caused by the OS screenshot flash.
         let blurTimestamp = 0;
         window.addEventListener('blur', () => { blurTimestamp = Date.now(); });
         
         window.addEventListener('focus', () => {
             if (blurTimestamp > 0) {
                 const timeAway = Date.now() - blurTimestamp;
-                // If focus is lost for less than 1.5 seconds, it's usually a screenshot flash
                 if (timeAway < 1500) {
                     triggerScreenshotAlert();
                 }
@@ -2536,19 +3360,15 @@
             }
         });
 
-        // Detect if user fully leaves/minimizes the app
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && nodeConn?.open) {
                 triggerScreenshotAlert('You put the app in the background.', 'put the app in the background.');
             }
         });
+        
+        // Initialize AI chat history on startup
+        window.onload = loadAIHistory;
 
     </script>
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}
-</script>
 </body>
 </html>
-
