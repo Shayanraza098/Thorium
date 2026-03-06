@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thorium</title>
+    <title>Thorium Secure</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Added Playfair Display for the fancy, aesthetic CN logo -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Code+Pro:wght@600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
@@ -58,21 +57,20 @@
             --speed-slow: 0.6s;
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth bouncy spring */
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* DARK MODE - NOW TRUE BLACK */
         body.dark-mode {
-            --background-start: #000000;
-            --background-end: #000000;
-            --surface: #111111;
-            --surface-glass: rgba(15, 15, 15, 0.85);
-            --secondary: #222222;
-            --secondary-hover: #333333;
+            --background-start: #050505;
+            --background-end: #0a0a0a;
+            --surface: #121212;
+            --surface-glass: rgba(18, 18, 18, 0.85);
+            --secondary: #1e1e1e;
+            --secondary-hover: #2a2a2a;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --glow-color: rgba(168, 85, 247, 0.2);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --glow-color: rgba(168, 85, 247, 0.15);
+            --border-color: rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -98,6 +96,45 @@
             letter-spacing: -0.01em;
         }
 
+        /* APP INITIALIZATION LOADER */
+        .app-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--background-start);
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s var(--ease-out-expo), visibility 0.5s;
+        }
+        
+        .app-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--secondary);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-text {
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
         .container {
             background-color: var(--surface-glass);
             backdrop-filter: blur(25px);
@@ -107,7 +144,7 @@
             max-width: 640px;
             width: 100%;
             height: 90vh;
-            display: flex;
+            display: none; /* Hidden until auth resolves */
             flex-direction: column;
             border: 1px solid var(--border-color);
             animation: containerEnter 0.8s var(--ease-spring) forwards;
@@ -181,6 +218,39 @@
             color: var(--text-secondary);
             font-size: 0.95em;
             font-weight: 500;
+        }
+        
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .user-email {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--secondary);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .logout-btn {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--danger);
+            background: transparent;
+            border: 1px solid var(--danger);
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .logout-btn:hover {
+            background: var(--danger);
+            color: white;
         }
 
         /* CONTENT WRAPPER */
@@ -773,9 +843,49 @@
             color: var(--waiting-text);
             animation: pulseFade 2s infinite ease-in-out;
         }
-        @keyframes pulseFade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        
+        /* PROFESSIONAL TOAST NOTIFICATIONS */
+        #toastContainer {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        
+        .ux-toast {
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary-color, #6366f1);
+            font-size: 0.9em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastEnter 0.4s var(--ease-spring) forwards;
+            pointer-events: auto;
+        }
+        
+        .ux-toast.error { border-left-color: var(--danger); }
+        .ux-toast.success { border-left-color: var(--success); }
+        
+        .ux-toast.fade-out {
+            animation: toastExit 0.3s var(--ease-in-out) forwards;
+        }
+
+        @keyframes toastEnter {
+            from { opacity: 0; transform: translateX(100%) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        
+        @keyframes toastExit {
+            to { opacity: 0; transform: translateX(100%) scale(0.9); }
         }
 
         .code-well {
@@ -789,6 +899,82 @@
             text-align: center;
             margin: 20px 0;
             border: 1px solid var(--border-color);
+        }
+
+        /* PROFESSIONAL AUTH SCREEN */
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            display: none; /* Hidden by default, controlled by JS */
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            z-index: 90000;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background-color: var(--surface-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px 32px;
+            border: 1px solid var(--border-color);
+            animation: containerEnter 0.6s var(--ease-spring) forwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--secondary);
+            border-radius: var(--radius-md);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--speed-fast);
+            font-size: 0.9em;
+        }
+
+        .auth-tab.active {
+            background: var(--surface);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .auth-header svg {
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .auth-header h2 {
+            font-size: 1.8em;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+        
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 4px;
         }
 
         .hidden { display: none !important; }
@@ -1068,17 +1254,15 @@
            CN AI CHATBOX SPECIFIC STYLES
            ======================================================== */
         
-        /* Aesthetic Typographic Logo Class */
         .aesthetic-logo {
             font-family: 'Playfair Display', serif;
             font-weight: 700;
             font-style: italic;
             letter-spacing: -1px;
             line-height: 1;
-            transform: translateX(2px); /* Optical centering for italics */
+            transform: translateX(2px);
         }
 
-        /* Added ambient glowing orbs behind AI Window for Gen-Z vibes */
         .ai-chat-window::before {
             content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
             background: rgba(168, 85, 247, 0.2); filter: blur(40px); border-radius: 50%; z-index: -1; pointer-events: none;
@@ -1165,7 +1349,6 @@
             background: var(--surface);
         }
 
-        /* CN Custom Logo Badge */
         .cn-logo-badge {
             display: flex;
             align-items: center;
@@ -1180,7 +1363,6 @@
             position: relative;
         }
 
-        /* Aesthetic Custom Dropdown for AI Modes */
         .ai-custom-select-container {
             position: relative;
             font-size: 0.85em;
@@ -1386,115 +1568,6 @@
             box-shadow: 0 0 0 3px var(--glow-color);
         }
 
-        /* --------------------------------------------------------
-           ADDED: AI SETTINGS MENU & PRIVACY OVERLAY STYLES
-           -------------------------------------------------------- */
-        
-        .ai-chat-header-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .ai-settings-overlay {
-            position: absolute; 
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 10000; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: flex-end; 
-            opacity: 0; 
-            pointer-events: none;
-            transition: all 0.4s var(--ease-spring);
-        }
-
-        .ai-settings-overlay.open { 
-            opacity: 1; 
-            pointer-events: all; 
-        }
-
-        .ai-settings-content {
-            background: var(--surface); 
-            border-top-left-radius: var(--radius-xl); 
-            border-top-right-radius: var(--radius-xl);
-            padding: 24px; 
-            transform: translateY(100%); 
-            transition: transform 0.4s var(--ease-spring);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-            border-top: 1px solid var(--glow-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .ai-settings-overlay.open .ai-settings-content { 
-            transform: translateY(0); 
-        }
-
-        .ai-settings-content h3 {
-            margin-bottom: 12px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-
-        /* Toggle Switches */
-        .toggle-switch { 
-            position: relative; 
-            display: inline-block; 
-            width: 44px; 
-            height: 24px; 
-            flex-shrink: 0;
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        
-        .slider { 
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
-            background-color: var(--secondary-hover); transition: .4s; border-radius: 24px; 
-        }
-        .slider:before { 
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; 
-            background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-        }
-        
-        input:checked + .slider { background: var(--primary-gradient); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        
-        .setting-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 0; border-bottom: 1px solid var(--border-color); 
-            font-weight: 600; font-size: 0.9em; 
-        }
-        
-        .setting-row input[type="password"] { 
-            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); 
-            background: var(--secondary); color: var(--text-primary); width: 150px; outline: none; transition: all 0.3s;
-        }
-        .setting-row input[type="password"]:focus {
-            border-color: #6366f1; background: var(--surface); box-shadow: 0 0 0 3px var(--glow-color);
-        }
-
-        /* Privacy Blur Overlay */
-        body.privacy-blur #app, 
-        body.privacy-blur .ai-chat-window, 
-        body.privacy-blur .ai-fab { 
-            filter: blur(20px) grayscale(50%); 
-            transition: filter 0.2s; 
-            pointer-events: none;
-        }
-        
-        body.privacy-blur::after { 
-            content: "📸 SCREENSHOT PREVENTION ACTIVE 🚫\n\nReturn to app to view contents."; 
-            white-space: pre-wrap;
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 1.2em; font-weight: 800; color: var(--danger); 
-            z-index: 100000; text-align: center; background: var(--surface); 
-            padding: 24px 32px; border-radius: var(--radius-lg); 
-            box-shadow: var(--shadow-lg); animation: popIn 0.4s var(--ease-spring); 
-            border: 2px solid var(--danger);
-        }
-
     </style>
 </head>
 <body ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
@@ -1504,12 +1577,54 @@
         Developed by Shayan<br>
         <span style="font-size: 0.85em; opacity: 0.9;">POC:-shayanraza.cs@gmail.com</span>
     </div>
+    
+    <!-- INITIALIZATION LOADER -->
+    <div id="appLoader" class="app-loader">
+        <div class="spinner"></div>
+        <p class="loader-text">Verifying Secure Session...</p>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer"></div>
+
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-card">
+            <div class="auth-header">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                    <path d="M6 10h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2v3l-3-3H6a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z" />
+                    <circle cx="8.5" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                    <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                    <circle cx="15.5" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                </svg>
+                <h2>Thorium</h2>
+                <p>Secure, End-to-End Encrypted Chat</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="setAuthMode('login')">Sign In</button>
+                <button class="auth-tab" id="tabSignup" onclick="setAuthMode('signup')">Create Account</button>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                <div class="input-wrapper">
+                    <label>Email Address</label>
+                    <input type="email" id="authEmail" required placeholder="you@example.com">
+                </div>
+                <div class="input-wrapper">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••" minlength="6">
+                </div>
+                <button type="submit" class="action-trigger" id="authSubmitBtn" style="margin-top: 12px;">Sign In</button>
+            </form>
+        </div>
+    </div>
 
     <!-- ==========================================
          CN AI ASSISTANT CHATBOX
          ========================================== -->
     <button class="ai-fab" id="aiFab" onclick="toggleAIChat()" title="Chat with CN">
-        <!-- Elegant Typographic Logo with subtle sparkle -->
         <span class="aesthetic-logo" style="font-size: 1.8em; position: relative;">
             CN
             <svg style="position: absolute; top: -6px; right: -12px; width: 14px; height: 14px; color: #fde047;" viewBox="0 0 24 24" fill="currentColor">
@@ -1521,7 +1636,6 @@
     <div class="ai-chat-window hidden" id="aiChatWindow">
         <div class="ai-chat-header">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <!-- Sleek CN Badge -->
                 <div class="cn-logo-badge">
                     <span class="aesthetic-logo" style="font-size: 1.25em;">CN</span>
                 </div>
@@ -1530,7 +1644,6 @@
                     <span style="font-size: 0.75em; color: var(--text-secondary); font-weight: 600;">your bestie</span>
                 </div>
                 
-                <!-- AESTHETIC CUSTOM DROPDOWN -->
                 <div class="ai-custom-select-container" id="aiModeContainer">
                     <input type="hidden" id="aiModeSelect" value="chill">
                     <div class="ai-select-trigger" onclick="toggleAIModeSelect(event)">
@@ -1550,11 +1663,6 @@
             </div>
             
             <div class="ai-chat-header-actions">
-                <!-- ADDED SETTINGS HAMBURGER -->
-                <button class="edit-btn" onclick="toggleAISettings()" style="color: var(--text-secondary);" title="Settings">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-
                 <button class="edit-btn" id="aiExpandBtn" onclick="toggleExpandAIChat()" style="color: var(--text-secondary);" title="Expand Chat">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
                 </button>
@@ -1568,14 +1676,12 @@
             <div class="ai-bubble incoming">hey, i'm cn. what's up? ✌️</div>
         </div>
         
-        <!-- Image Preview Area before sending -->
         <div class="ai-img-preview-container" id="aiImgPreviewContainer">
             <img id="aiImgPreview" src="" class="ai-img-preview">
             <button class="ai-preview-close" onclick="clearAIImage()">×</button>
         </div>
 
         <div class="ai-chat-composer">
-            <!-- Add Image Button -->
             <label class="ai-attach-btn" title="Add a picture">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                 <input type="file" id="aiImagePicker" hidden accept="image/*" onchange="handleAIImageUpload(event)">
@@ -1586,39 +1692,6 @@
             <button class="send-pill" onclick="sendToCN()" style="width: 44px; height: 44px; flex-shrink: 0;">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
-        </div>
-
-        <!-- ADDED AI SETTINGS OVERLAY -->
-        <div class="ai-settings-overlay" id="aiSettingsMenu">
-            <div class="ai-settings-content">
-                <h3>Settings ✨</h3>
-                
-                <!-- API Key -->
-                <div class="setting-row">
-                    <span>API Key <span style="font-size:0.7em; opacity:0.7; display:block;">(Needs key for real answers)</span></span>
-                    <input type="password" id="customApiKey" placeholder="AIzaSy..." onchange="saveAISettings()">
-                </div>
-                
-                <!-- Screenshot Prevention -->
-                <div class="setting-row">
-                    <span>Anti-Screenshot 📸🚫</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="preventScreenshots" onchange="saveAISettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <!-- Incognito Mode -->
-                <div class="setting-row">
-                    <span>Incognito Vibe 👻</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="incognitoMode" onchange="saveAISettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button class="action-trigger outline" style="margin-top:15px; padding: 10px;" onclick="toggleAISettings()">Done</button>
-            </div>
         </div>
     </div>
     <!-- ========================================== -->
@@ -1642,12 +1715,14 @@
                 </svg>
                 <h1>Thorium</h1>
             </div>
-            <p>End to End Encrypted</p>
+            <div class="user-controls">
+                <span id="userEmail" class="user-email"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
         </header>
-
+        
         <main class="content">
             
-            <!-- Setup Screen -->
             <section class="setup-screen fade-in" id="setupView">
                 <h2 class="screen-title">Start Chat</h2>
                 
@@ -1702,14 +1777,10 @@
                         <button class="action-trigger outline" onclick="resetSetupView()">Back</button>
                     </div>
                 </div>
-                
-                <div id="uxFeedback"></div>
             </section>
 
-            <!-- Active Chat Screen -->
             <section class="chat-screen fade-in" id="chatView">
                 
-                <!-- NEW CALL BAR -->
                 <div class="chat-top-bar">
                     <div class="connection-status" id="linkSuccess"></div>
                     <div class="call-buttons">
@@ -1749,7 +1820,6 @@
                         </div>
                     </div>
                     
-                    <!-- REPLACED INPUT WITH AUTO-EXPANDING TEXTAREA -->
                     <textarea id="userInput" placeholder="Type a message..." rows="1" onkeydown="handleKeySubmit(event)" oninput="autoResizeTextarea(this); broadcastTyping()"></textarea>
                     
                     <button class="send-pill" onclick="transmitText()">
@@ -1759,7 +1829,6 @@
                 
                 <button class="action-trigger outline" style="margin-top: 16px; font-size: 0.8em; padding: 10px;" onclick="requestDisconnect()">Disconnect</button>
 
-                <!-- Disconnect Undo Modal inside Chat -->
                 <div id="disconnectOverlay">
                     <div class="dc-modal-content">
                         <h2 class="screen-title" style="margin-bottom: 10px;">Chat Closing</h2>
@@ -1785,7 +1854,6 @@
         </div>
     </div>
 
-    <!-- Image Preview & Send Configuration -->
     <div id="imageSendOverlay">
         <div class="preview-card">
             <h3 class="screen-title" style="margin-bottom: 0; font-size: 1.2em;">Send Photo</h3>
@@ -1821,7 +1889,6 @@
         <img id="viewerImg" src="" alt="Multimedia decrypted view" onclick="closeImageViewer(event)">
     </div>
 
-    <!-- Call Active / Incoming Overlay -->
     <div id="callOverlay">
         <div class="call-info">
             <h2 id="callStatusText">Incoming Call...</h2>
@@ -1830,20 +1897,19 @@
         </div>
         
         <div class="call-video-container" id="videoWrapper" style="display:none;">
-            <!-- Remote stream handles audio playback as well as video -->
             <video id="remoteVideoNode" autoplay playsinline></video>
             <video id="localVideoNode" autoplay playsinline muted></video>
         </div>
         
-        <div class="call-controls" id="callControls">
-            <!-- Dynamically populated via JS depending on call state -->
-        </div>
+        <div class="call-controls" id="callControls"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
     
     <script>
-        // GLOBAL STATE
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
         let nodePeer = null;        
         let nodeConn = null;        
         let localAlias = '';        
@@ -1852,7 +1918,6 @@
         let cipherKey = null;        
         let typeTick = null;        
         let lifeTick = null;        
-        let killLoop = null;        
         
         // Peer Calling State
         let remotePeerId = null;
@@ -1885,65 +1950,36 @@
         let dcCountdown = 10;
         let disconnectInitiator = null;
 
-        // --- AI HISTORY & NEW SETTINGS LOGIC ---
-        let aiChatHistory = JSON.parse(localStorage.getItem('cn_ai_history')) || [];
-        
-        // Settings State
-        let screenshotPreventionEnabled = false;
-        let aiIncognitoMode = false;
-
-        function loadSettings() {
-            const saved = JSON.parse(localStorage.getItem('cn_settings')) || {};
+        // ==========================================
+        // PROFESSIONAL TOAST NOTIFICATION SYSTEM
+        // ==========================================
+        function showFeedback(txt, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `ux-toast ${type}`;
             
-            if(saved.customApiKey) {
-                document.getElementById('customApiKey').value = saved.customApiKey;
-            }
-            if(saved.preventScreenshots) {
-                document.getElementById('preventScreenshots').checked = true;
-                screenshotPreventionEnabled = true;
-            }
-            if(saved.incognitoMode) {
-                document.getElementById('incognitoMode').checked = true;
-                aiIncognitoMode = true;
-            }
-        }
-
-        function saveAISettings() {
-            const apiKeyVal = document.getElementById('customApiKey').value.trim();
-            screenshotPreventionEnabled = document.getElementById('preventScreenshots').checked;
-            aiIncognitoMode = document.getElementById('incognitoMode').checked;
-
-            localStorage.setItem('cn_settings', JSON.stringify({
-                customApiKey: apiKeyVal,
-                preventScreenshots: screenshotPreventionEnabled,
-                incognitoMode: aiIncognitoMode
-            }));
-            
-            if(screenshotPreventionEnabled) {
-                // Apply blur immediately if they switch tabs right after saving
-                document.body.classList.toggle('privacy-blur', document.hidden || !document.hasFocus());
+            // Icon based on type
+            let iconSvg = '';
+            if (type === 'error') {
+                iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
             } else {
-                document.body.classList.remove('privacy-blur');
+                iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
             }
+
+            toast.innerHTML = `${iconSvg} <span>${txt}</span>`;
+            container.appendChild(toast);
+
+            // Auto dismiss mechanism
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 4000);
         }
 
-        function toggleAISettings() {
-            document.getElementById('aiSettingsMenu').classList.toggle('open');
-        }
 
-        function loadAIHistory() {
-            loadSettings(); // Load user settings first
-            
-            const body = document.getElementById('aiChatBody');
-            if (aiChatHistory.length > 0 && !aiIncognitoMode) {
-                body.innerHTML = '';
-                aiChatHistory.forEach(msg => {
-                    addAIBubble(msg.text, msg.type, null, msg.imgSrc, true);
-                });
-            }
-        }
-
+        // ==========================================
         // THEME HANDLERS
+        // ==========================================
         const modeSwitch = document.getElementById('modeSwitch');
         const modeIcon = document.getElementById('modeIcon');
         const SUN = "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z";
@@ -1965,11 +2001,21 @@
             applyMode(); 
         }
 
-        /* ========================================================
-           CN AI CHATBOT LOGIC
-           ======================================================== */
-        
-        // Persona Definitions - Highly optimized for natural texting
+        // ==========================================
+        // CN AI CHATBOT LOGIC
+        // ==========================================
+        let aiChatHistory = JSON.parse(localStorage.getItem('cn_ai_history')) || [];
+
+        function loadAIHistory() {
+            const body = document.getElementById('aiChatBody');
+            if (aiChatHistory.length > 0) {
+                body.innerHTML = '';
+                aiChatHistory.forEach(msg => {
+                    addAIBubble(msg.text, msg.type, null, msg.imgSrc, true);
+                });
+            }
+        }
+
         const aiPersonas = {
             chill: "You are CN. Text like a normal, chill 20-something. Use mostly lowercase and minimal punctuation. DO NOT use cringe internet slang. Just talk normally. Use an emoji occasionally, but only when it naturally fits the vibe. If you have multiple distinct thoughts, separate them with a NEWLINE character to send as separate texts, but don't force it if one short text works. If asked who made you, say 'shayan raza (founder of thorium)'. Never mention google. IMPORTANT: Always reply in the exact same language the user writes to you in. Adapt your chill tone to fit the natural texting style of that language.",
             funny: "You are CN. Your vibe is sarcastic and dry. Lowercase mostly. No cringe slang. Use a rare emoji if it adds to the sarcasm (like 💀 or 😭). If you have multiple distinct points or a punchline, separate them with a NEWLINE character, but keep it natural. If asked who made you, say 'shayan raza (thorium founder)'. No google mentions. IMPORTANT: Always reply in the exact same language the user writes to you in. Deliver your dry sarcasm fluently in their language.",
@@ -1981,7 +2027,6 @@
 
         let aiPendingImageBase64 = null;
 
-        // Custom AI Dropdown Logic
         function toggleAIModeSelect(e) {
             e.stopPropagation();
             document.getElementById('aiModeContainer').classList.toggle('open');
@@ -2000,11 +2045,9 @@
             
             document.getElementById('aiModeContainer').classList.remove('open');
 
-            // Send a tiny transition message to show the persona changed
             addAIBubble(`*switched vibe to ${text.split(' ')[0].toLowerCase()}*`, 'incoming typing');
         }
 
-        // Close dropdown if clicked outside
         window.addEventListener('click', (e) => {
             const aiContainer = document.getElementById('aiModeContainer');
             if (aiContainer && !aiContainer.contains(e.target)) {
@@ -2020,7 +2063,7 @@
         aiFabEl.addEventListener('touchstart', startFabDrag, {passive: false});
 
         function startFabDrag(e) {
-            if (e.type === 'touchstart' && e.touches.length > 1) return; // Only handle single touch
+            if (e.type === 'touchstart' && e.touches.length > 1) return;
             
             fabDragMoved = false;
             let startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
@@ -2030,7 +2073,6 @@
             let offsetX = startX - rect.left;
             let offsetY = startY - rect.top;
 
-            // Lock initial position to top/left to avoid jumping when dragging starts
             aiFabEl.style.left = rect.left + 'px';
             aiFabEl.style.top = rect.top + 'px';
             aiFabEl.style.bottom = 'auto';
@@ -2043,11 +2085,8 @@
                 let moveDx = Math.abs(currentX - startX);
                 let moveDy = Math.abs(currentY - startY);
                 
-                // If dragged more than 5px, it's considered a drag and not a click
                 if (moveDx > 5 || moveDy > 5) {
                     fabDragMoved = true;
-                    
-                    // Calculate new bounds so it doesn't go off screen
                     let newLeft = currentX - offsetX;
                     let newTop = currentY - offsetY;
                     
@@ -2058,16 +2097,13 @@
 
                     aiFabEl.style.left = newLeft + 'px';
                     aiFabEl.style.top = newTop + 'px';
-                    aiFabEl.style.transform = 'none'; // Disable hover scaling during drag
+                    aiFabEl.style.transform = 'none';
                 }
-                
-                if (fabDragMoved && ev.cancelable) {
-                    ev.preventDefault();
-                }
+                if (fabDragMoved && ev.cancelable) ev.preventDefault();
             }
 
             function endFabDrag(ev) {
-                aiFabEl.style.transform = ''; // Restore hover transform
+                aiFabEl.style.transform = ''; 
                 document.removeEventListener('mousemove', moveFabDrag);
                 document.removeEventListener('touchmove', moveFabDrag);
                 document.removeEventListener('mouseup', endFabDrag);
@@ -2081,7 +2117,6 @@
         }
 
         function toggleAIChat() {
-            // Block opening the chat if the user was just dragging the icon
             if (typeof fabDragMoved !== 'undefined' && fabDragMoved) return;
 
             const chatWindow = document.getElementById('aiChatWindow');
@@ -2089,13 +2124,11 @@
             
             if (chatWindow.classList.contains('hidden')) {
                 chatWindow.classList.remove('hidden');
-                // Hide the FAB if the window is currently in expanded mode
                 if (chatWindow.classList.contains('expanded')) {
                     aiFab.style.display = 'none';
                 }
             } else {
                 chatWindow.classList.add('hidden');
-                // Always ensure the FAB is visible when closing the chat
                 aiFab.style.display = 'flex';
             }
         }
@@ -2107,21 +2140,16 @@
             const aiFab = document.getElementById('aiFab');
             
             if (chatWindow.classList.contains('expanded')) {
-                // Switch to "minimize/shrink" icon
                 expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
                 expandBtn.title = "Minimize Chat";
-                // Hide the floating button while in full screen
                 aiFab.style.display = 'none';
             } else {
-                // Switch back to "expand" icon
                 expandBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
                 expandBtn.title = "Expand Chat";
-                // Restore the floating button when returning to windowed mode
                 aiFab.style.display = 'flex';
             }
         }
 
-        // Handle File Selection for AI Image Analysis
         function handleAIImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
@@ -2132,7 +2160,7 @@
                     document.getElementById('aiImgPreviewContainer').style.display = 'block';
                 };
                 reader.readAsDataURL(file);
-                event.target.value = ''; // Reset input so you can select the same file again if needed
+                event.target.value = '';
             }
         }
 
@@ -2154,58 +2182,43 @@
             const userText = inputEl.value.trim();
             const hasImage = !!aiPendingImageBase64;
 
-            // Stop if there is no text and no image
             if (!userText && !hasImage) return;
 
-            const imageToSend = aiPendingImageBase64; // Store reference
-            
-            // Clear inputs
+            const imageToSend = aiPendingImageBase64;
             inputEl.value = '';
             clearAIImage();
 
-            // Show outgoing bubble (handles text and/or image)
             addAIBubble(userText, 'outgoing', null, imageToSend);
             
-            // Add typing indicator
             const typingId = 'typing-' + Date.now();
             addAIBubble('CN is typing...', 'incoming typing', typingId);
 
-            // Get Current Persona
             const currentMode = document.getElementById('aiModeSelect').value;
-            
-            // Inject the user's real-time local clock into CN's prompt
             const localTime = new Date().toLocaleString();
             
-            // Add a universal instruction so CN knows how to generate images and knows the time
             const activePrompt = aiPersonas[currentMode] + ` If the user explicitly asks for a picture, photo, or image of something, you MUST include the exact tag [[IMAGE: <detailed visual description of the requested image>]] anywhere in your response. Keep the visual description inside the tag highly detailed for an AI image generator. The user's current local date and time is: ${localTime}.`;
 
-            // Fetch response from Gemini
             const aiResponseRaw = await fetchGeminiWithRetry(userText, imageToSend, activePrompt);
             
-            // Check if CN decided to generate an image
             const imgMatch = aiResponseRaw.match(/\[\[IMAGE:\s*(.*?)\]\]/i);
             let imageGenPrompt = null;
             let aiResponse = aiResponseRaw;
 
             if (imgMatch) {
-                imageGenPrompt = imgMatch[1]; // Extract what CN wants to generate
-                aiResponse = aiResponseRaw.replace(imgMatch[0], '').trim(); // Remove tag from visible text
+                imageGenPrompt = imgMatch[1];
+                aiResponse = aiResponseRaw.replace(imgMatch[0], '').trim();
             }
             
-            // Remove typing indicator
             const typingEl = document.getElementById(typingId);
             if (typingEl) typingEl.remove();
             
-            // Split response into multiple bubbles separated by newlines
             const messages = aiResponse.split('\n').map(m => m.trim()).filter(m => m.length > 0);
 
             for (let i = 0; i < messages.length; i++) {
                 if (i > 0) {
-                    // Show typing indicator for subsequent messages to simulate real typing
                     const subTypingId = 'typing-sub-' + Date.now();
                     addAIBubble('CN is typing...', 'incoming typing', subTypingId);
                     
-                    // Dynamic typing delay based on text length (between 800ms and 2000ms)
                     const delay = Math.min(Math.max(messages[i].length * 30, 800), 2000);
                     await new Promise(r => setTimeout(r, delay));
                     
@@ -2215,7 +2228,6 @@
                 addAIBubble(messages[i], 'incoming');
             }
 
-            // If an image was requested, generate and display it after the text
             if (imageGenPrompt) {
                 const loadingId = 'loading-img-' + Date.now();
                 addAIBubble("generating pic... ⏳", "incoming typing", loadingId);
@@ -2239,7 +2251,6 @@
             bubble.className = `ai-bubble ${type}`;
             if (id) bubble.id = id;
 
-            // Safe DOM insertion to prevent injection but allow our generated image tags
             if (imgSrc) {
                 const img = document.createElement('img');
                 img.src = imgSrc;
@@ -2257,8 +2268,7 @@
             body.appendChild(bubble);
             body.scrollTop = body.scrollHeight;
 
-            // Save to localStorage if it's a real message (not a typing indicator) AND NOT INCOGNITO
-            if (!skipSave && !type.includes('typing') && !aiIncognitoMode) {
+            if (!skipSave && !type.includes('typing')) {
                 aiChatHistory.push({ text: text, type: type, imgSrc: imgSrc });
                 try {
                     localStorage.setItem('cn_ai_history', JSON.stringify(aiChatHistory));
@@ -2268,68 +2278,66 @@
             }
         }
 
-        // --- GEMINI API INTEGRATION ---
-        // Defaults to empty for environment injection, but allows user custom key via Settings
-        const defaultApiKey = ""; 
+        // --- GEMINI API ENGINE WITH TIMEOUT ABORT CONTROLLER ---
+        const defaultApiKey = "AIzaSyBV3KHhoX1kL7D4J_SBZZ32bcnyGVg5P0s"; 
 
         async function fetchGeminiWithRetry(userText, imageBase64, systemPrompt, retries = 5) {
-            const userKey = document.getElementById('customApiKey')?.value;
-            const finalKey = userKey ? userKey : defaultApiKey;
+            const finalKey = defaultApiKey;
+            // Changed from the internal preview model to the standard public model so your key works
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${finalKey}`;
             
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${finalKey}`;
-            
-            // Build the dynamic payload
             const parts = [];
-            
             if (userText) {
                 parts.push({ text: userText });
             } else if (imageBase64 && !userText) {
-                parts.push({ text: "What do you think about this picture?" }); // Fallback text if only image is sent
+                parts.push({ text: "What do you think about this picture?" });
             }
 
-            // Append image data if present
             if (imageBase64) {
                 const base64Data = imageBase64.split(',')[1];
                 const mimeType = imageBase64.split(';')[0].split(':')[1];
                 parts.push({
-                    inlineData: {
-                        mimeType: mimeType,
-                        data: base64Data
-                    }
+                    inlineData: { mimeType: mimeType, data: base64Data }
                 });
             }
 
             const payload = {
                 contents: [{ role: "user", parts: parts }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                tools: [{ google_search: {} }] // Enabled real-time web search grounding
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+                // Removed Google Search grounding as it requires a specific tier that standard keys might not have
             };
 
             let delay = 1000;
             for (let i = 0; i < retries; i++) {
+                // AbortController to prevent hanging API requests
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 sec timeout per retry
+                
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
+                    
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
                     return data.candidates?.[0]?.content?.parts?.[0]?.text || "my bad, connection dropped 💀";
                 } catch (error) {
-                    if (i === retries - 1) return "servers are totally down right now, sorry. try again in a bit. (Hint: Make sure your API Key is set in the ☰ Settings!)";
+                    clearTimeout(timeoutId);
+                    console.error("Gemini API Error:", error);
+                    if (i === retries - 1) return "servers are totally down right now, sorry. try again in a bit.";
                     await new Promise(res => setTimeout(res, delay));
                     delay *= 2;
                 }
             }
         }
 
-        // --- IMAGE GENERATION ENGINE ---
         async function generateImage(promptText, retries = 3) {
-            const userKey = document.getElementById('customApiKey')?.value;
-            const finalKey = userKey ? userKey : defaultApiKey;
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${finalKey}`;
+            const finalKey = defaultApiKey;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${finalKey}`;
             const payload = {
                 instances: { prompt: promptText },
                 parameters: { sampleCount: 1 }
@@ -2337,12 +2345,16 @@
 
             let delay = 1000;
             for (let i = 0; i < retries; i++) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000);
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
                     if (!response.ok) throw new Error(`Image API error: ${response.status}`);
                     const data = await response.json();
                     
@@ -2351,6 +2363,8 @@
                     }
                     return null;
                 } catch (error) {
+                    clearTimeout(timeoutId);
+                    console.error("Gemini Image API Error:", error);
                     if (i === retries - 1) return null;
                     await new Promise(res => setTimeout(res, delay));
                     delay *= 2;
@@ -2359,9 +2373,9 @@
             return null;
         }
 
-        /* ======================================================== */
-
+        // ==========================================
         // CRYPTO CORE
+        // ==========================================
         function bufferToBase64(buf) {
             let binary = '';
             const bytes = new Uint8Array(buf);
@@ -2383,9 +2397,14 @@
         }
 
         async function fetchNewKeys() { 
-            return await window.crypto.subtle.generateKey(
-                { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]
-            ); 
+            try {
+                return await window.crypto.subtle.generateKey(
+                    { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey"]
+                ); 
+            } catch(e) {
+                showFeedback("Cryptography error during key generation.", "error");
+                throw e;
+            }
         }
 
         async function synthesizeSharedKey(priv, pub) { 
@@ -2420,7 +2439,9 @@
             }
         }
 
-        // CUSTOM SELECT DROPDOWN LOGIC
+        // ==========================================
+        // UI INTERACTIONS & DROPDOWNS
+        // ==========================================
         function toggleCustomSelect() {
             document.getElementById('sessionLifeContainer').classList.toggle('open');
         }
@@ -2429,25 +2450,17 @@
             const val = element.getAttribute('data-value');
             const text = element.innerText;
             
-            // Update the hidden input that acts as our state holder
             document.getElementById('sessionLife').value = val;
-            
-            // Update the display text shown to the user
             document.getElementById('sessionLifeDisplay').innerText = text;
             
-            // Update the "selected" highlight class
             const options = document.querySelectorAll('#sessionLifeOptions .custom-option');
             options.forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
             
-            // Close dropdown
             document.getElementById('sessionLifeContainer').classList.remove('open');
-            
-            // Trigger the original manual life check function
             checkManualLife();
         }
 
-        // Close custom select dropdown if clicked outside of it
         window.addEventListener('click', (e) => {
             const container = document.getElementById('sessionLifeContainer');
             if (container && !container.contains(e.target)) {
@@ -2455,7 +2468,9 @@
             }
         });
 
-        // PEER CALLING LOGIC & TIMER
+        // ==========================================
+        // PEER CALLING LOGIC
+        // ==========================================
         function startCallTimer() {
             if (callTimerTick) return; 
             callSeconds = 0;
@@ -2485,7 +2500,6 @@
             document.getElementById('callTimer').style.display = 'none';
         }
 
-        // Advanced Call Controls
         function toggleMic() {
             isMicMuted = !isMicMuted;
             if (callLocalStream) {
@@ -2537,18 +2551,17 @@
             }
         }
 
-        // Generate high quality media constraints
         function getMediaConstraints(isVideo) {
             return {
                 audio: {
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
-                    sampleRate: 48000, // HD 48kHz Audio
+                    sampleRate: 48000, 
                     channelCount: 2
                 },
                 video: isVideo ? {
-                    width: { ideal: 1280 }, // 720p HD Video
+                    width: { ideal: 1280 },
                     height: { ideal: 720 },
                     frameRate: { ideal: 30 }
                 } : false
@@ -2667,22 +2680,33 @@
                 callSessionActive = false;
             }
 
+            // Robust stream cleanup
             if (callLocalStream) {
-                callLocalStream.getTracks().forEach(t => t.stop());
+                callLocalStream.getTracks().forEach(t => {
+                    t.stop();
+                });
                 callLocalStream = null;
             }
             
-            // Reset Call Config State
             isMicMuted = false;
             isCamOff = false;
             isDeafened = false;
             
             activeCall = null;
             stopCallTimer();
-            document.getElementById('remoteVideoNode').muted = false;
+            
+            // Clean DOM element bindings
+            const remoteVid = document.getElementById('remoteVideoNode');
+            const localVid = document.getElementById('localVideoNode');
+            if(remoteVid) {
+                remoteVid.muted = false;
+                remoteVid.srcObject = null;
+            }
+            if(localVid) {
+                localVid.srcObject = null;
+            }
+            
             document.getElementById('callOverlay').style.display = 'none';
-            document.getElementById('remoteVideoNode').srcObject = null;
-            document.getElementById('localVideoNode').srcObject = null;
         }
 
         function showCallOverlay(status, isIncoming, isVideo) {
@@ -2691,7 +2715,6 @@
             document.getElementById('callPeerName').innerText = remoteAlias;
             document.getElementById('videoWrapper').style.display = 'none';
             
-            // If making outgoing video call, show local preview instantly
             if (!isIncoming && isVideo) {
                 document.getElementById('videoWrapper').style.display = 'flex';
             }
@@ -2711,10 +2734,8 @@
                     </button>
                 `;
             } else if (state === 'outgoing' || state === 'active') {
-                
                 let activeHtml = '';
                 if (state === 'active') {
-                    // Mic Toggle
                     activeHtml += `
                         <button class="call-btn btn-secondary ${isMicMuted ? 'btn-muted' : ''}" id="micBtn" onclick="toggleMic()" title="Mute/Unmute Mic">
                             ${isMicMuted ? 
@@ -2723,7 +2744,6 @@
                         </button>
                     `;
                     
-                    // Video Toggle (only if it's a video call)
                     if (isVideo) {
                         activeHtml += `
                             <button class="call-btn btn-secondary ${isCamOff ? 'btn-muted' : ''}" id="camBtn" onclick="toggleCam()" title="Turn Camera On/Off">
@@ -2734,7 +2754,6 @@
                         `;
                     }
 
-                    // Deafen Toggle (Mute remote audio)
                     activeHtml += `
                         <button class="call-btn btn-secondary ${isDeafened ? 'btn-muted' : ''}" id="deafenBtn" onclick="toggleDeafen()" title="Mute/Unmute Remote Audio">
                             ${isDeafened ? 
@@ -2753,8 +2772,9 @@
             }
         }
 
-
+        // ==========================================
         // MULTIMEDIA ENGINE
+        // ==========================================
         function toggleTray() { 
             document.getElementById('trayMenu').classList.toggle('open'); 
         }
@@ -2774,7 +2794,7 @@
                 });
                 document.getElementById('videoPipe').srcObject = streamHandle;
                 document.getElementById('camOverlay').style.display = 'flex';
-            } catch (err) { alert("Camera access denied."); }
+            } catch (err) { showFeedback("Camera access denied.", 'error'); }
         }
 
         function haltCamera() {
@@ -2789,14 +2809,12 @@
             sheet.height = pipe.videoHeight;
             
             const ctx = sheet.getContext('2d');
-            // Flip the canvas context horizontally to match the mirrored video preview
             ctx.translate(sheet.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(pipe, 0, 0, sheet.width, sheet.height);
             
             pendingImageBase64 = sheet.toDataURL('image/jpeg', 0.9);
             haltCamera();
-            
             showImagePreviewModal();
         }
 
@@ -2809,7 +2827,7 @@
                     showImagePreviewModal();
                 };
                 scan.readAsDataURL(f);
-                e.target.value = ''; // Reset input
+                e.target.value = ''; 
             }
         }
 
@@ -2818,7 +2836,7 @@
             document.getElementById('viewOnceCheck').checked = false;
             document.getElementById('imageQualitySelect').value = 'standard';
             document.getElementById('imageSendOverlay').style.display = 'flex';
-            toggleTray(); // Close attachments menu
+            toggleTray(); 
         }
 
         function cancelSendImage() {
@@ -2839,7 +2857,6 @@
             });
         }
 
-        // Image Compression Engine
         function compressBase64(b64, isHD, callback) {
             const img = new Image();
             img.onload = () => {
@@ -2878,7 +2895,6 @@
                         }
                     });
                     
-                    // Fixed compatibility for multiple browsers (Safari/Chrome/Firefox)
                     let options = {};
                     if (MediaRecorder.isTypeSupported('audio/webm')) {
                         options = { mimeType: 'audio/webm' };
@@ -2897,16 +2913,15 @@
                         const conv = new FileReader();
                         conv.onload = async (e) => dispatchMediaPacket(e.target.result, 'voice');
                         
-                        // Ensure blob has exact mimeType so the browser creates a playable Data URI
                         const audioType = audioRecorder.mimeType || 'audio/webm';
                         conv.readAsDataURL(new Blob(pcmChunks, { type: audioType }));
                         sound.getTracks().forEach(track => track.stop());
                     };
                     
-                    audioRecorder.start(200); // 200ms slices ensure consistent chunking across devices
+                    audioRecorder.start(200); 
                     isCapturingAudio = true;
                     mic.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop Recording';
-                } catch (err) { alert("Microphone access denied."); }
+                } catch (err) { showFeedback("Microphone access denied.", 'error'); }
             } else {
                 audioRecorder.stop();
                 isCapturingAudio = false;
@@ -2915,9 +2930,10 @@
             }
         }
 
+        // ==========================================
         // SESSION ESTABLISHMENT
+        // ==========================================
         function checkManualLife() {
-            // Using the hidden input 'sessionLife' instead of the native select
             const val = document.getElementById('sessionLife').value;
             if (val === 'custom') document.getElementById('manualLifeBox').classList.remove('hidden');
             else document.getElementById('manualLifeBox').classList.add('hidden');
@@ -2928,12 +2944,6 @@
             if (!val) { showFeedback('Enter your name first', 'error'); return false; }
             localAlias = val; 
             return true;
-        }
-
-        function showFeedback(txt, type) {
-            const log = document.getElementById('uxFeedback');
-            log.innerHTML = `<div style="padding:12px; border-radius:12px; font-size:0.9em; margin-top:16px; background:${type==='error'?'#fee2e2':'#dcfce7'}; color:${type==='error'?'#991b1b':'#166534'};">${txt}</div>`;
-            setTimeout(() => { log.innerHTML = ''; }, 4500);
         }
 
         function copyIdentityID(btnElement) {
@@ -2949,7 +2959,6 @@
             if (!validateIdentity()) return;
             
             let secondsLeft = 300;
-            // Get value from hidden input instead of select element
             const lifeSel = document.getElementById('sessionLife').value;
             if (lifeSel === 'custom') {
                 const mins = parseInt(document.getElementById('manualMinutes').value);
@@ -2963,7 +2972,12 @@
             document.getElementById('joiningArea').classList.add('hidden');
             document.getElementById('hostOptions').classList.add('hidden');
             
-            nodeKeys = await fetchNewKeys();
+            try {
+                nodeKeys = await fetchNewKeys();
+            } catch(e) {
+                return showFeedback("Cryptography unsupported in this context.", "error");
+            }
+
             const fingerprint = Math.random().toString(36).substring(2, 8).toUpperCase();
             
             nodePeer = new Peer('thor-v4-' + fingerprint, { config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
@@ -2985,7 +2999,6 @@
             });
             
             nodePeer.on('connection', conn => { 
-                // SECURITY FIX: Prevent third person (Person C) from interrupting active chat
                 if (nodeConn) {
                     conn.on('open', () => {
                         conn.send({ type: 'chat_full' });
@@ -3005,7 +3018,12 @@
             const code = document.getElementById('targetID').value.trim().toUpperCase();
             if (!code) return showFeedback('Valid Code required.', 'error');
             
-            nodeKeys = await fetchNewKeys();
+            try {
+                nodeKeys = await fetchNewKeys();
+            } catch(e) {
+                return showFeedback("Cryptography unsupported in this context.", "error");
+            }
+
             nodePeer = new Peer({ config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] } });
             setupPeerCallListener();
 
@@ -3044,7 +3062,6 @@
             });
             
             nodeConn.on('data', async (incoming) => {
-                // Instantly disconnect if the room was locked by the host
                 if (incoming.type === 'chat_full') {
                     finalizeDisconnect('Chat room is already full. You cannot join.');
                     return;
@@ -3070,7 +3087,6 @@
             });
             
             nodeConn.on('close', () => {
-                // Instantly disconnected without clicking button (e.g. closing tab)
                 if (disconnectInitiator !== 'local') {
                     finalizeDisconnect(`${remoteAlias} disconnected. Would you like to rejoin?`);
                 } else {
@@ -3085,7 +3101,9 @@
             document.getElementById('linkSuccess').innerHTML = `Private chat secured with <strong>${remoteAlias}</strong>`;
         }
 
+        // ==========================================
         // DISCONNECT & UNDO LOGIC
+        // ==========================================
         function requestDisconnect() {
             disconnectInitiator = 'local';
             showDisconnectTimer();
@@ -3098,8 +3116,6 @@
             document.getElementById('dcTimerText').innerText = dcCountdown;
             
             const desc = document.getElementById('dcModalDesc');
-            
-            // Set text dynamically in the modal based on who initiated the disconnect
             if (disconnectInitiator === 'remote') {
                 desc.innerText = `${remoteAlias} disconnected. Would you like to rejoin?`;
             } else {
@@ -3111,7 +3127,6 @@
                 document.getElementById('dcTimerText').innerText = dcCountdown;
                 if (dcCountdown <= 0) {
                     clearInterval(dcTimer);
-                    // Pass the final message to be displayed as a toast on the home screen
                     let finalMsg = disconnectInitiator === 'remote' ? `${remoteAlias} disconnected. Would you like to rejoin?` : `You disconnected. Would you like to rejoin?`;
                     finalizeDisconnect(finalMsg);
                 }
@@ -3131,7 +3146,9 @@
             finalizeDisconnect(finalMsg);
         }
 
+        // ==========================================
         // DATA ROUTING & ACTIONS
+        // ==========================================
         function handleDataRouting(p) {
             if (p.type === 'txt') {
                 renderBubble(p.content, remoteAlias, 'incoming', p.ts, p.msgId);
@@ -3150,17 +3167,12 @@
                 tip.textContent = `${remoteAlias} is typing...`;
                 tip.className = p.active ? 'typing-indicator visible' : 'typing-indicator';
             }
-            // Message Actions
             else if (p.type === 'unsend') performUnsendLocal(p.msgId);
             else if (p.type === 'edit') performEditLocal(p.msgId, p.newText);
             else if (p.type === 'react') performReactLocal(p.msgId, p.reaction, false);
             else if (p.type === 'viewed_once') markViewedOnce(p.msgId);
             else if (p.type === 'msg_seen') markMessageSeen(p.msgId);
-            
-            // Call Actions
             else if (p.type === 'end_call' || p.type === 'reject_call') cleanupCall();
-
-            // Disconnect Actions
             else if (p.type === 'intent_disconnect') {
                 disconnectInitiator = 'remote';
                 showDisconnectTimer();
@@ -3170,13 +3182,11 @@
                 clearInterval(dcTimer);
                 document.getElementById('disconnectOverlay').style.display = 'none';
             }
-            // NEW: Screenshot Alerts
             else if (p.type === 'screenshot') {
                 renderSystemMessage(`${remoteAlias} ${p.customMsg || 'took a screenshot!'}`, p.ts);
             }
         }
 
-        // MESSAGE SENDING
         async function transmitText() {
             const bar = document.getElementById('userInput');
             const str = bar.value.trim();
@@ -3189,7 +3199,7 @@
             renderBubble(str, 'You', 'outgoing', now, msgId);
             
             bar.value = ''; 
-            bar.style.height = 'auto'; // Reset text area size
+            bar.style.height = 'auto';
             broadcastTyping(true);
         }
 
@@ -3200,7 +3210,9 @@
             renderMedia(data, 'You', 'outgoing', now, mediaType === 'img' ? 'image' : 'audio', msgId, isViewOnce);
         }
 
+        // ==========================================
         // RENDERING
+        // ==========================================
         function createActionsHtml(msgId, isMine) {
             const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '🎉'];
             const reactHtml = emojis.map(e => 
@@ -3297,7 +3309,6 @@
             popLightbox(viewOnceStore[msgId]);
             
             if (!isMine) {
-                // Remove data so it cannot be opened again
                 delete viewOnceStore[msgId];
                 markViewedOnce(msgId);
                 sendSecurePacket({ type: 'viewed_once', msgId: msgId });
@@ -3331,14 +3342,12 @@
             const src = document.getElementById('viewerImg').src;
             const a = document.createElement('a');
             a.href = src;
-            // Name the file dynamically based on the current timestamp
             a.download = 'thorium_image_' + Date.now() + '.png'; 
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        // MESSAGE ACTIONS (EDIT, UNSEND, REACT)
         function triggerAction(action, msgId, extraVal = null) {
             if (action === 'unsend') {
                 performUnsendLocal(msgId);
@@ -3349,14 +3358,11 @@
                 if (!wrap) return;
                 
                 const textNode = wrap.querySelector('.msg-text');
-                
-                // Prevent duplicate edit inputs or trying to edit non-text media
                 if (!textNode || wrap.querySelector('.edit-input-container')) return;
 
                 const currentText = textNode.innerText;
-                textNode.style.display = 'none'; // Hide current text temporarily
+                textNode.style.display = 'none';
 
-                // Create inline editing UI
                 const editContainer = document.createElement('div');
                 editContainer.className = 'edit-input-container';
                 
@@ -3365,7 +3371,6 @@
                 input.value = currentText;
                 input.rows = 1;
                 
-                // Auto-resize edit field
                 setTimeout(() => {
                     input.style.height = 'auto';
                     input.style.height = input.scrollHeight + 'px';
@@ -3386,7 +3391,6 @@
                 cancelBtn.innerHTML = '❌';
                 cancelBtn.title = 'Cancel Edit';
 
-                // Handle edit completion
                 const finishEdit = (save) => {
                     if (save) {
                         const newText = input.value.trim();
@@ -3395,11 +3399,10 @@
                             sendSecurePacket({ type: 'edit', msgId: msgId, newText: newText });
                         }
                     }
-                    textNode.style.display = ''; // Restore standard text display
-                    editContainer.remove();      // Clean up input
+                    textNode.style.display = ''; 
+                    editContainer.remove();      
                 };
 
-                // Attach events
                 saveBtn.onclick = () => finishEdit(true);
                 cancelBtn.onclick = () => finishEdit(false);
                 input.onkeydown = (e) => {
@@ -3410,16 +3413,12 @@
                     if (e.key === 'Escape') finishEdit(false);
                 };
 
-                // Append everything
                 editContainer.appendChild(input);
                 editContainer.appendChild(saveBtn);
                 editContainer.appendChild(cancelBtn);
                 
-                // Insert directly inside the bubble, exactly where the text was
                 textNode.parentNode.insertBefore(editContainer, textNode.nextSibling);
                 input.focus();
-                
-                // Move cursor to the end of the input field naturally
                 input.selectionStart = input.selectionEnd = input.value.length;
             }
             else if (action === 'react') {
@@ -3462,7 +3461,6 @@
             }
         }
 
-        // INTERACTIVITY
         function autoResizeTextarea(el) {
             el.style.height = 'auto';
             el.style.height = el.scrollHeight + 'px';
@@ -3484,7 +3482,6 @@
         }
 
         function handleKeySubmit(e) { 
-            // Allow Shift+Enter for new lines, Enter to send
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 transmitText(); 
@@ -3506,7 +3503,6 @@
             }
         }
 
-        // FINAL DESTRUCTION
         function finalizeDisconnect(msg) {
             cleanupCall();
             remotePeerId = null;
@@ -3525,7 +3521,6 @@
             if (msg) showFeedback(msg, 'error');
         }
 
-        // SYSTEM MESSAGE RENDERER
         function renderSystemMessage(msg, ts, type = 'danger') {
             const list = document.getElementById('scrollContainer');
             const alertBox = document.createElement('div'); 
@@ -3546,7 +3541,6 @@
             list.scrollTop = list.scrollHeight;
         }
 
-        // SCREENSHOT SHORTCUT DETECTION ENGINE
         function triggerScreenshotAlert(customLogMsg = null, customPeerMsg = null) {
             if (nodeConn?.open) {
                 const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -3555,32 +3549,22 @@
             }
         }
 
-        // Detect PrintScreen key (Windows/Linux)
         window.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen') triggerScreenshotAlert();
         });
 
-        // Detect Cmd+Shift+3/4/5 (Mac) and Win+Shift+S (Windows Snipping Tool)
         window.addEventListener('keydown', (e) => {
             if (e.metaKey && e.shiftKey && ['3', '4', '5', 's', 'S'].includes(e.key)) {
                 triggerScreenshotAlert();
             }
         });
 
-        // MOBILE & TABLET HEURISTIC: Focus Interruption
         let blurTimestamp = 0;
         window.addEventListener('blur', () => { 
             blurTimestamp = Date.now(); 
-            // NEW: Anti-Screenshot mechanism
-            if (screenshotPreventionEnabled) {
-                document.body.classList.add('privacy-blur');
-            }
         });
         
         window.addEventListener('focus', () => {
-            // NEW: Anti-Screenshot mechanism
-            document.body.classList.remove('privacy-blur');
-
             if (blurTimestamp > 0) {
                 const timeAway = Date.now() - blurTimestamp;
                 if (timeAway < 1500) {
@@ -3596,9 +3580,113 @@
             }
         });
         
-        // Initialize AI chat history and settings on startup
         window.onload = loadAIHistory;
-
     </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCvTGrx6vVWuaQvwxDQgpMyD_n6GSusRR0",
+          authDomain: "thoriumchat-83f83.firebaseapp.com",
+          projectId: "thoriumchat-83f83",
+          storageBucket: "thoriumchat-83f83.firebasestorage.app",
+          messagingSenderId: "148049096078",
+          appId: "1:148049096078:web:c7b67d726af6c154cf08df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- Auth UI State Management ---
+        let currentAuthMode = 'login';
+
+        window.setAuthMode = function(mode) {
+            currentAuthMode = mode;
+            document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+            document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'Sign In' : 'Create Account';
+        };
+
+        window.handleAuthSubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authSubmitBtn');
+            
+            // Set loading state
+            const originalText = btn.innerText;
+            btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;border-top-color:#fff;"></div>';
+            btn.disabled = true;
+
+            try {
+                if (currentAuthMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    showFeedback("Authentication successful", "success");
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                    showFeedback("Account created successfully", "success");
+                }
+            } catch (error) {
+                // Format Firebase errors professionally
+                let errorMsg = error.message.replace('Firebase: ', '').split(' (auth/')[0];
+                if(error.code === 'auth/invalid-credential') errorMsg = "Invalid email or password.";
+                if(error.code === 'auth/email-already-in-use') errorMsg = "An account with this email already exists.";
+                showFeedback(errorMsg, "error");
+                
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // App Initialization Flow
+        onAuthStateChanged(auth, (user) => {
+            const loader = document.getElementById('appLoader');
+            const mainApp = document.getElementById('app');
+            const authScreen = document.getElementById('authScreen');
+            const aiFab = document.getElementById('aiFab');
+            
+            // Fade out initialization loader
+            if (loader) {
+                loader.classList.add('hidden');
+                setTimeout(() => loader.style.display = 'none', 500); 
+            }
+
+            if(!user){
+                // UNREGISTERED STATE: Show Auth Screen, Hide App
+                if(mainApp) mainApp.style.display = 'none';
+                if(aiFab) aiFab.style.display = 'none';
+                if(authScreen) authScreen.style.display = 'flex';
+                
+                // Reset auth button state in case they just logged out
+                const btn = document.getElementById('authSubmitBtn');
+                btn.disabled = false;
+                btn.innerText = currentAuthMode === 'login' ? 'Sign In' : 'Create Account';
+                document.getElementById('authPassword').value = '';
+            } else {
+                // AUTHENTICATED STATE: Hide Auth Screen, Show App
+                if(authScreen) authScreen.style.display = 'none';
+                if(mainApp) mainApp.style.display = 'flex';
+                if(aiFab) aiFab.style.display = 'flex';
+                
+                const emailEl = document.getElementById("userEmail");
+                if (emailEl) emailEl.innerText = user.email;
+            }
+        });
+
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+              signOut(auth).then(() => {
+                showFeedback("Logged out securely.", "success");
+              }).catch((error) => {
+                showFeedback("Error logging out.", "error");
+              });
+            });
+        }
+    </script>
+
 </body>
 </html>
